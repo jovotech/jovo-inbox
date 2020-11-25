@@ -1,0 +1,13 @@
+{
+  "name": "jovo-inbox",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "postinstall": "npm run setup",
+    "setup": "npm run setup:app & npm run setup:frontend",
+    "setup:api": "cd api && npm i && cd ..",
+    "setup:frontend": "cd frontend && npm i && cd .."
+  },
+  "author": "jovotech",
+  "license": "Apache-2.0"
+}
