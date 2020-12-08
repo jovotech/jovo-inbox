@@ -1,14 +1,12 @@
 import { App } from 'jovo-framework';
 import { Alexa } from 'jovo-platform-alexa';
 import { JovoDebugger } from 'jovo-plugin-debugger';
-import { DynamoDb } from 'jovo-db-dynamodb';
+// import { DynamoDb } from 'jovo-db-dynamodb';
 import { FileDb } from 'jovo-db-filedb';
 import { GoogleAssistant } from 'jovo-platform-googleassistant';
 import * as dotenv from 'dotenv';
 import { resolve } from 'path';
-import {JovoInboxPlugin} from "./framework/JovoInbox";
-import _merge = require('lodash.merge');
-
+import { JovoInboxPlugin } from './framework/JovoInbox';
 dotenv.config({
   path: resolve(__dirname, '../../.env'),
 });
@@ -22,34 +20,27 @@ app.use(
   new Alexa(),
   new GoogleAssistant(),
   new JovoDebugger(),
-  new DynamoDb({
-    awsConfig: {
-      credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY_ID as string,
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY as string
-      },
-      region: process.env.AWS_REGION as string
+  new FileDb(),
+  // new DynamoDb({
+  //   awsConfig: {
+  //     credentials: {
+  //       accessKeyId: process.env.AWS_ACCESS_KEY_ID as string,
+  //       secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY as string,
+  //     },
+  //     region: process.env.AWS_REGION as string,
+  //   },
+  //   tableName: 'jovoinboxuserdb',
+  // }),
+  new JovoInboxPlugin({
+    appId: process.env.APP_ID as string,
+    db: {
+      dbName: process.env.MYSQL_DATABASE as string,
+      user: process.env.MYSQL_USER as string,
+      password: process.env.MYSQL_PASSWORD as string,
+      host: process.env.MYSQL_HOST as string,
     },
-    tableName: 'jovoinboxuserdb',
   }),
-        new JovoInboxPlugin({
-          appId: 'demoskill',
-          db: {
-            awsConfig: {
-              credentials: {
-                accessKeyId: process.env.AWS_ACCESS_KEY_ID as string,
-                secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY as string
-              },
-              region: process.env.AWS_REGION as  string
-            },
-              tableName: 'jovoinbox',
-          },
-
-        }),
-
 );
-
-
 
 // ------------------------------------------------------------------
 // APP LOGIC
@@ -57,7 +48,6 @@ app.use(
 
 app.setHandler({
   LAUNCH() {
-    this.$user.$data.foo = 'bar';
     return this.toIntent('HelloWorldIntent');
   },
 
@@ -70,4 +60,4 @@ app.setHandler({
   },
 });
 
-export { app };
+export {app};

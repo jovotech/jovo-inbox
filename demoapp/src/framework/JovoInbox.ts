@@ -1,10 +1,11 @@
 import type { Plugin, PluginConfig, BaseApp } from 'jovo-framework';
 import { HandleRequest } from 'jovo-core';
-import { DataEntry } from './interfaces';
-import * as AWS from 'aws-sdk';
-import { DynamoDbInbox, DynamoDbInboxConfig } from './DynamoDbInbox';
+import { DataEntry, JovoInboxDb } from './interfaces';
+// import { DynamoDbInbox, DynamoDbInboxConfig } from './DynamoDbInbox';
 import { AlexaRequest, AlexaSkill } from 'jovo-platform-alexa';
 import _merge = require('lodash.merge');
+import { InboxLog, InboxLogType } from '../entities/InboxLog';
+import { SqlInbox, SqlInboxConfig } from './SqlInbox';
 
 declare module 'jovo-core/dist/src/core/Jovo' {
   export interface Jovo {
@@ -13,19 +14,23 @@ declare module 'jovo-core/dist/src/core/Jovo' {
 }
 
 export interface JovoInboxConfig extends PluginConfig {
-  db?: DynamoDbInboxConfig;
+  db?: SqlInboxConfig;
   appId?: string;
 }
 
 export class JovoInbox {
-  inboxDb: DynamoDbInbox;
+  inboxDb: JovoInboxDb;
 
   constructor(private config: JovoInboxConfig) {
-    this.inboxDb = new DynamoDbInbox(config.db);
+    this.inboxDb = new SqlInbox(config.db);
   }
 
-  async add(dataEntry: DataEntry) {
-    await this.inboxDb.add(dataEntry);
+  async add(inboxLog: InboxLog) {
+    await this.inboxDb.add(inboxLog);
+  }
+
+  async close() {
+    await this.inboxDb.close();
   }
 }
 
@@ -40,21 +45,24 @@ export class JovoInboxPlugin implements Plugin {
   }
 
   install(app: BaseApp): void {
+    console.log('install');
     app.middleware('platform.init')!.use(async (handleRequest: HandleRequest) => {
       handleRequest.jovo!.$inbox = new JovoInbox(this.config);
+      console.log('init');
 
       const alexaSkill = (handleRequest.jovo as AlexaSkill)!;
 
-      await handleRequest.jovo!.$inbox.add({
-        appId: this.config.appId!,
-        userId: handleRequest.jovo?.$user.getId()!,
-        sessionId: alexaSkill.$request!.getSessionId() || 'no-session',
-        requestId: (alexaSkill.$request as AlexaRequest).getRequestId(),
-        locale: alexaSkill.$request?.getLocale() || 'en',
-        timestamp: new Date().toISOString(),
-        type: 'request',
-        payload: alexaSkill.$request,
-      });
+      const inboxLog = new InboxLog();
+      inboxLog.appId = this.config.appId!;
+      inboxLog.createdAt = new Date();
+      inboxLog.locale = alexaSkill.$request?.getLocale() || 'en';
+      inboxLog.requestId = (alexaSkill.$request as AlexaRequest).getRequestId();
+      inboxLog.sessionId = alexaSkill.$request!.getSessionId() || 'no-session';
+      inboxLog.userId = handleRequest.jovo?.$user.getId()!;
+      inboxLog.type = InboxLogType.REQUEST;
+      inboxLog.payload = alexaSkill.$request;
+
+      await handleRequest.jovo!.$inbox.add(inboxLog);
     });
 
     app.middleware('response')!.use(async (handleRequest: HandleRequest) => {
@@ -63,16 +71,46 @@ export class JovoInboxPlugin implements Plugin {
       }
       const alexaSkill = (handleRequest.jovo as AlexaSkill)!;
 
-      await handleRequest.jovo!.$inbox.add({
-        appId: this.config.appId!,
-        userId: handleRequest.jovo?.$user.getId()!,
-        sessionId: alexaSkill.$request!.getSessionId() || 'no-session',
-        requestId: (alexaSkill.$request as AlexaRequest).getRequestId(),
-        locale: alexaSkill.$request?.getLocale() || 'en',
-        timestamp: new Date().toISOString(),
-        type: 'response',
-        payload: alexaSkill.$response,
-      });
+      const inboxLog = new InboxLog();
+      inboxLog.appId = this.config.appId!;
+      inboxLog.createdAt = new Date();
+      inboxLog.locale = alexaSkill.$request?.getLocale() || 'en';
+      inboxLog.requestId = (alexaSkill.$request as AlexaRequest).getRequestId();
+      inboxLog.sessionId = alexaSkill.$request!.getSessionId() || 'no-session';
+      inboxLog.userId = handleRequest.jovo?.$user.getId()!;
+      inboxLog.type = InboxLogType.RESPONSE;
+      inboxLog.payload = alexaSkill.$response;
+
+      await handleRequest.jovo!.$inbox.add(inboxLog);
+    });
+
+    app.middleware('fail')!.use(async (handleRequest: HandleRequest) => {
+      if (!handleRequest.jovo!.$inbox || !handleRequest.error) {
+        return;
+      }
+      const alexaSkill = (handleRequest.jovo as AlexaSkill)!;
+
+      const payload = {
+        message: handleRequest.error.message,
+        stackTrace: handleRequest.error.stack,
+      };
+
+      const inboxLog = new InboxLog();
+      inboxLog.appId = this.config.appId!;
+      inboxLog.createdAt = new Date();
+      inboxLog.locale = alexaSkill.$request?.getLocale() || 'en';
+      inboxLog.requestId = (alexaSkill.$request as AlexaRequest).getRequestId();
+      inboxLog.sessionId = alexaSkill.$request!.getSessionId() || 'no-session';
+      inboxLog.userId = handleRequest.jovo?.$user.getId()!;
+      inboxLog.type = InboxLogType.ERROR;
+      inboxLog.payload = payload;
+
+      await handleRequest.jovo!.$inbox.add(inboxLog);
+      await handleRequest.jovo!.$inbox.close();
+    });
+
+    app.middleware('after.response')!.use(async (handleRequest: HandleRequest) => {
+      await handleRequest.jovo!.$inbox!.close();
     });
   }
 }
