@@ -6,7 +6,7 @@
   "types": "dist/index.d.ts",
   "private": true,
   "scripts": {
-    "build": "npm i && tsc",
+    "build": "tsc",
     "tsc": "tsc",
     "watch": "tsc -w",
     "postinstall": "npm run build"
