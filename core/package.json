@@ -1,0 +1,21 @@
+{
+  "name": "jovo-inbox-core",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "private": true,
+  "scripts": {
+    "build": "npm i && tsc",
+    "tsc": "tsc",
+    "watch": "tsc -w",
+    "postinstall": "npm run build"
+  },
+  "author": "jovotech",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "prettier": "^2.0.5",
+    "tslint": "^5.20.0",
+    "typescript": "^3.9.3"
+  }
+}
