@@ -1,22 +1,29 @@
 <template>
   <div class="group w-full flex-grow flex">
-    <div class="inline-flex flex-row relative w-full" :class="[isRequest ? 'right-neg-100' : 'right-0',
-        isRequest ? '-translate-x-full' : 'translate-x-0',]">
+    <div class="inline-flex w-full max-w-3/4" :class="isRequest ? 'ml-auto justify-end' : ''">
 
-      <div v-if="isResponse" class="rounded-full h-12 w-12 bg-red-100 flex mr-2 items-center justify-center"></div>
-      <div
-      class="max-w-3/4 py-2 px-4 inline text-sm"
-      :class="[
+      <div class="flex items-start space-x-2">
+        <div v-if="isResponse" class="rounded-full h-8 w-8 bg-gray-200 flex mr-2 items-center justify-center flex-shrink-0"></div>
+        <div
+            class="py-2 px-4 inline text-sm"
+            :class="[
         isRequest
           ? 'bg-primary self-end text-right text-white rounded-t-xl rounded-bl-xl'
           : 'bg-white self-start text-gray-800 rounded-b-xl rounded-tr-xl',
       ]"
-    >
-      <p class="font-sans whitespace-pre-wrap" v-html="print(part)" @click="handleClick"></p>
-      <detail-conversation-part :visible="isDetailVisible" @hide="isDetailVisible = false" :part="part"></detail-conversation-part>
-      <ScreenConversationPart :visible="isScreenViewVisible" @hide="isScreenViewVisible = false" :part="part"></ScreenConversationPart>
+        >
+          <p class="font-sans whitespace-pre-wrap" v-html="print(part)" @click="handleClick"></p>
+          <detail-conversation-part :visible="isDetailVisible" @hide="isDetailVisible = false" :part="part"></detail-conversation-part>
+          <ScreenConversationPart :visible="isScreenViewVisible" @hide="isScreenViewVisible = false" :part="part"></ScreenConversationPart>
 
-    </div>
+        </div>
+        <div v-if="isRequest" class="rounded-full h-8 w-8 bg-gray-200 flex items-center justify-center flex-shrink-0"></div>
+
+      </div>
+
+
+
+
 
 <!--      <code-icon class="invisiblexxxx inline-block group-hover:visible mt-2 text-gray-500 hover:text-gray-800 cursor-pointer" :class="[-->
 <!--          isRequest-->
@@ -116,7 +123,7 @@ export default class ConversationPart extends Vue {
     const message = log.payload.response?.outputSpeech?.ssml || '...';
     return this.formatMessage(message);
   }
-  
+
   formatMessage(message: string) {
     message = message.replace('<speak>', '').replace('</speak>', '');
 

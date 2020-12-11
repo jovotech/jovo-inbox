@@ -8,6 +8,8 @@
       <ul class="mt-2 bg-gray-700">
         <li v-for="conversation in lastConversations" v-bind:key="conversation.requestId"
             class="group flex bg-gray-700 hover:bg-gray-400 p-2 cursor-pointer text-gray-200 hover:text-gray-700 pl-7" @click="handleSelectConversation(conversation.userId)">
+          <div class="rounded-full h-10 w-10 bg-gray-200 flex mr-2 items-center justify-center flex-shrink-0"></div>
+
           <div class="flex-grow">
             <div class="text-sm font-medium">{{shortenUserId(conversation.userId)}}</div>
             <div class="text-xs inline-block text-gray-400 group-hover:text-gray-700" :title="conversation.createdAt">{{lastConversationItemDate(conversation)}}, {{lastConversationItemDevice(conversation)}}</div>
@@ -22,7 +24,7 @@
 
 
 
-      <div v-if="!loading" class="ml-auto p-8 overflow-y-auto h-screen font-medium  space-y-4 space-x-1 overflow-y-scroll px-12 py-7" :class="[isHovered ? 'scrollbar' : 'scrollbar-invisible']">
+      <div v-if="!loading" class="ml-auto p-8 overflow-y-auto h-screen font-medium  space-y-4 overflow-y-scroll px-12 py-7" :class="[isHovered ? 'scrollbar' : 'scrollbar-invisible']">
           <conversation-part
               v-for="(part, index) in selectedConversation"
               :key="index"
