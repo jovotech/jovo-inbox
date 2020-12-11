@@ -1,0 +1,37 @@
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu+Mono:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap');
+
+html {
+  line-height: normal;
+}
+#app {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.scrollbar {
+&::-webkit-scrollbar {
+   @apply w-1 h-1;
+ }
+
+&::-webkit-scrollbar-track {
+ }
+
+&::-webkit-scrollbar-thumb {
+   @apply bg-gray-500 rounded-full;
+ }
+
+&-invisible {
+&::-webkit-scrollbar {
+   @apply w-1 h-1;
+ }
+
+&::-webkit-scrollbar-track {
+ }
+
+&::-webkit-scrollbar-thumb {
+   @apply bg-transparent rounded-full;
+ }
+}
+}

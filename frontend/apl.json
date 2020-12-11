@@ -1,0 +1,411 @@
+{
+  "version": "1.0",
+  "response": {
+    "shouldEndSession": false,
+    "reprompt": {
+      "outputSpeech": {
+        "type": "SSML",
+        "ssml": "<speak><audio src=\"https://nba-ui.s3.amazonaws.com/audio/A7.mp3\" /> Currently there are 3 games <sub alias=\"life\">live</sub>. <audio src=\"https://nba-ui.s3.amazonaws.com/audio/D7.mp3\" /></speak>"
+      }
+    },
+    "directives": [
+      {
+        "type": "Alexa.Presentation.APL.RenderDocument",
+        "datasources": {},
+        "version": "1.0",
+        "document": {
+          "type": "APL",
+          "mainTemplate": {
+            "items": [
+              {
+                "width": "100vw",
+                "type": "Container",
+                "alignItems": "center",
+                "items": [
+                  {
+                    "width": "100vw",
+                    "scale": "best-fill",
+                    "position": "absolute",
+                    "source": "https://nba-ui.s3.amazonaws.com/NBA_visuals/00_Welcome/480x480/3.png",
+                    "type": "Image",
+                    "when": "${viewport.width == 480}",
+                    "height": "100vh"
+                  },
+                  {
+                    "width": "100vw",
+                    "scale": "best-fill",
+                    "position": "absolute",
+                    "source": "https://nba-ui.s3.amazonaws.com/NBA_visuals/00_Welcome/960x480/3.png",
+                    "type": "Image",
+                    "when": "${viewport.width == 960}",
+                    "height": "100vh"
+                  },
+                  {
+                    "width": "100vw",
+                    "scale": "best-fill",
+                    "position": "absolute",
+                    "source": "https://nba-ui.s3.amazonaws.com/NBA_visuals/00_Welcome/1024x600/3.png",
+                    "type": "Image",
+                    "when": "${viewport.width == 1024}",
+                    "height": "100vh"
+                  },
+                  {
+                    "width": "100vw",
+                    "scale": "best-fill",
+                    "position": "absolute",
+                    "source": "https://nba-ui.s3.amazonaws.com/NBA_visuals/00_Welcome/3.png",
+                    "type": "Image",
+                    "when": "${viewport.width == 1280}",
+                    "height": "100vh"
+                  },
+                  {
+                    "width": "100vw",
+                    "scale": "best-fill",
+                    "position": "absolute",
+                    "source": "https://nba-ui.s3.amazonaws.com/NBA_visuals/00_Welcome/1920x1080/3.png",
+                    "type": "Image",
+                    "when": "${viewport.pixelHeight == 1080}",
+                    "height": "100vh"
+                  }
+                ],
+                "justifyContent": "end",
+                "height": "100vh"
+              }
+            ]
+          },
+          "version": "1.0"
+        }
+      },
+      {
+        "type": "Alexa.Presentation.APL.RenderDocument",
+        "datasources": {
+          "data": {
+            "games": [
+              {
+                "teams": [
+                  {
+                    "score": 112,
+                    "logo": "https://nba-ui.s3.amazonaws.com/NBA_visuals/TeamLogo_Global/Heat_Global.png"
+                  },
+                  {
+                    "score": 124,
+                    "logo": "https://nba-ui.s3.amazonaws.com/NBA_visuals/TeamLogo_Global/Lakers_Global.png"
+                  }
+                ],
+                "time": {
+                  "minutes": 0,
+                  "seconds": 0
+                },
+                "quarter": "4"
+              },
+              {
+                "teams": [
+                  {
+                    "score": 108,
+                    "logo": "https://nba-ui.s3.amazonaws.com/NBA_visuals/TeamLogo_Global/Warriors_Global.png"
+                  },
+                  {
+                    "score": 100,
+                    "logo": "https://nba-ui.s3.amazonaws.com/NBA_visuals/TeamLogo_Global/Thunder_Global.png"
+                  }
+                ],
+                "time": {
+                  "minutes": 14,
+                  "seconds": 39
+                },
+                "quarter": "3"
+              },
+              {
+                "teams": [
+                  {
+                    "score": 45,
+                    "logo": "https://nba-ui.s3.amazonaws.com/NBA_visuals/TeamLogo_Global/Heat_Global.png"
+                  },
+                  {
+                    "score": 32,
+                    "logo": "https://nba-ui.s3.amazonaws.com/NBA_visuals/TeamLogo_Global/Lakers_Global.png"
+                  }
+                ],
+                "time": {
+                  "minutes": 12,
+                  "seconds": 19
+                },
+                "quarter": "3"
+              }
+            ]
+          }
+        },
+        "version": "1.0",
+        "document": {
+          "import": [
+            {
+              "name": "alexa-layouts",
+              "version": "1.0.0"
+            }
+          ],
+          "mainTemplate": {
+            "description": null,
+            "parameters": [
+              "payload"
+            ],
+            "items": [
+              {
+                "width": "100vw",
+                "type": "Container",
+                "items": [
+                  {
+                    "width": "100vw",
+                    "scale": "best-fill",
+                    "source": "https://nba-ui.s3.amazonaws.com/NBA_visuals/05_LiveGameStatsScreen/Background.png",
+                    "position": "absolute",
+                    "type": "Image",
+                    "height": "100vh"
+                  },
+                  {
+                    "width": "100vw",
+                    "source": "https://nba-ui.s3.amazonaws.com/NBA_visuals/05_LiveGameStatsScreen/Title_LiveGames.png",
+                    "type": "Image",
+                    "top": 10,
+                    "height": "7vh"
+                  },
+                  {
+                    "top": 20,
+                    "data": "${payload.data.games}",
+                    "width": "100vw",
+                    "type": "Sequence",
+                    "scrollDirection": "vertical",
+                    "items": [
+                      {
+                        "width": "100vw",
+                        "type": "Container",
+                        "items": [
+                          {
+                            "alignItems": "center",
+                            "width": "100%",
+                            "type": "Container",
+                            "items": [
+                              {
+                                "type": "Team",
+                                "teamData": "${data.teams[0]}",
+                                "direction": "row"
+                              },
+                              {
+                                "alignItems": "center",
+                                "width": "33%",
+                                "type": "Container",
+                                "items": [
+                                  {
+                                    "width": "80%",
+                                    "source": "https://nba-ui.s3.amazonaws.com/NBA_visuals/05_LiveGameStatsScreen/Circle_Time.png",
+                                    "type": "Image",
+                                    "height": "80%"
+                                  },
+                                  {
+                                    "type": "Timer",
+                                    "time": "${data.time}",
+                                    "quarter": "${data.quarter}"
+                                  }
+                                ],
+                                "justifyContent": "center",
+                                "height": "100%",
+                                "direction": "column"
+                              },
+                              {
+                                "type": "Team",
+                                "teamData": "${data.teams[1]}",
+                                "direction": "rowReverse"
+                              }
+                            ],
+                            "justifyContent": "center",
+                            "height": "100%",
+                            "direction": "row"
+                          },
+                          {
+                            "bottom": 0,
+                            "width": "100vw",
+                            "source": "https://nba-ui.s3.amazonaws.com/NBA_visuals/05_LiveGameStatsScreen/DivisionLine.png",
+                            "position": "absolute",
+                            "type": "Image",
+                            "align": "bottom",
+                            "height": "20dp"
+                          }
+                        ],
+                        "height": "30vh"
+                      }
+                    ],
+                    "height": "100vh"
+                  }
+                ],
+                "height": "100vh"
+              }
+            ]
+          },
+          "resources": [],
+          "theme": "dark",
+          "styles": {
+            "PlaceStyle": {
+              "values": [
+                {
+                  "when": "${viewport.width === 1920}",
+                  "fontSize": "15dp",
+                  "fontWeight": 500
+                },
+                {
+                  "when": "${viewport.width < 1920}",
+                  "fontSize": "20dp",
+                  "fontWeight": 700
+                }
+              ]
+            },
+            "TimerStyle": {
+              "values": [
+                {
+                  "when": "${viewport.width === 1920}",
+                  "fontSize": "30dp"
+                },
+                {
+                  "when": "${viewport.width < 1920}",
+                  "fontSize": "40dp",
+                  "fontWeight": 700
+                }
+              ]
+            },
+            "ScoreStyle": {
+              "values": [
+                {
+                  "textAlign": "left",
+                  "fontWeight": "700",
+                  "fontSize": "60dp"
+                }
+              ]
+            }
+          },
+          "type": "APL",
+          "version": "1.0",
+          "layouts": {
+            "Timer": {
+              "parameters": [
+                "time",
+                "quarter"
+              ],
+              "items": [
+                {
+                  "alignItems": "center",
+                  "width": "100%",
+                  "position": "absolute",
+                  "type": "Container",
+                  "items": [
+                    {
+                      "style": "TimerStyle",
+                      "position": "absolute",
+                      "bind": [
+                        {
+                          "name": "TimerMinutes",
+                          "value": "${time.minutes}"
+                        },
+                        {
+                          "name": "TimerSeconds",
+                          "value": "${time.seconds}"
+                        }
+                      ],
+                      "text": "${TimerMinutes < 10 ? \"0\" + TimerMinutes : TimerMinutes}:${TimerSeconds < 10 ? \"0\" + TimerSeconds : TimerSeconds}",
+                      "handleTick": {
+                        "when": "${TimerMinutes > 0 || TimerSeconds > 0}",
+                        "commands": [
+                          {
+                            "type": "Sequential",
+                            "commands": [
+                              {
+                                "property": "TimerSeconds",
+                                "type": "SetValue",
+                                "when": "${TimerSeconds == 0 && TimerMinutes > 0}",
+                                "value": 60
+                              },
+                              {
+                                "property": "TimerMinutes",
+                                "type": "SetValue",
+                                "when": "${TimerSeconds == 60 && TimerMinutes > 0}",
+                                "value": "${TimerMinutes - 1}"
+                              },
+                              {
+                                "property": "TimerSeconds",
+                                "type": "SetValue",
+                                "when": "${TimerSeconds > 0 && TimerMinutes >= 0}",
+                                "value": "${TimerSeconds - 1}"
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      "type": "Text"
+                    },
+                    {
+                      "style": "PlaceStyle",
+                      "text": "${quarter}",
+                      "position": "absolute",
+                      "type": "Text",
+                      "bottom": 0
+                    }
+                  ],
+                  "justifyContent": "center",
+                  "height": "50%",
+                  "direction": "column"
+                }
+              ]
+            },
+            "Team": {
+              "parameters": [
+                "teamData",
+                "direction"
+              ],
+              "items": [
+                {
+                  "width": "33%",
+                  "type": "Container",
+                  "items": [
+                    {
+                      "width": "50%",
+                      "type": "Container",
+                      "alignItems": "center",
+                      "items": [
+                        {
+                          "type": "Image",
+                          "source": "${teamData.logo}"
+                        }
+                      ],
+                      "justifyContent": "center",
+                      "height": "100%"
+                    },
+                    {
+                      "width": "50%",
+                      "type": "Container",
+                      "alignItems": "center",
+                      "items": [
+                        {
+                          "type": "Text",
+                          "style": "ScoreStyle",
+                          "text": "${teamData.score}"
+                        }
+                      ],
+                      "justifyContent": "center",
+                      "height": "100%"
+                    }
+                  ],
+                  "height": "100%",
+                  "direction": "${direction}"
+                }
+              ]
+            }
+          }
+        }
+      }
+    ],
+    "outputSpeech": {
+      "type": "SSML",
+      "ssml": "<speak><audio src=\"https://nba-ui.s3.amazonaws.com/audio/A7.mp3\" /> Currently there are 3 games <sub alias=\"life\">live</sub>. <audio src=\"https://nba-ui.s3.amazonaws.com/audio/D7.mp3\" /></speak>"
+    }
+  },
+  "sessionAttributes": {
+    "_JOVO_STATE_": "MAIN_MENU"
+  }
+}
