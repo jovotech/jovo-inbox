@@ -4,8 +4,9 @@
   "private": true,
   "scripts": {
     "postinstall": "npm run setup",
-    "setup": "npm run setup:app & npm run setup:frontend",
+    "setup": "npm run setup:frontend && npm run setup:api && npm run setup:frontend",
     "setup:api": "cd api && npm i && cd ..",
+    "setup:core": "cd core && npm i && cd ..",
     "setup:frontend": "cd frontend && npm i && cd .."
   },
   "author": "jovotech",
