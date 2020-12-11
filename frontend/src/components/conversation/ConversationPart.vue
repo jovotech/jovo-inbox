@@ -1,8 +1,10 @@
 <template>
-  <div  class="group w-full flex-grow flex flex-col">
+  <div class="group w-full flex-grow flex">
+    <div class="inline-flex flex-row relative w-full" :class="[isRequest ? 'right-neg-100' : 'right-0',
+        isRequest ? '-translate-x-full' : 'translate-x-0',]">
 
-
-    <div
+      <div v-if="isResponse" class="rounded-full h-12 w-12 bg-red-100 flex mr-2 items-center justify-center"></div>
+      <div
       class="max-w-3/4 py-2 px-4 inline text-sm"
       :class="[
         isRequest
@@ -16,24 +18,23 @@
 
     </div>
 
-      <code-icon class="invisible inline-block group-hover:visible mt-2 text-gray-500 hover:text-gray-800 cursor-pointer" :class="[
-          isRequest
-            ? 'self-end text-right mr-2'
-            : ' self-start  ml-2',
-        ]" size="14"
-                 @click="isDetailVisible = true"></code-icon>
+<!--      <code-icon class="invisiblexxxx inline-block group-hover:visible mt-2 text-gray-500 hover:text-gray-800 cursor-pointer" :class="[-->
+<!--          isRequest-->
+<!--            ? 'self-end text-right mr-2'-->
+<!--            : ' self-start  ml-2',-->
+<!--        ]" size="14"-->
+<!--                 @click="isDetailVisible = true"></code-icon>-->
 
-    <monitor-icon v-if="isResponse && hasScreenInterface" class="invisible inline-block group-hover:visible mt-2 text-gray-500 hover:text-gray-800 cursor-pointer" :class="[
-          isRequest
-            ? 'self-end text-right mr-2'
-            : ' self-start  ml-2',
-        ]" size="14"
-               @click="isScreenViewVisible = true"></monitor-icon>
-    <div v-if="isNextSession" class="text-center" :title="nextSessionStart">
-      <div class="my-10 mx-auto w-4/5 new-session"><span class="bg-gray-100 ">{{newSessionDate(nextSessionStart)}}</span></div>
+<!--    <monitor-icon v-if="isResponse && hasScreenInterface" class="invisiblexxxx inline-block group-hover:visible mt-2 text-gray-500 hover:text-gray-800 cursor-pointer" :class="[-->
+<!--          isRequest-->
+<!--            ? 'self-end text-right mr-2'-->
+<!--            : ' self-start  ml-2',-->
+<!--        ]" size="14"-->
+<!--               @click="isScreenViewVisible = true"></monitor-icon>-->
+<!--    <div v-if="isNextSession" class="text-center" :title="nextSessionStart">-->
+<!--      <div class="my-10 mx-auto w-4/5 new-session"><span class="bg-gray-100 ">{{newSessionDate(nextSessionStart)}}</span></div>-->
+<!--    </div>-->
     </div>
-
-
   </div>
 </template>
 
