@@ -14,19 +14,41 @@ export class InboxLogService {
     private readonly em: EntityManager,
   ) {}
   async getConversations(): Promise<any> {
-    const res = await this.em
-      .createQueryBuilder(InboxLogEntity)
-      .groupBy('userId')
-      .where({
-        appId: 'studios-nba-jovo-inbox',
-      })
-      .orderBy({
-        createdAt: QueryOrder.DESC,
-      })
-      .limit(10)
-      .execute();
+    // TODO: Temporary!
+    const results = await this.em.getConnection().execute(`    SELECT *
+                            FROM inbox_log
+                            WHERE id IN (
+                                SELECT MAX(id)
+                                FROM inbox_log
+                                WHERE type = 0
+                                GROUP BY user_id
+                            )
+                            ORDER BY created_at DESC`);
 
-    return res.map((item: InboxLogEntity) => {
+    const repo = this.orm.em.getRepository(InboxLogEntity);
+    const logs = results.map(log => repo.map(log));
+
+    // const res = await this.em
+    //   .createQueryBuilder(InboxLogEntity)
+    //   .select([
+    //     'userId',
+    //     'appId',
+    //     'payload',
+    //     'id',
+    //     'max(created_at) as createdAt',
+    //   ])
+    //   .where({
+    //     appId: 'studios-nba-jovo-inbox',
+    //   })
+    //   .groupBy('userId')
+    //
+    //   .orderBy({
+    //     createdAt: QueryOrder.DESC,
+    //   })
+    //   // .limit(10)
+    //   .execute();
+
+    return logs.map((item: InboxLogEntity) => {
       return {
         ...item,
         payload: JSON.parse(item.payload),
