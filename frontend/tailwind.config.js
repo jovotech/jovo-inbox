@@ -16,6 +16,9 @@ module.exports = {
         1: '1rem',
         2: '2rem',
       },
+      colors: {
+        'alexa-blue': '#78e5ff',
+      },
       spacing: {
         72: '18rem',
         80: '20rem',

@@ -1,3 +1,5 @@
+import { FormatUtil } from '@/utils/FormatUtil';
+
 export enum AlexaDeviceName {
   ALEXA_AUDIO_ONLY = 'AUDIO_ALEXA_AUDIO_ONLY',
   ALEXA_HUB_SMALL_ROUND = 'ALEXA_HUB_SMALL_ROUND',
@@ -89,5 +91,15 @@ export class AlexaUtil {
       typeof request.context?.System?.device?.supportedInterfaces['Alexa.Presentation.APL'] !==
       'undefined'
     );
+  }
+
+  static getFriendlyRequestName(request: any) {
+    return request.request?.intent?.name || 'LAUNCH';
+  }
+
+  static getFriendlyResponse(response: any) {
+    return response.response?.outputSpeech?.ssml
+      ? FormatUtil.formatMessage(response.response?.outputSpeech?.ssml)
+      : '...';
   }
 }

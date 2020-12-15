@@ -1,30 +1,29 @@
 <template>
-  <div class="bg-gray-600  w-full m-auto flex flex-row">
+  <div class="bg-gray-800  w-full m-auto flex flex-row">
     <div class="h-screen w-2/12 overflow-y-auto h-full">
-      <div class="text-gray-200 p-3 pb-1 flex align-center items-center pl-7">
+      <div class="text-gray-200 p-3 pb-1 flex align-center items-center pl-9">
         <inbox-icon class="inline-block mr-3"></inbox-icon>
         <h1 class="text-2xl inline-block">Jovo Inbox</h1>
       </div>
       <ul class="mt-2 bg-gray-700">
         <li v-for="conversation in lastConversations" v-bind:key="conversation.requestId"
-            class="group flex bg-gray-700 hover:bg-gray-400 p-2 cursor-pointer text-gray-200 hover:text-gray-700 pl-7" @click="handleSelectConversation(conversation.userId)">
+            class="group flex bg-gray-800 hover:bg-gray-900 p-2 cursor-pointer text-gray-200 hover:text-gray-200 pl-7" @click="handleSelectConversation(conversation.userId)">
           <div class="rounded-full h-10 w-10 bg-gray-200 flex mr-2 items-center justify-center flex-shrink-0"></div>
 
           <div class="flex-grow">
             <div class="text-sm font-medium">{{shortenUserId(conversation.userId)}}</div>
-            <div class="text-xs inline-block text-gray-400 group-hover:text-gray-700" :title="conversation.createdAt">{{lastConversationItemDate(conversation)}}, {{lastConversationItemDevice(conversation)}}</div>
+            <div class="text-xs text-gray-600 group-hover:text-gray-500 " :title="conversation.createdAt" v-html="lastConversationItemRequest(conversation)"></div>
           </div>
-<!--          <div class="float-right floatplace-self-end rounded-md self-center p-1 px-2 bg-gray-600 inline-block text-xs text-gray-500 align-middle opacity-50">-->
-<!--            <div class="text-xs inline-block text-gray-400 group-hover:text-gray-700" :title="conversation.createdAt">{{lastConversationItemDate(conversation)}}</div>-->
-<!--          </div>-->
+          <div class="float-right place-self-start rounded-md  p-1 px-2 inline-block text-xs text-gray-500  opacity-50">
+            <div class="text-xs inline-block text-gray-200 group-hover:text-gray-200" :title="conversation.createdAt">{{lastConversationItemDate(conversation)}}</div>
+          </div>
         </li>
       </ul>
     </div>
-    <div class="bg-gray-100 w-6/12 " @mouseenter="isHovered = true" @mouseleave="isHovered = false">
+    <div class="bg-gray-100 w-4/12 " @mouseenter="isHovered = true" @mouseleave="isHovered = false">
 
 
-
-      <div v-if="!loading" class="ml-auto p-8 overflow-y-auto h-screen font-medium  space-y-4 overflow-y-scroll px-12 py-7" :class="[isHovered ? 'scrollbar' : 'scrollbar-invisible']">
+      <div v-if="!loading" class="ml-auto p-8 overflow-y-auto h-screen font-medium  space-y-4 overflow-y-scroll px-12 py-7 pb-32" ref="partContainer" :class="[isHovered ? 'scrollbar' : 'scrollbar-invisible']">
           <conversation-part
               v-for="(part, index) in selectedConversation"
               :key="index"
@@ -37,7 +36,7 @@
         <div class="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-16 w-16 m-auto"></div>
       </div>
     </div>
-    <div class="bg-gray-200 w-4/12">
+    <div class="bg-gray-200 w-6/12">
 
     </div>
 <!--    <div id="aplviewer" style="width:510px; height: 300px"></div>-->
@@ -58,6 +57,7 @@ import {
 } from 'vue-feather-icons';
 import {AlexaUtil} from "@/utils/AlexaUtil";
 import * as AplRenderer from 'apl-viewhost-web';
+import {FormatUtil} from "@/utils/FormatUtil";
 
 @Component({
   name: 'inbox',
@@ -82,13 +82,29 @@ export default class Inbox extends Vue {
   }
 
   lastConversationItemDate(inboxLog: InboxLog) {
-    return format(inboxLog.createdAt);
+    return FormatUtil.formatDate(inboxLog.createdAt)
+  }
+
+  lastConversationItemRequest(inboxLog: InboxLog) {
+    return AlexaUtil.getFriendlyRequestName(inboxLog.payload);
+    // return AlexaUtil.getFriendlyResponse(inboxLog.payload);
+
   }
 
   async handleSelectConversation(userId: string) {
     this.loading = true;
     this.selectedConversation = await Api.getUserConversations(userId);
     this.loading = false;
+    this.$nextTick(() => {
+      this.scrollToBottom();
+
+    });
+
+  }
+
+  scrollToBottom() {
+    const partContainer = this.$refs.partContainer as HTMLDivElement;
+    partContainer.scrollTop = partContainer.scrollHeight;
   }
 }
 </script>
