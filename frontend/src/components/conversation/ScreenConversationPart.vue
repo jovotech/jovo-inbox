@@ -1,5 +1,5 @@
 <template>
-  <div v-if="visible" class="fixed z-10 inset-0 overflow-y-auto text-gray-800 ">
+  <div v-if="visible" class="fixed z-30 inset-0 overflow-y-auto text-gray-800 ">
     <div
       class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0"
     >
