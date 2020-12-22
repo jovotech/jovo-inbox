@@ -1,13 +1,19 @@
 import dayjs from 'dayjs';
+import isToday from 'dayjs/plugin/isToday';
+import isYesterday from 'dayjs/plugin/isYesterday';
+
+dayjs.extend(isToday);
+dayjs.extend(isYesterday);
 
 export class FormatUtil {
-  static formatDate(dateStr: string) {
-    const dateDayJs = dayjs(dateStr);
-
+  static formatDate(date: string | Date, simple = true) {
+    const dateDayJs = dayjs(date);
     if (dateDayJs.isToday()) {
       return dateDayJs.format('h:mm a');
+    } else if (dateDayJs.isYesterday()) {
+      return 'yesterday,' + dateDayJs.format(' h:mm a');
     } else if (dateDayJs.isAfter(dateDayJs.subtract(7, 'day'))) {
-      return dateDayJs.format('ddd h:mm a');
+      return simple ? dateDayJs.format('dddd') : dateDayJs.format('ddd, h:mm a');
     } else {
       return dateDayJs.format('ddd, MMM, DD h:mm a');
     }
@@ -34,9 +40,8 @@ export class FormatUtil {
     );
     message = message.replace(
       /<audio src=(?:'|")(.+?)(?:'|") \/>/g,
-      '<span class="tag-audio p-1 rounded-lg" title="$1">Audio <a href="$1" target="_blank">►</a></span>',
+      '<span class="tag-audio p-1 rounded-lg" title="$1"><audio class="audio-player" src="$1"></audio></span>',
     );
-
     return message;
   }
 }

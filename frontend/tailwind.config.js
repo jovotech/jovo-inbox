@@ -1,3 +1,5 @@
+const colors = require('tailwindcss/colors');
+
 module.exports = {
   future: {
     defaultLineHeights: true,
@@ -18,6 +20,7 @@ module.exports = {
       },
       colors: {
         'alexa-blue': '#78e5ff',
+        'blueGray': colors.blueGray,
       },
       spacing: {
         72: '18rem',
@@ -43,6 +46,7 @@ module.exports = {
         '172': '44rem',
       },
       height: {
+        120: '30rem',
         144: '36rem',
         172: '44rem',
       },

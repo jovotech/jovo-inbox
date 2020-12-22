@@ -1,21 +1,18 @@
 <template>
   <div id="app" class="flex h-screen max-h-screen">
-       <inbox></inbox>
-
+    <inbox></inbox>
   </div>
 </template>
 
 <script lang="ts">
-
 import { Component, Vue } from 'vue-property-decorator';
 
-import Inbox from "@/components/Inbox.vue";
+import Inbox from '@/components/Inbox.vue';
 
 @Component({
-  components: {Inbox},
+  components: { Inbox },
 })
-export default class App extends Vue {
-}
+export default class App extends Vue {}
 </script>
 
 <style lang="css">
