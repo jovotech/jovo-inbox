@@ -1,4 +1,6 @@
 export * from './InboxLog';
+export * from './InboxLogUser';
+
 export * from './JovoAppMetaData';
 export * from './dtos/select-user-conversations.dto';
 export * from './dtos/update-inbox-log-user.dto';

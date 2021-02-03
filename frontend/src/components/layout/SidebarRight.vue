@@ -3,13 +3,18 @@
     <!-- Start secondary column (hidden on smaller screens) -->
     <div class="text-right px-7 py-7">
       <button
+        v-if="!isCopied"
         type="button"
-        class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+        @click="handleShareConversation"
+        class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-jovo-blue bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
       >
         <!-- Heroicon name: mail -->
         <share2-icon size="16" class="mr-2"></share2-icon>
         Share
       </button>
+      <span v-else class="inline-block px-3 py-2 text-sm text-color"
+        >Link copied to clipboard!</span
+      >
     </div>
     <div v-if="!!conversation" class="text-center">
       <div class="flex items-center">
@@ -62,8 +67,24 @@
         </div>
       </div>
 
-      <div v-if="!isNameEdit" class="mt-4 text-sm" @click="editName">
+      <div v-if="!isNameEdit" class="group mt-4 text-sm">
         {{ user.name || shortenUserId(conversation) }}
+
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          class="w-3 h-auto inline ml-1 cursor-pointer text-gray-600 hover:text-gray-700 hidden group-hover:inline-block"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          @click="editName"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+          />
+        </svg>
       </div>
       <div v-else class="mt-4 text-sm w-24 m-auto">
         <input
@@ -108,7 +129,7 @@
         <textarea
           id="about"
           name="about"
-          rows="5"
+          rows="7"
           v-model="user.notes"
           @blur="handleSaveUser"
           class="shadow-sm focus:ring-light-blue-500 focus:border-light-blue-500 mt-1 block w-full sm:text-sm border-gray-200 rounded-md bg-gray-50"
@@ -121,24 +142,25 @@
 
 <script lang="ts">
 import { Component, Watch } from 'vue-property-decorator';
-import { Share2Icon } from 'vue-feather-icons';
+import { Share2Icon, CheckIcon } from 'vue-feather-icons';
 import { BaseMixin } from '@/mixins/BaseMixin';
 import { mixins } from 'vue-class-component';
 import { InboxLog, InboxLogType } from 'jovo-inbox-core';
 import { InboxLogUser } from 'jovo-inbox-core/dist/InboxLogUser';
 import { Api } from '@/Api';
-import { AlexaRequest } from 'jovo-platform-alexa';
 import { AlexaUtil } from '@/utils/AlexaUtil';
+import { BASE_URL } from '@/main';
 
 @Component({
   name: 'sidebar-right',
-  components: { Share2Icon },
+  components: { Share2Icon, CheckIcon },
 })
 export default class SidebarRight extends mixins(BaseMixin) {
   isNameEdit = false;
   devices: string[] = ['Echo', 'Echo Show'];
 
   user: Partial<InboxLogUser> = {};
+  isCopied = false;
 
   async handleSaveUserName() {
     this.isNameEdit = false;
@@ -206,10 +228,30 @@ export default class SidebarRight extends mixins(BaseMixin) {
     this.user = {
       name: this.shortenUserId(this.conversation!),
     };
-
+    this.isCopied = false;
     await this.getInboxLogUserData();
   }
 
+  async handleShareConversation() {
+    if (!this.conversation) {
+      return;
+    }
+
+    if (!this.user.id) {
+      try {
+        await Api.updateInboxLogUser({
+          appId: this.conversation.appId,
+          platformUserId: this.conversation.userId,
+        });
+        await this.$store.dispatch('DataModule/buildAppUsersMap', this.app.id);
+        await this.getInboxLogUserData();
+      } catch (e) {
+        console.log(e);
+      }
+    }
+    this.isCopied = true;
+    this.$clipboard(`${window.location.origin}/user/${this.user.id}`);
+  }
   async handleDeleteImage() {
     try {
       const result = await Api.deleteUserImage(this.user.id as string);

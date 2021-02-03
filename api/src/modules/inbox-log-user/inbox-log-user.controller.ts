@@ -29,6 +29,13 @@ export class InboxLogUserController {
     return this.service.getUser(getInboxLogUser);
   }
 
+  @Post('conversations')
+  getUserConversations(
+    @Body() getInboxLogUser: Pick<GetInboxLogUserDto, 'id'>,
+  ) {
+    return this.service.getUserConversations(getInboxLogUser);
+  }
+
   @Get(':appId')
   getAppUsers(@Param('appId') appId: string) {
     return this.service.geAppUser(appId);

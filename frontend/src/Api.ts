@@ -74,7 +74,14 @@ export class Api {
     };
     return await axios.request<InboxLogUser[]>(config);
   }
-
+  static async getInboxLogUserConversations(getInboxLogUserDto: Pick<GetInboxLogUserDto, 'id'>) {
+    const config: AxiosRequestConfig = {
+      method: 'POST',
+      url: `${BASE_URL}/inboxloguser/conversations`,
+      data: getInboxLogUserDto,
+    };
+    return await axios.request<InboxLogUser[]>(config);
+  }
   static async uploadUserImage(
     updateInboxLogUserDto: Pick<UpdateInboxLogUserDto, 'appId' | 'platformUserId'>,
     data: FormData,

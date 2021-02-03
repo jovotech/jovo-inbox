@@ -18,12 +18,10 @@ import { LOGS_PER_REQUEST } from '../../constants';
 
 @Injectable()
 export class InboxLogService {
-  constructor(
-    @InjectRepository(InboxLogEntity)
-    private inboxLogRepository: Repository<InboxLogEntity>,
-  ) {}
   async getConversations(): Promise<any> {
-    const qb = await this.inboxLogRepository.createQueryBuilder('inboxlog');
+    const qb = await getRepository(InboxLogEntity).createQueryBuilder(
+      'inboxlog',
+    );
     const logs = await qb
       .where(
         'inboxlog.id IN ' +

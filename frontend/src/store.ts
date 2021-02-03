@@ -2,7 +2,6 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import VuexPersistence from 'vuex-persist';
 import { DataModule, DataState } from '@/store/DataModule';
-import { PreferencesState } from '../dist/frontend/src/store/PreferencesModule';
 
 export interface RootState {
   data: DataState;

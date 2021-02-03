@@ -174,8 +174,17 @@ export default class SidebarLeft extends mixins(BaseMixin) {
 
   async mounted() {
     try {
-      console.log(this.$route);
-      await this.$store.dispatch('DataModule/fetchConversations');
+      if (this.$route.params.id) {
+        const result = await Api.getInboxLogUserConversations({
+          id: this.$route.params.id,
+        });
+        if (result.data?.logs.length > 0) {
+          await this.$store.dispatch('DataModule/fetchUserConversations', {
+            userId: result.data?.logs[0].userId,
+            appId: result.data?.logs[0].appId,
+          } as SelectUserConversationsDto);
+        }
+      }
     } catch (e) {
       console.log(e);
     }
@@ -191,8 +200,6 @@ export default class SidebarLeft extends mixins(BaseMixin) {
         userId: inboxLog.userId,
         appId: inboxLog.appId,
       } as SelectUserConversationsDto);
-
-      console.log(this.$store.state.DataModule.selectedUserConversations);
     } catch (e) {
       console.log(e);
     }

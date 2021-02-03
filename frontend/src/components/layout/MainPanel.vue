@@ -87,7 +87,6 @@ export default class MainPanel extends Vue {
 
   @Watch('selectedConversation')
   onSelectedConversation() {
-    console.log(this.selectedConversation);
     this.$nextTick(() => {
       this.scrollToBottom();
     });

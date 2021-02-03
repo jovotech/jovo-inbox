@@ -7,13 +7,7 @@ import { MikroORM, QueryOrder } from '@mikro-orm/core';
 import { InboxLogEntity } from '../../entity/inbox-log.entity';
 import * as path from 'path';
 
-import {
-  GetInboxLogUserDto,
-  InboxLog,
-  InboxLogType,
-  SelectUserConversationsDto,
-  UpdateInboxLogUserDto,
-} from 'jovo-inbox-core';
+import { GetInboxLogUserDto, UpdateInboxLogUserDto } from 'jovo-inbox-core';
 import {
   EntityManager,
   FindOneOptions,
@@ -26,6 +20,7 @@ import { LOGS_PER_REQUEST } from '../../constants';
 import { InboxLogUserEntity } from '../../entity/inbox-log-user.entity';
 import { UploadedFile } from 'jovo-inbox-core/dist/UploadedFile';
 import * as fs from 'fs';
+import { InboxLogService } from '../inbox-log/inbox-log.service';
 
 @Injectable()
 export class InboxLogUserService {
@@ -88,6 +83,23 @@ export class InboxLogUserService {
     return user;
   }
 
+  async getUserConversations(dto: Pick<GetInboxLogUserDto, 'id'>) {
+    const user = await getRepository(InboxLogUserEntity).findOne({
+      id: dto.id,
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const service = new InboxLogService();
+
+    return service.getUserConversations({
+      appId: user.appId,
+      userId: user.platformUserId,
+    });
+  }
+
   async geAppUser(appId: string) {
     return await getRepository(InboxLogUserEntity).find({
       where: {
@@ -127,6 +139,7 @@ export class InboxLogUserService {
       '../../../../public/images',
       user.image,
     );
+    console.log(filePath);
     fs.writeFileSync(filePath, image.buffer);
   }
 

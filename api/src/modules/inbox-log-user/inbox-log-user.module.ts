@@ -5,6 +5,7 @@ import { InboxLogUserEntity } from '../../entity/inbox-log-user.entity';
 import { InboxLogUserService } from './inbox-log-user.service';
 import { InboxLogUserController } from './inbox-log-user.controller';
 import { MulterModule } from '@nestjs/platform-express';
+import { InboxLogService } from '../inbox-log/inbox-log.service';
 
 @Module({
   imports: [
@@ -34,6 +35,6 @@ import { MulterModule } from '@nestjs/platform-express';
     }),
   ],
   controllers: [InboxLogUserController],
-  providers: [InboxLogUserService],
+  providers: [InboxLogUserService, InboxLogService],
 })
 export class InboxLogUserModule {}
