@@ -1,1 +1,1 @@
-export const LOGS_PER_REQUEST = 15;
+export const LOGS_PER_REQUEST = 150;
