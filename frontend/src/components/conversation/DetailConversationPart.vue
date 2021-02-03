@@ -37,16 +37,20 @@
         aria-modal="true"
         aria-labelledby="modal-headline"
       >
-        <div class="bg-red px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-          <div class="sm:flex sm:items-start">
-            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+        <div class="bg-red px-2 pt-5 pb-4 sm:p-6 sm:pb-4 ">
+          <div class="sm:flex">
+            <div
+              class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left flex-grow"
+              :class="[isContentHovered ? 'scrollbar' : 'scrollbar-invisible']"
+              @mouseenter="isContentHovered = true"
+              @mouseleave="isContentHovered = false"
+            >
               <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-headline">
                 Details
               </h3>
               <div class="mt-2">
-                <div class="h-172 w-3/5 text-sm max-h-144 overflow-y-auto">
+                <div class="h-172 w-full text-sm max-h-144 overflow-y-auto  bg-gray-50 p-3">
                   <div id="aplviewer"></div>
-
                   <vue-json-pretty :data="json"> </vue-json-pretty>
                 </div>
               </div>
@@ -59,7 +63,7 @@
             @click="hide"
             class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
           >
-            Cancel
+            Close
           </button>
         </div>
       </div>
@@ -87,6 +91,8 @@ export default class DetailConversationPart extends Vue {
 
   @Prop()
   visible = false;
+
+  isContentHovered = false;
 
   renderer: any;
 

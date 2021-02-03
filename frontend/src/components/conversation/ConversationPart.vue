@@ -95,7 +95,7 @@
         <div class="invisible group-hover:visible" :class="isResponse ? 'ml-auto' : ''">
           <code-icon
             class="inline-block mt-2 text-gray-500 hover:text-gray-800 cursor-pointer"
-            :class="[isResponse ? 'self-end text-right ml-auto mr-2' : ' self-start  ml-2']"
+            :class="[isResponse ? 'self-end text-right ml-auto mr-3' : ' self-start  ml-3']"
             size="14"
             @click="isDetailVisible = true"
           ></code-icon>
