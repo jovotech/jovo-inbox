@@ -1,6 +1,6 @@
 <template>
   <div class="hidden lg:flex lg:flex-shrink-0">
-    <div class="flex flex-col w-72">
+    <div class="flex flex-col w-80">
       <!-- Sidebar component, swap this element with another sidebar if you like -->
       <div class="flex flex-col h-0 flex-1 border-r border-gray-200 bg-gray-50">
         <div class="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">
@@ -20,6 +20,7 @@
                 >
                   <span class="flex min-w-0 items-center justify-between space-x-3">
                     <div
+                      v-if="false"
                       class="rounded-full h-10 w-10 flex items-center justify-center bg-jovo-blue"
                     ></div>
                     <span class="flex-1 min-w-0">
@@ -81,7 +82,7 @@
             </div>
           </div>
 
-          <div class="bg-white  sm:rounded-md w-auto m-4">
+          <div class="bg-white  sm:rounded-md w-auto m-5">
             <ul class="divide-y divide-gray-200">
               <li
                 v-for="conversation in getConversations()"
