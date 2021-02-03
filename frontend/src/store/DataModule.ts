@@ -52,6 +52,7 @@ export class DataModule extends VuexModule<DataState> {
 
   @MutationAction({ mutate: ['selectedApp'], rawError: true })
   async [DataAction.selectApp](app: JovoAppMetaData) {
+    document.title = app.name + ' -  Jovo Inbox';
     return { selectedApp: app };
   }
 
