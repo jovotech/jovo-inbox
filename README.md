@@ -1,8 +1,9 @@
-### Install Jovo-Inbox
+# Jovo Inbox
 
+## Installation
+### Install Services
 
-### Install services
-Run setup (installs dependecies for `/core` `/api` and `/frontend`)
+Run setup (installs dependencies for `/core` `/api` and `/frontend`):
 
 ```
 $ npm run setup
@@ -23,16 +24,18 @@ INBOX_MYSQL_PASSWORD=
 INBOX_MYSQL_HOST=
 ```
 
+For other database configurations, take a look at the `inbox.config.ts` file in `src/api`.
 
-### Start services
+### Start Services
 
-#### API service
+Start the API service:
+
 ```
 $ cd api
 $ npm run start:dev
 ```
 
-#### Frontend
+Start the frontend:
 
 ```
 $ cd frontend
@@ -40,5 +43,8 @@ $ npm run serve
 ```
 
 
+Then open  http://localhost:8080
 
-Open  http://localhost:8080
+### Connect to Jovo App
+
+Install the Jovo Inbox plugin as explained here: https://github.com/jovotech/jovo-framework/tree/master/jovo-integrations/jovo-plugin-inbox
