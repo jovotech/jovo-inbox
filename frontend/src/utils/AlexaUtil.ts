@@ -11,6 +11,11 @@ export enum AlexaDeviceName {
   ALEXA_UNSPECIFIED_SCREEN = 'ALEXA_UNSPECIFIED_SCREEN',
 }
 
+export interface FriendlyRequestResponse {
+  type: 'Action' | 'Output';
+  text: string;
+}
+
 export class AlexaUtil {
   static getDeviceName(request: any): AlexaDeviceName {
     let device: AlexaDeviceName = AlexaDeviceName.ALEXA_AUDIO_ONLY;
@@ -93,13 +98,68 @@ export class AlexaUtil {
     );
   }
 
-  static getFriendlyRequestName(request: any) {
-    return request.request?.intent?.name || 'LAUNCH';
+  static getFriendlyRequestName(request: any): FriendlyRequestResponse {
+    if (request.request?.type === 'LaunchRequest') {
+      return {
+        type: 'Output',
+        text: 'LAUNCH',
+      };
+    } else if (request.request?.type === 'IntentRequest' && request.request?.intent?.name) {
+      return {
+        type: 'Output',
+        text: request.request?.intent?.name,
+      };
+    } else if (request.request?.type === 'SessionEndedRequest') {
+      return {
+        type: 'Output',
+        text: `SessionEndedRequest ${request.request.reason || ''}`,
+      };
+    } else if (request.request?.type === 'Connections.Response') {
+      switch (request.request.name) {
+        case 'AskFor': {
+          const scope = request.request.payload.permissionScope.includes('reminders')
+            ? 'Reminders'
+            : request.request.payload.permissionScope;
+          const status = request.request.payload.status.toLowerCase();
+          return {
+            type: 'Action',
+            text: `${scope} ${status}`,
+          };
+        }
+      }
+    }
+
+    return {
+      type: 'Output',
+      text: `Unspecified`,
+    };
   }
 
-  static getFriendlyResponse(response: any) {
-    return response.response?.outputSpeech?.ssml
-      ? FormatUtil.formatMessage(response.response?.outputSpeech?.ssml)
-      : '...';
+  static getFriendlyResponse(response: any): FriendlyRequestResponse {
+    if (response.response?.outputSpeech?.ssml) {
+      return {
+        text: FormatUtil.formatMessage(response.response?.outputSpeech?.ssml),
+        type: 'Output',
+      };
+    } else if (response.response?.directives) {
+      const [directive] = response.response.directives;
+
+      switch (directive.name) {
+        case 'AskFor': {
+          const scope = directive.payload.permissionScope.includes('reminders')
+            ? 'Reminders'
+            : directive.payload.permissionScope;
+          return {
+            type: 'Action',
+            text: `AskFor ${scope}`,
+          };
+        }
+      }
+    }
+
+    return {
+      type: 'Output',
+      text: 'Unspecified',
+    };
   }
 }

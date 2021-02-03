@@ -11,3 +11,4 @@ declare module 'vue-feather-icons/icons/*' {
 
 declare module 'apl-viewhost-web';
 declare module 'vue-json-pretty';
+declare module 'vue-sanitize';

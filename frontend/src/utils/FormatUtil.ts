@@ -13,12 +13,13 @@ export class FormatUtil {
     } else if (dateDayJs.isYesterday()) {
       return 'yesterday,' + dateDayJs.format(' h:mm a');
     } else if (dateDayJs.isAfter(dateDayJs.subtract(7, 'day'))) {
-      return simple ? dateDayJs.format('dddd') : dateDayJs.format('ddd, h:mm a');
+      return simple ? dateDayJs.format('ddd') : dateDayJs.format('ddd, h:mm a');
     } else {
       return dateDayJs.format('ddd, MMM, DD h:mm a');
     }
   }
 
+  // TODO: not XSS safe!!!
   static formatMessage(message: string) {
     message = message.replace('<speak>', '').replace('</speak>', '');
 
@@ -38,10 +39,16 @@ export class FormatUtil {
       /<break time=(?:'|")(\S+?)(?:'|")\/>/g,
       '<span class="tag-break">(Break $1)</span>',
     );
+
     message = message.replace(
       /<audio src=(?:'|")(.+?)(?:'|") \/>/g,
       '<span class="tag-audio p-1 rounded-lg" title="$1"><audio class="audio-player" src="$1"></audio></span>',
     );
     return message;
+  }
+
+  // TODO: alexa only
+  static shortenUserId(userId: string) {
+    return userId.substr(userId.indexOf('account.') + 8, 10);
   }
 }

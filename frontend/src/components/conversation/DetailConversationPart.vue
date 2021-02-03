@@ -91,7 +91,7 @@ export default class DetailConversationPart extends Vue {
   renderer: any;
 
   async mounted() {
-    console.log('mounted');
+    //
   }
 
   @Watch('visible', { deep: true })

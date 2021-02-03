@@ -21,6 +21,7 @@ module.exports = {
       colors: {
         'alexa-blue': '#78e5ff',
         'blueGray': colors.blueGray,
+        'jovo-blue': '#272f48',
       },
       spacing: {
         72: '18rem',
@@ -60,5 +61,5 @@ module.exports = {
       visibility: ['group-hover'],
     },
   },
-  plugins: [],
+  plugins: [require('@tailwindcss/forms')],
 };

@@ -1,0 +1,33 @@
+
+
+:root {
+    --plyr-color-main: #374152;
+    --plyr-control-radius: 4px;
+    --plyr-control-icon-size: 12px;
+    --plyr-audio-controls-background: #e5e7eb;
+}
+.plyr {
+    min-width: unset;
+    border-radius: 4px;
+}
+.plyr--audio .plyr__controls {
+    margin-left: unset;
+    margin-right: unset;
+    padding: 0;
+}
+.plyr--audio {
+    display: inline-block;
+}
+.plyr__controls__item .plyr__time--current .plyr__time {
+    font-size: smaller;
+}
+
+.plyr__controls .plyr__controls__item.plyr__time {
+    margin-left: 0 !important;
+}
+
+.plyr__controls .plyr__controls__item:first-child {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+

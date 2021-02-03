@@ -1,26 +1,39 @@
 <template>
   <div class="group w-full flex-grow flex flex-col">
+    <div v-if="isSessionStart" class="text-center" :title="sessionStart">
+      <div class="my-10 mx-auto w-4/5 new-session">
+        <span class="bg-gray-100 ">{{ newSessionDate(sessionStart) }}</span>
+      </div>
+    </div>
     <div class="inline-flex w-full max-w-3/4" :class="isResponse ? 'ml-auto justify-end' : ''">
       <div class="inline-flex flex-col">
         <div class="flex items-start space-x-2">
           <!--          <div v-if="isRequest" class="response-avatar">-->
           <!--            &lt;!&ndash;            <user-icon size="14" class="text-gray-500"></user-icon>&ndash;&gt;-->
           <!--          </div>-->
-
           <div
             v-if="isRequest"
-            class="rounded-full h-8 w-8 bg-gray-200 flex mr-1 text-center items-center justify-center flex-shrink-0"
+            class="rounded-full  flex text-center items-center justify-center flex-shrink-0"
           >
-            <span
-              v-if="isRequest"
-              class="inline-block h-6 w-6 rounded-full overflow-hidden bg-gray-200"
+            <img
+              v-if="isRequest && getImage(part)"
+              class="h-10 w-10 rounded-full"
+              :src="getImage(part)"
+              :title="part.userId"
+              alt=""
+            />
+            <svg
+              v-else-if="isRequest"
+              class="h-auto w-10 text-gray-400"
+              viewBox="0 0 20 20"
+              fill="currentColor"
             >
-              <svg class="h-full w-full text-gray-400" fill="currentColor" viewBox="0 0 24 24">
-                <path
-                  d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z"
-                />
-              </svg>
-            </span>
+              <path
+                fill-rule="evenodd"
+                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z"
+                clip-rule="evenodd"
+              />
+            </svg>
           </div>
 
           <div
@@ -28,14 +41,26 @@
             :class="[
               isResponse
                 ? 'bg-white self-end text-gray-800 rounded-xl '
-                : 'bg-primary self-start text-right text-white rounded-xl',
+                : 'bg-jovo-blue self-start text-right text-white rounded-xl',
             ]"
           >
             <p
+              v-if="isRequest"
+              :class="[printRequest(part).type === 'Action' ? 'italic' : '']"
+              class="font-sans leading-6 whitespace-pre-wrap "
+              @click="handleClick"
+            >
+              {{ printRequest(part).text }}
+            </p>
+
+            <p
+              v-if="isResponse"
+              :class="[printResponse(part).type === 'Action' ? 'italic' : '']"
               class="font-sans leading-6 whitespace-pre-wrap"
-              v-html="print(part)"
+              v-html="$sanitize(printResponse(part).text)"
               @click="handleClick"
             ></p>
+
             <detail-conversation-part
               :visible="isDetailVisible"
               @hide="isDetailVisible = false"
@@ -85,26 +110,22 @@
         </div>
       </div>
     </div>
-    <div v-if="isNextSession" class="text-center" :title="nextSessionStart">
-      <div class="my-10 mx-auto w-4/5 new-session">
-        <span class="bg-gray-100 ">{{ newSessionDate(nextSessionStart) }}</span>
-      </div>
-    </div>
   </div>
 </template>
 
 <script lang="ts">
 import DetailConversationPart from '@/components/conversation/DetailConversationPart.vue';
 import ScreenConversationPart from '@/components/conversation/ScreenConversationPart.vue';
-import { AlexaUtil } from '@/utils/AlexaUtil';
+import { AlexaUtil, FriendlyRequest } from '@/utils/AlexaUtil';
 import { InboxLog, InboxLogType } from 'jovo-inbox-core';
-import { format } from 'timeago.js';
 import { CodeIcon, MonitorIcon, UserIcon } from 'vue-feather-icons';
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
-import dayjs from 'dayjs';
 import Plyr from 'plyr';
 import 'plyr/src/sass/plyr.scss';
 import { FormatUtil } from '@/utils/FormatUtil';
+import { Alexa } from 'jovo-platform-alexa';
+import { BaseMixin } from '@/mixins/BaseMixin';
+import { mixins } from 'vue-class-component';
 
 @Component({
   name: 'conversation-part',
@@ -116,7 +137,7 @@ import { FormatUtil } from '@/utils/FormatUtil';
     UserIcon,
   },
 })
-export default class ConversationPart extends Vue {
+export default class ConversationPart extends mixins(BaseMixin) {
   @Prop({ required: true, type: Object })
   part!: InboxLog;
 
@@ -161,8 +182,20 @@ export default class ConversationPart extends Vue {
     );
   }
 
+  get isSessionStart() {
+    return (
+      this.index === 0 ||
+      this.selectedConversation[this.index - 1].sessionId !==
+        this.selectedConversation[this.index].sessionId
+    );
+  }
+
   get nextSessionStart() {
     return this.selectedConversation[this.index + 1].createdAt;
+  }
+
+  get sessionStart() {
+    return this.selectedConversation[this.index].createdAt;
   }
 
   print(log: InboxLog) {
@@ -182,17 +215,12 @@ export default class ConversationPart extends Vue {
     }
   }
 
-  printRequest(log: InboxLog) {
+  printRequest(log: InboxLog): FriendlyRequest {
     return AlexaUtil.getFriendlyRequestName(log.payload);
   }
 
   printResponse(log: InboxLog) {
-    const message = log.payload.response?.outputSpeech?.ssml || '...';
-    return this.formatMessage(message);
-  }
-
-  formatMessage(message: string) {
-    return FormatUtil.formatMessage(message);
+    return AlexaUtil.getFriendlyResponse(log.payload);
   }
 
   handleClick(e: Event) {
@@ -214,29 +242,6 @@ export default class ConversationPart extends Vue {
 }
 </script>
 <style lang="postcss">
-.plyr {
-  //max-width: unset;
-  min-width: unset;
-  border-radius: 4px;
-}
-.plyr--audio .plyr__controls {
-  margin-left: unset;
-  margin-right: unset;
-  padding: 0;
-}
-.plyr--audio {
-  display: inline-block;
-}
-.plyr__controls__item .plyr__time--current .plyr__time {
-  margin-left: 2px;
-  font-size: smaller;
-}
-:root {
-  --plyr-color-main: #374152;
-  --plyr-control-radius: 4px;
-  --plyr-control-icon-size: 12px;
-  --plyr-audio-controls-background: #e5e7eb;
-}
 .response-avatar {
   @apply rounded-full h-8 w-8 bg-gray-200 flex mr-1 items-center justify-center flex-shrink-0;
 }
