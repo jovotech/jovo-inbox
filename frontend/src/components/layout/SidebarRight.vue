@@ -73,7 +73,7 @@
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
-          class="w-3 h-auto inline ml-1 cursor-pointer text-gray-600 hover:text-gray-700 hidden group-hover:inline-block"
+          class="w-3 h-auto inline ml-1 cursor-pointer text-gray-600 hover:text-gray-700 invisible group-hover:visible"
           viewBox="0 0 24 24"
           stroke="currentColor"
           @click="editName"
@@ -86,19 +86,48 @@
           />
         </svg>
       </div>
-      <div v-else class="mt-4 text-sm w-24 m-auto">
+      <div v-else class="mt-4 text-sm m-auto">
         <input
           type="text"
           name="first_name"
           v-model="user.name"
-          @blur="handleSaveUserName"
           ref="name"
           id="name"
-          @keyup.enter="handleSaveUserName"
           placeholder="Name"
           autocomplete="given-name"
-          class="max-w-lg block w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:max-w-xs sm:text-sm border-gray-300 rounded-md"
+          class="w-24 block m-auto shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:max-w-xs sm:text-sm border-gray-300 rounded-md"
         />
+        <svg
+          @click="handleSaveUserName"
+          class="w-3 h-auto inline ml-1 cursor-pointer text-gray-600 hover:text-gray-700"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M5 13l4 4L19 7"
+          />
+        </svg>
+
+        <svg
+          @click="cancelEditName"
+          class="w-3 h-auto inline ml-1 cursor-pointer text-gray-600 hover:text-gray-700"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
       </div>
 
       <div class="mt-8">
@@ -161,6 +190,7 @@ export default class SidebarRight extends mixins(BaseMixin) {
 
   user: Partial<InboxLogUser> = {};
   isCopied = false;
+  oldNameValue = '';
 
   async handleSaveUserName() {
     this.isNameEdit = false;
@@ -218,9 +248,14 @@ export default class SidebarRight extends mixins(BaseMixin) {
 
   editName() {
     this.isNameEdit = true;
-
+    this.oldNameValue = this.user.name;
     // TODO: focus doesn't work
     // (this.$refs['name'] as HTMLElement).focus();
+  }
+  cancelEditName() {
+    this.isNameEdit = false;
+
+    this.user.name = this.oldNameValue;
   }
 
   @Watch('conversation')
