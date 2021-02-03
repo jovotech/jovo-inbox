@@ -6,7 +6,7 @@ export = {
       connection: {
         type: 'mysql',
         host: process.env.INBOX_MYSQL_HOST,
-        port: 3306,
+        port: process.env.INBOX_MYSQL_PORT || 3306,
         synchronize: true,
         // eslint-disable-next-line no-undef
         username: process.env.INBOX_MYSQL_USER,
