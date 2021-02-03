@@ -37,8 +37,8 @@
                 >
                   Sessions
                   <span
-                    class="inline-flex items-center justify-center px-2 py-1 mr-2 text-xs font-bold leading-none text-gray-500 bg-gray-200 rounded"
-                    >9</span
+                    class="inline-flex items-center justify-center px-1 py-0.5 mr-2 text-xs font-bold leading-none text-gray-500 bg-gray-200 rounded"
+                    >{{ sessionsCount }}</span
                   >
                 </a>
                 <!-- Current: "border-indigo-500 text-indigo-600", Default: "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300" -->
@@ -69,6 +69,8 @@
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator';
 import ConversationPart from '@/components/conversation/ConversationPart.vue';
+import { InboxLog, InboxLogType } from 'jovo-inbox-core';
+import { AlexaUtil } from '@/utils/AlexaUtil';
 
 @Component({
   name: 'main-panel',
@@ -77,6 +79,7 @@ import ConversationPart from '@/components/conversation/ConversationPart.vue';
 export default class MainPanel extends Vue {
   loading = false;
   isContentHovered = false;
+  sessionsCount = 0;
 
   get selectedConversation() {
     return this.$store.state.DataModule.selectedUserConversations;
@@ -84,13 +87,26 @@ export default class MainPanel extends Vue {
 
   @Watch('selectedConversation')
   onSelectedConversation() {
+    console.log(this.selectedConversation);
     this.$nextTick(() => {
       this.scrollToBottom();
     });
+    this.countSessions();
   }
   scrollToBottom() {
     const partContainer = this.$refs.partContainer as HTMLDivElement;
     partContainer.scrollTop = partContainer.scrollHeight;
+  }
+
+  countSessions() {
+    const sessionsMap: Record<string, string> = {};
+    this.selectedConversation.forEach((inboxLog: InboxLog) => {
+      sessionsMap[inboxLog.sessionId] = true;
+    });
+
+    console.log('asd');
+    console.log(Object.keys(sessionsMap));
+    this.sessionsCount = Object.keys(sessionsMap).length;
   }
 }
 </script>

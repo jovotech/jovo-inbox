@@ -1,13 +1,11 @@
 import { Module, MutationAction, VuexModule } from 'vuex-module-decorators';
 import {
-  GetInboxLogUserDto,
   InboxLog,
-  JovoAppList,
   JovoAppMetaData,
   SelectUserConversationsDto,
+  InboxLogUser,
 } from 'jovo-inbox-core';
 import { Api } from '@/Api';
-import { InboxLogUser } from 'jovo-inbox-core/dist/InboxLogUser';
 export enum DataAction {
   fetchApps = 'fetchApps',
   fetchConversations = 'fetchConversations',
