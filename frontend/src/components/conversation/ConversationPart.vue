@@ -77,10 +77,10 @@
 
           <div
             v-if="isResponse"
-            class="rounded-full h-8 w-8 bg-white flex mr-3 text-center items-center justify-center flex-shrink-0"
+            class="rounded-full h-10 w-10 bg-white flex mr-3 text-center items-center justify-center flex-shrink-0"
           >
             <svg
-              class="h-6 w-6 fill-current text-alexa-blue"
+              class="h-8 w-8 fill-current text-alexa-blue"
               height="24"
               width="24"
               viewBox="0 0 24 24"
