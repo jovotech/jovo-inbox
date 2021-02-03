@@ -200,7 +200,10 @@ export default class SidebarLeft extends mixins(BaseMixin) {
   getConversations(): InboxLog[] {
     if (this.search.length >= 2) {
       return this.$store.state.DataModule.conversations.filter((log: InboxLog) => {
-        return log.userId.indexOf(this.search) > -1;
+        return (
+          log.userId.indexOf(this.search) > -1 ||
+          (this.nameMap[log.userId] && this.nameMap[log.userId].name.indexOf(this.search) > -1)
+        );
       });
     }
     return this.$store.state.DataModule.conversations;
