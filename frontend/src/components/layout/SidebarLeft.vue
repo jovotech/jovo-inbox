@@ -90,7 +90,7 @@
               >
                 <a
                   href="#"
-                  class="group block hover:bg-gray-100 "
+                  class="group block hover:bg-gray-100 focus:bg-gray-200"
                   :class="[isSelected(conversation) ? 'bg-gray-200' : '']"
                 >
                   <div class="px-2 py-2 sm:px-3 flex text-xs">
@@ -121,9 +121,9 @@
                         </p>
                         <div class="ml-2 flex-shrink-0 flex">
                           <p
-                            class=" inline-flex text-xs leading-5 text-gray-400 group-hover:text-gray-500"
+                            class=" inline-flex text-xs leading-5 text-gray-400 group-hover:text-gray-500 group-focus:text-gray-600"
                             :title="lastConversationItemDate(conversation, false)"
-                            :class="[isSelected(conversation) ? 'text-gray-500' : '']"
+                            :class="[isSelected(conversation) ? 'text-gray-600' : '']"
                           >
                             {{ lastConversationItemDate(conversation) }}
                           </p>
@@ -132,8 +132,8 @@
                       <div class="mt-1q sm:flex sm:justify-between">
                         <div class="sm:flex">
                           <p
-                            class="flex items-center text-xs text-gray-400 group-hover:text-gray-500"
-                            :class="[isSelected(conversation) ? 'text-gray-500' : '']"
+                            class="flex items-center text-xs text-gray-400 group-hover:text-gray-500 group-focus:text-gray-600"
+                            :class="[isSelected(conversation) ? 'text-gray-600' : '']"
                           >
                             {{ lastConversationItemRequest(conversation).text }}
                           </p>
