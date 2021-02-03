@@ -188,6 +188,7 @@ export default class SidebarLeft extends mixins(BaseMixin) {
     } catch (e) {
       console.log(e);
     }
+    await this.$store.dispatch('DataModule/fetchConversations');
   }
 
   get apps(): JovoAppMetaData[] {
