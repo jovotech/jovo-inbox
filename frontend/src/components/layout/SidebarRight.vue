@@ -81,7 +81,26 @@
       </div>
 
       <div class="mt-8">
-        <div class="tracking-wide text-gray-400 text-xs uppercase">Devices</div>
+        <div class="tracking-wide text-gray-400 text-xs uppercase mb-2">Devices</div>
+
+        <span
+          v-for="device in devices"
+          v-bind:key="device"
+          class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-50 text-indigo-800 mr-1"
+        >
+          <svg
+            class="h-4 w-4 fill-current text-alexa-blue mr-1"
+            height="24"
+            width="24"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M0,10.0000489 C0,15.0707816 3.77428289,19.2594477 8.66667972,19.9113334 L8.66667972,17.8962718 C8.66667972,17.3281595 8.30829606,16.8174945 7.76974193,16.636736 C4.94690794,15.688512 2.927648,12.9904434 3.00202582,9.8313279 C3.09245359,5.9853886 6.22532565,2.96152397 10.0722248,3.00037678 C13.9049334,3.03913173 16.9999315,6.15812215 16.9999315,10.0000489 C16.9999315,10.087639 16.9977785,10.1747398 16.9945489,10.2614491 C16.9887748,10.4004189 16.9838815,10.4807669 16.9775203,10.5606256 C16.975563,10.5860707 16.9731163,10.611418 16.9707676,10.6367653 C16.9658743,10.692549 16.9601002,10.7479411 16.9538368,10.8032355 C16.9466926,10.8660654 16.9385698,10.928504 16.9298598,10.9906489 C16.9258473,11.01903 16.9220305,11.0475091 16.9177244,11.0756945 C16.0607158,16.7212922 8.70778325,19.8942068 8.66756051,19.9115291 C9.10355154,19.9694658 9.54815475,20 9.99990213,20 C15.5228467,20 20,15.5229227 20,10.0000489 C20,4.47717519 15.5228467,0 9.99990213,0 C4.47715329,0 0,4.47717519 0,10.0000489 Z"
+              transform="translate(2 2)"
+            ></path>
+          </svg>
+          {{ device }}
+        </span>
       </div>
 
       <div class="mt-8  px-7">
@@ -101,13 +120,15 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
 import { Share2Icon } from 'vue-feather-icons';
 import { BaseMixin } from '@/mixins/BaseMixin';
 import { mixins } from 'vue-class-component';
-import { InboxLog } from 'jovo-inbox-core';
+import { InboxLog, InboxLogType } from 'jovo-inbox-core';
 import { InboxLogUser } from 'jovo-inbox-core/dist/InboxLogUser';
 import { Api } from '@/Api';
+import { AlexaRequest } from 'jovo-platform-alexa';
+import { AlexaUtil } from '@/utils/AlexaUtil';
 
 @Component({
   name: 'sidebar-right',
@@ -115,6 +136,7 @@ import { Api } from '@/Api';
 })
 export default class SidebarRight extends mixins(BaseMixin) {
   isNameEdit = false;
+  devices: string[] = ['Echo', 'Echo Show'];
 
   user: Partial<InboxLogUser> = {};
 
@@ -148,9 +170,6 @@ export default class SidebarRight extends mixins(BaseMixin) {
       return;
     }
 
-    /*
-        Add the form data we need to submit
-    */
     formData.append('images', file);
     try {
       await Api.uploadUserImage(
@@ -213,12 +232,24 @@ export default class SidebarRight extends mixins(BaseMixin) {
         platformUserId: this.conversation.userId,
         appId: this.conversation.appId,
       });
+      this.getDevices();
       this.user = {
         ...result.data,
       };
     } catch (e) {
       console.log(e);
     }
+  }
+
+  getDevices() {
+    const devicesMap: Record<string, string> = {};
+    this.selectedConversations.forEach((inboxLog: InboxLog) => {
+      if (inboxLog.type === InboxLogType.REQUEST) {
+        devicesMap[AlexaUtil.getFriendlyDeviceName(inboxLog.payload)] = true;
+      }
+    });
+
+    this.devices = Object.keys(devicesMap);
   }
 }
 </script>
