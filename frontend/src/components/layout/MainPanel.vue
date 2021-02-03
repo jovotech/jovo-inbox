@@ -104,8 +104,6 @@ export default class MainPanel extends Vue {
       sessionsMap[inboxLog.sessionId] = true;
     });
 
-    console.log('asd');
-    console.log(Object.keys(sessionsMap));
     this.sessionsCount = Object.keys(sessionsMap).length;
   }
 }
