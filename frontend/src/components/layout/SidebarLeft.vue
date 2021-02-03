@@ -88,7 +88,11 @@
                 v-bind:key="conversation.id"
                 @click="selectConversation(conversation)"
               >
-                <a href="#" class="block hover:bg-gray-100 focus:bg-gray-200">
+                <a
+                  href="#"
+                  class="group block hover:bg-gray-100 "
+                  :class="[isSelected(conversation) ? 'bg-gray-200' : '']"
+                >
                   <div class="px-2 py-2 sm:px-3 flex text-xs">
                     <img
                       v-if="getImage(conversation)"
@@ -117,8 +121,9 @@
                         </p>
                         <div class="ml-2 flex-shrink-0 flex">
                           <p
-                            class=" inline-flex text-xs leading-5 text-gray-400"
+                            class=" inline-flex text-xs leading-5 text-gray-400 group-hover:text-gray-500"
                             :title="lastConversationItemDate(conversation, false)"
+                            :class="[isSelected(conversation) ? 'text-gray-500' : '']"
                           >
                             {{ lastConversationItemDate(conversation) }}
                           </p>
@@ -126,7 +131,10 @@
                       </div>
                       <div class="mt-1q sm:flex sm:justify-between">
                         <div class="sm:flex">
-                          <p class="flex items-center text-xs text-gray-400">
+                          <p
+                            class="flex items-center text-xs text-gray-400 group-hover:text-gray-500"
+                            :class="[isSelected(conversation) ? 'text-gray-500' : '']"
+                          >
                             {{ lastConversationItemRequest(conversation).text }}
                           </p>
                         </div>
@@ -166,6 +174,7 @@ export default class SidebarLeft extends mixins(BaseMixin) {
 
   async mounted() {
     try {
+      console.log(this.$route);
       await this.$store.dispatch('DataModule/fetchConversations');
     } catch (e) {
       console.log(e);
@@ -195,6 +204,17 @@ export default class SidebarLeft extends mixins(BaseMixin) {
 
   lastConversationItemRequest(inboxLog: InboxLog) {
     return AlexaUtil.getFriendlyRequestName(inboxLog.payload);
+  }
+
+  isSelected(inboxLog: InboxLog) {
+    const selectedConversations = this.$store.state.DataModule.selectedUserConversations;
+    if (!selectedConversations || selectedConversations.length === 0) {
+      return false;
+    }
+    return (
+      selectedConversations[0].appId === inboxLog.appId &&
+      selectedConversations[0].userId === inboxLog.userId
+    );
   }
 
   getConversations(): InboxLog[] {
