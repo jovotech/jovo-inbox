@@ -7,7 +7,7 @@
     @mouseleave="isContentHovered = false"
   >
     <!-- Start main area-->
-    <div class="inset-0 mt-6 px-0  bg-gray-100">
+    <div class="inset-0 mt-6 px-0  bg-gray-100" v-if="selectedConversation.length > 0">
       <div class="h-full  rounded-lg">
         <div class="text-center">
           <div class="sm:hidden">
@@ -69,8 +69,7 @@
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator';
 import ConversationPart from '@/components/conversation/ConversationPart.vue';
-import { InboxLog, InboxLogType } from 'jovo-inbox-core';
-import { AlexaUtil } from '@/utils/AlexaUtil';
+import { InboxLog } from 'jovo-inbox-core';
 
 @Component({
   name: 'main-panel',

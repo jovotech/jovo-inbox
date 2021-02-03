@@ -8,8 +8,8 @@ export interface SqlInboxConfig extends PluginConfig, Partial<MikroORMOptions> {
 
 export class SqlInbox implements JovoInboxDb {
   config: SqlInboxConfig = {
-    entities: ['./src/entities'], // path to your JS entities (dist), relative to `baseDir`
-    // entitiesTs: [path.resolve(Project.getProjectPath(), 'dist', 'src/entities')],
+    entities: ['./src/entity'], // path to your JS entity (dist), relative to `baseDir`
+    // entitiesTs: [path.resolve(Project.getProjectPath(), 'dist', 'src/entity')],
     dbName: 'jovoinbox',
     type: 'mysql',
     host: 'localhost',
@@ -27,8 +27,6 @@ export class SqlInbox implements JovoInboxDb {
 
   async init() {
     if (!this.orm) {
-      console.log(this.config);
-
       this.orm = await MikroORM.init();
     }
   }

@@ -13,6 +13,8 @@ declare module 'jovo-core/dist/src/core/Jovo' {
   }
 }
 
+
+
 export interface JovoInboxConfig extends PluginConfig {
   db?: SqlInboxConfig;
   appId?: string;

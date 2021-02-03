@@ -1,7 +1,7 @@
 <template>
   <aside class="hidden relative xl:flex xl:flex-col flex-shrink-0 w-4/12 border-l  border-gray-200">
     <!-- Start secondary column (hidden on smaller screens) -->
-    <div class="text-right px-7 py-7">
+    <div v-if="!!conversation" class="text-right px-7 py-7">
       <button
         v-if="!isCopied"
         type="button"
@@ -73,7 +73,7 @@
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
-          class="w-3 h-auto inline ml-1 cursor-pointer text-gray-600 hover:text-gray-700 invisible group-hover:visible"
+          class="w-3 h-auto inline ml-1 cursor-pointer text-gray-600 hover:text-gray-700"
           viewBox="0 0 24 24"
           stroke="currentColor"
           @click="editName"

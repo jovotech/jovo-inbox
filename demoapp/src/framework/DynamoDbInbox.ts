@@ -13,7 +13,7 @@
 // import _get = require('lodash.get');
 // import _merge = require('lodash.merge');
 // import { DataEntry, JovoInboxDb } from './interfaces';
-// import { InboxLogEntity } from '../entities/InboxLogEntity';
+// import { InboxLogEntity } from '../entity/InboxLogEntity';
 //
 // export interface DynamoDbInboxConfig extends PluginConfig {
 //   tableName?: string;

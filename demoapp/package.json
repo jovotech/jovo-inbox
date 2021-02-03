@@ -7,6 +7,7 @@
   "dependencies": {
     "@mikro-orm/core": "^4.3.2",
     "@mikro-orm/mysql": "^4.3.2",
+    "typeorm": "^0.2.30",
     "aws-sdk": "^2.798.0",
     "dotenv": "^8.2.0",
     "jovo-db-dynamodb": "^3.2.2",

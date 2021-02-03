@@ -184,6 +184,10 @@ export default class SidebarLeft extends mixins(BaseMixin) {
             appId: result.data?.logs[0].appId,
           } as SelectUserConversationsDto);
         }
+      } else {
+        if (this.getConversations().length > 0) {
+          await this.selectConversation(this.getConversations()[0]);
+        }
       }
     } catch (e) {
       console.log(e);

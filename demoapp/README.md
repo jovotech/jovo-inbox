@@ -30,7 +30,7 @@ $ cd <directory>
 # Install dependencies.
 $ npm install
 
-# Run voice app, optionally with a --watch flag to restart on code changes.
+# Run voice jovo-app, optionally with a --watch flag to restart on code changes.
 $ jovo run [-w]
 ```
 

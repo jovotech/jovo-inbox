@@ -1,5 +1,5 @@
 module.exports = {
-  entities: ['./src/entities'],
+  entities: ['./src/entity'],
 
   type: 'mysql', // one of `mongo` | `mysql` | `mariadb` | `postgresql` | `sqlite`
 
