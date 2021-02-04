@@ -1,5 +1,5 @@
 <template>
-  <div id="app" class="h-screen max-h-screen bg-gray-100">
+  <div id="app" class="h-screen max-h-screen bg-gray-100 flex flex-col">
     <inbox-header></inbox-header>
     <div class=" flex overflow-hidden bg-white">
       <sidebar-left></sidebar-left>

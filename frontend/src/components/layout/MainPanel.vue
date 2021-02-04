@@ -50,7 +50,7 @@
     </div>
     <div
       v-if="!loading"
-      class="ml-auto overflow-y-auto h-screen font-medium  space-y-4 overflow-y-scroll px-32 pt-10 pb-32"
+      class="ml-auto overflow-y-auto h-screen font-medium  space-y-4 overflow-y-scroll px-32 pt-10 pb-36"
       ref="partContainer"
       :class="[isContentHovered ? 'scrollbar' : 'scrollbar-invisible']"
     >
@@ -97,7 +97,7 @@ export default class MainPanel extends Vue {
   }
 
   countSessions() {
-    const sessionsMap: Record<string, string> = {};
+    const sessionsMap: Record<string, boolean> = {};
     this.selectedConversation.forEach((inboxLog: InboxLog) => {
       sessionsMap[inboxLog.sessionId] = true;
     });

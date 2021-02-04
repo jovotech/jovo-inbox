@@ -12,7 +12,7 @@
         <share2-icon size="16" class="mr-2"></share2-icon>
         Share
       </button>
-      <span v-else class="inline-block px-3 py-2 text-sm text-color"
+      <span v-else class="inline-flex text-sm items-center px-3 py-2 "
         >Link copied to clipboard!</span
       >
     </div>
