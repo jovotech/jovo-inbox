@@ -60,17 +60,16 @@
               v-html="$sanitize(printResponse(part).text)"
               @click="handleClick"
             ></p>
-
-            <detail-conversation-part
-              :visible="isDetailVisible"
-              @hide="isDetailVisible = false"
-              :part="part"
-            ></detail-conversation-part>
             <ScreenConversationPart
               :visible="isScreenViewVisible"
               @hide="isScreenViewVisible = false"
               :part="part"
             ></ScreenConversationPart>
+            <detail-conversation-part
+              :visible="isDetailVisible"
+              @hide="isDetailVisible = false"
+              :part="part"
+            ></detail-conversation-part>
           </div>
           <!--          <div v-if="isRequest"-->
           <!--               class="rounded-full h-8 w-8 bg-gray-200 flex items-center justify-center flex-shrink-0"></div>-->
@@ -93,13 +92,6 @@
           </div>
         </div>
         <div class="invisible group-hover:visible" :class="isResponse ? 'ml-auto' : ''">
-          <code-icon
-            class="inline-block mt-2 text-gray-500 hover:text-gray-800 cursor-pointer"
-            :class="[isResponse ? 'self-end text-right ml-auto mr-3' : ' self-start  ml-3']"
-            size="14"
-            @click="isDetailVisible = true"
-          ></code-icon>
-
           <monitor-icon
             v-if="isResponse && hasScreenInterface"
             class="inline-block mt-2 text-gray-500 hover:text-gray-800 cursor-pointer"
@@ -107,6 +99,12 @@
             size="14"
             @click="isScreenViewVisible = true"
           ></monitor-icon>
+          <code-icon
+            class="inline-block mt-2 text-gray-500 hover:text-gray-800 cursor-pointer"
+            :class="[isResponse ? 'self-end text-right ml-auto mr-3' : ' self-start  ml-3']"
+            size="14"
+            @click="isDetailVisible = true"
+          ></code-icon>
         </div>
       </div>
     </div>
@@ -171,6 +169,7 @@ export default class ConversationPart extends mixins(BaseMixin) {
 
   get hasScreenInterface(): boolean {
     const lastRequest = this.findLastRequest();
+    console.log(AlexaUtil.hasAplInterface(lastRequest.payload));
     return !!lastRequest && AlexaUtil.hasAplInterface(lastRequest.payload);
   }
 

@@ -1,7 +1,7 @@
 <template>
   <aside class="hidden relative xl:flex xl:flex-col flex-shrink-0 w-4/12 border-l  border-gray-200">
     <!-- Start secondary column (hidden on smaller screens) -->
-    <div v-if="!!conversation" class="text-right px-7 py-7">
+    <div v-if="!!conversation" class="text-right px-5 py-5">
       <button
         v-if="!isCopied"
         type="button"

@@ -403,7 +403,6 @@ export default class DetailConversationPart extends Vue {
 
   hide(val: boolean) {
     this.$emit('hide');
-    this.visible = false;
   }
 }
 </script>

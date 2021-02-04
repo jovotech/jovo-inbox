@@ -7,7 +7,7 @@
     @mouseleave="isContentHovered = false"
   >
     <!-- Start main area-->
-    <div class="inset-0 mt-6 px-0  bg-gray-100" v-if="selectedConversation.length > 0">
+    <div class="inset-0 mt-2 px-0  bg-gray-100" v-if="selectedConversation.length > 0">
       <div class="h-full  rounded-lg">
         <div class="text-center">
           <div class="sm:hidden">

@@ -15,8 +15,6 @@ import {
   Repository,
 } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UserConversationsResponse } from 'jovo-inbox-core/dist/UserConversationsResponse';
-import { LOGS_PER_REQUEST } from '../../constants';
 import { InboxLogUserEntity } from '../../entity/inbox-log-user.entity';
 import { UploadedFile } from 'jovo-inbox-core/dist/UploadedFile';
 import * as fs from 'fs';
@@ -136,7 +134,7 @@ export class InboxLogUserService {
     // TODO: better error mgmt
     const filePath = path.join(
       __dirname,
-      '../../../../public/images',
+      './../../../../public/images',
       user.image,
     );
     console.log(filePath);
@@ -155,7 +153,7 @@ export class InboxLogUserService {
     }
     const filePath = path.join(
       __dirname,
-      '../../../../public/images',
+      './../../../../public/images',
       user.image,
     );
     if (fs.existsSync(filePath)) {
