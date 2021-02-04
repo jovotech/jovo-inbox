@@ -9,7 +9,7 @@
             <div class="w-full">
               <button
                 type="button"
-                class="group w-full bg-gray-50 rounded-md px-3.5 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-purple-500"
+                class="group w-full bg-gray-50 rounded-md px-3.5 pl-6 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-purple-500"
                 id="options-menu2"
                 aria-haspopup="true"
                 aria-expanded="true"
@@ -49,7 +49,7 @@
               </button>
             </div>
           </div>
-          <div class="px-3 mt-5">
+          <div class="px-7 mt-5">
             <label for="search" class="sr-only">Search</label>
             <div class="mt-1 relative rounded-md shadow-sm">
               <div

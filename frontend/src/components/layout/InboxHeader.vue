@@ -5,7 +5,7 @@
         <div class="flex flex-col  lg:w-0 lg:flex-1">
           <a href="#">
             <span class="sr-only">Jovo Inbox</span>
-            <img class="h-4 w-auto sm:h-10" src="@/assets/newlogo.png" alt="" />
+            <img class="h-2 w-auto sm:h-8" src="@/assets/jovo-inbox-logo.png" alt="" />
           </a>
         </div>
       </div>
