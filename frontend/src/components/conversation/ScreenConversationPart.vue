@@ -104,7 +104,7 @@ export default class ScreenConversationPart extends Vue {
     const directive = this.part.payload.response.directives[0];
     const doc = directive.document;
     doc.version = '1.4';
-    const datasource = directive.datasources;
+    const datasource = directive.datasources || {};
     console.log(directive);
     const content = AplRenderer.Content.create(JSON.stringify(doc));
     if (content && datasource) {
@@ -122,9 +122,9 @@ export default class ScreenConversationPart extends Vue {
         disallowVideo: false,
       },
       viewport: {
-        width: 1280,
+        width: 1024,
         height: 600,
-        dpi: 160,
+        dpi: 96,
       },
       theme: 'dark',
       developerToolOptions: {
@@ -142,9 +142,8 @@ export default class ScreenConversationPart extends Vue {
     return this.part.payload;
   }
 
-  hide(val: boolean) {
+  hide() {
     this.$emit('hide');
-    this.visible = false;
   }
 }
 </script>

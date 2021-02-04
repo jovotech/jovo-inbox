@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@popperjs/core": "^2.4.4",
-    "apl-viewhost-web": "^1.4.0",
+    "apl-viewhost-web": "^1.5.0",
     "vue-router": "^3.5.1",
     "axios": "^0.21.0",
     "core-js": "^3.6.5",
