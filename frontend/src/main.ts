@@ -1,4 +1,9 @@
 import Vue from 'vue';
+declare module 'vue/types/vue' {
+  interface Vue {
+    $clipboard(value: any): void;
+  }
+}
 import App from './App.vue';
 export const BASE_URL = process.env.VUE_APP_BACKEND_URL || 'http://localhost:4000';
 import VueSanitize from 'vue-sanitize';

@@ -155,7 +155,14 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import { Api } from '@/Api';
-import { InboxLog, JovoAppMetaData, SelectUserConversationsDto } from 'jovo-inbox-core';
+import {
+  AlexaRequest,
+  ConversationalActionRequest,
+  InboxLog,
+  JovoAppMetaData,
+  JovoInboxPlatformRequest,
+  SelectUserConversationsDto,
+} from 'jovo-inbox-core';
 import ConversationPart from '@/components/conversation/ConversationPart.vue';
 import DetailConversationPart from '@/components/conversation/DetailConversationPart.vue';
 
@@ -215,8 +222,24 @@ export default class SidebarLeft extends mixins(BaseMixin) {
     return FormatUtil.formatDate(inboxLog.createdAt, simple);
   }
 
-  lastConversationItemRequest(inboxLog: InboxLog) {
-    return AlexaUtil.getFriendlyRequestName(inboxLog.payload);
+  lastConversationItemRequest(log: InboxLog) {
+    // todo: temporary solution
+    let request: JovoInboxPlatformRequest;
+
+    if (AlexaRequest.isPlatformRequest(log.payload)) {
+      request = new AlexaRequest();
+      request = Object.assign(request, log.payload);
+    } else if (ConversationalActionRequest.isPlatformRequest(log.payload)) {
+      request = new ConversationalActionRequest();
+      request = Object.assign(request, log.payload);
+    }
+    if (!request) {
+      return {
+        type: 'user',
+        text: 'error',
+      };
+    }
+    return request.getText();
   }
 
   isSelected(inboxLog: InboxLog) {

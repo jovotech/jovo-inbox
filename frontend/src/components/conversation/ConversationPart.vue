@@ -46,7 +46,7 @@
           >
             <p
               v-if="isRequest"
-              :class="[printRequest(part).type === 'Action' ? 'italic' : '']"
+              :class="[printRequest(part).type === 'platform' ? 'italic' : '']"
               class="font-sans leading-6 whitespace-pre-wrap "
               @click="handleClick"
             >
@@ -76,9 +76,37 @@
 
           <div
             v-if="isResponse"
-            class="rounded-full h-10 w-10 bg-white flex mr-3 text-center items-center justify-center flex-shrink-0"
+            class="rounded-full h-10 w-12  flex mr-3 text-center items-center justify-center flex-shrink-0"
           >
             <svg
+              v-if="platformType === 'googleassistant'"
+              class="h-7 w-7 fill-current"
+              xmlns="http://www.w3.org/2000/svg"
+              xmlns:xlink="http://www.w3.org/1999/xlink"
+              baseProfile="tiny"
+              id="Layer_1"
+              version="1.2"
+              viewBox="0 0 512 512"
+              xml:space="preserve"
+            >
+              <g>
+                <circle cx="156.268" cy="167.705" fill="#4285F4" r="156.268" />
+                <path
+                  d="M512,182.95c0,17.544-14.224,31.762-31.762,31.762s-31.762-14.218-31.762-31.762   c0-17.543,14.224-31.762,31.762-31.762S512,165.407,512,182.95z"
+                  fill="#34A853"
+                />
+                <path
+                  d="M454.829,260.449c0,35.081-28.438,63.522-63.523,63.522c-35.088,0-63.524-28.441-63.524-63.522   c0-35.083,28.437-63.524,63.524-63.524C426.392,196.925,454.829,225.367,454.829,260.449z"
+                  fill="#EA4335"
+                />
+                <path
+                  d="M467.533,424.339c0,42.1-34.124,76.225-76.228,76.225c-42.104,0-76.229-34.125-76.229-76.225   c0-42.098,34.124-76.227,76.229-76.227C433.409,348.112,467.533,382.241,467.533,424.339z"
+                  fill="#FBBC05"
+                />
+              </g>
+            </svg>
+            <svg
+              v-if="platformType === 'alexa'"
               class="h-8 w-8 fill-current text-alexa-blue"
               height="24"
               width="24"
@@ -115,7 +143,16 @@
 import DetailConversationPart from '@/components/conversation/DetailConversationPart.vue';
 import ScreenConversationPart from '@/components/conversation/ScreenConversationPart.vue';
 import { AlexaUtil, FriendlyRequest } from '@/utils/AlexaUtil';
-import { InboxLog, InboxLogType } from 'jovo-inbox-core';
+import {
+  AlexaRequest,
+  AlexaResponse,
+  ConversationalActionRequest,
+  ConversationalActionResponse,
+  InboxLog,
+  InboxLogType,
+  JovoInboxPlatformRequest,
+  JovoInboxPlatformResponse,
+} from 'jovo-inbox-core';
 import { CodeIcon, MonitorIcon, UserIcon } from 'vue-feather-icons';
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import Plyr from 'plyr';
@@ -169,7 +206,6 @@ export default class ConversationPart extends mixins(BaseMixin) {
 
   get hasScreenInterface(): boolean {
     const lastRequest = this.findLastRequest();
-    console.log(AlexaUtil.hasAplInterface(lastRequest.payload));
     return !!lastRequest && AlexaUtil.hasAplInterface(lastRequest.payload);
   }
 
@@ -215,11 +251,51 @@ export default class ConversationPart extends mixins(BaseMixin) {
   }
 
   printRequest(log: InboxLog): FriendlyRequest {
-    return AlexaUtil.getFriendlyRequestName(log.payload);
+    // todo: temporary solution
+    let request: JovoInboxPlatformRequest;
+
+    if (AlexaRequest.isPlatformRequest(log.payload)) {
+      request = new AlexaRequest();
+      request = Object.assign(request, log.payload);
+    } else if (ConversationalActionRequest.isPlatformRequest(log.payload)) {
+      request = new ConversationalActionRequest();
+      request = Object.assign(request, log.payload);
+    }
+    if (!request) {
+      return {
+        type: 'user',
+        text: 'error',
+      };
+    }
+    return request.getText();
+  }
+
+  get platformType() {
+    if (AlexaResponse.isPlatformResponse(this.part.payload)) {
+      return 'alexa';
+    } else if (ConversationalActionResponse.isPlatformResponse(this.part.payload)) {
+      return 'googleassistant';
+    }
+    return '';
   }
 
   printResponse(log: InboxLog) {
-    return AlexaUtil.getFriendlyResponse(log.payload);
+    let response: JovoInboxPlatformResponse;
+
+    if (AlexaResponse.isPlatformResponse(log.payload)) {
+      response = new AlexaResponse();
+      response = Object.assign(response, log.payload);
+    } else if (ConversationalActionResponse.isPlatformResponse(log.payload)) {
+      response = new ConversationalActionResponse();
+      response = Object.assign(response, log.payload);
+    }
+    if (!response) {
+      return {
+        type: 'user',
+        text: 'error',
+      };
+    }
+    return response.getSpeech();
   }
 
   handleClick(e: Event) {

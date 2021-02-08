@@ -135,10 +135,11 @@
 
         <span
           v-for="device in devices"
-          v-bind:key="device"
+          v-bind:key="device.platform + '-' + device.name"
           class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-50 text-indigo-800 mr-1"
         >
           <svg
+            v-if="device.platform === 'alexa'"
             class="h-4 w-4 fill-current text-alexa-blue mr-1"
             height="24"
             width="24"
@@ -149,7 +150,34 @@
               transform="translate(2 2)"
             ></path>
           </svg>
-          {{ device }}
+          <svg
+            v-if="device.platform === 'googleassistant'"
+            class="h-4 w-4 fill-current  mr-1"
+            xmlns="http://www.w3.org/2000/svg"
+            xmlns:xlink="http://www.w3.org/1999/xlink"
+            baseProfile="tiny"
+            id="Layer_1"
+            version="1.2"
+            viewBox="0 0 512 512"
+            xml:space="preserve"
+          >
+            <g>
+              <circle cx="156.268" cy="167.705" fill="#4285F4" r="156.268" />
+              <path
+                d="M512,182.95c0,17.544-14.224,31.762-31.762,31.762s-31.762-14.218-31.762-31.762   c0-17.543,14.224-31.762,31.762-31.762S512,165.407,512,182.95z"
+                fill="#34A853"
+              />
+              <path
+                d="M454.829,260.449c0,35.081-28.438,63.522-63.523,63.522c-35.088,0-63.524-28.441-63.524-63.522   c0-35.083,28.437-63.524,63.524-63.524C426.392,196.925,454.829,225.367,454.829,260.449z"
+                fill="#EA4335"
+              />
+              <path
+                d="M467.533,424.339c0,42.1-34.124,76.225-76.228,76.225c-42.104,0-76.229-34.125-76.229-76.225   c0-42.098,34.124-76.227,76.229-76.227C433.409,348.112,467.533,382.241,467.533,424.339z"
+                fill="#FBBC05"
+              />
+            </g>
+          </svg>
+          {{ device.name }}
         </span>
       </div>
 
@@ -174,19 +202,29 @@ import { Component, Watch } from 'vue-property-decorator';
 import { Share2Icon, CheckIcon } from 'vue-feather-icons';
 import { BaseMixin } from '@/mixins/BaseMixin';
 import { mixins } from 'vue-class-component';
-import { InboxLog, InboxLogType } from 'jovo-inbox-core';
+import {
+  AlexaRequest,
+  ConversationalActionRequest,
+  InboxLog,
+  InboxLogType,
+  JovoInboxPlatformRequest,
+} from 'jovo-inbox-core';
 import { InboxLogUser } from 'jovo-inbox-core/dist/InboxLogUser';
 import { Api } from '@/Api';
 import { AlexaUtil } from '@/utils/AlexaUtil';
 import { BASE_URL } from '@/main';
 
+interface Device {
+  name: string;
+  platform: string;
+}
 @Component({
   name: 'sidebar-right',
   components: { Share2Icon, CheckIcon },
 })
 export default class SidebarRight extends mixins(BaseMixin) {
   isNameEdit = false;
-  devices: string[] = ['Echo', 'Echo Show'];
+  devices: Device[] = [];
 
   user: Partial<InboxLogUser> = {};
   isCopied = false;
@@ -248,7 +286,7 @@ export default class SidebarRight extends mixins(BaseMixin) {
 
   editName() {
     this.isNameEdit = true;
-    this.oldNameValue = this.user.name;
+    this.oldNameValue = this.user.name!;
     // TODO: focus doesn't work
     // (this.$refs['name'] as HTMLElement).focus();
   }
@@ -264,6 +302,7 @@ export default class SidebarRight extends mixins(BaseMixin) {
       name: this.shortenUserId(this.conversation!),
     };
     this.isCopied = false;
+    this.getDevices();
     await this.getInboxLogUserData();
   }
 
@@ -287,6 +326,7 @@ export default class SidebarRight extends mixins(BaseMixin) {
     this.isCopied = true;
     this.$clipboard(`${window.location.origin}/user/${this.user.id}`);
   }
+
   async handleDeleteImage() {
     try {
       const result = await Api.deleteUserImage(this.user.id as string);
@@ -309,7 +349,7 @@ export default class SidebarRight extends mixins(BaseMixin) {
         platformUserId: this.conversation.userId,
         appId: this.conversation.appId,
       });
-      this.getDevices();
+
       this.user = {
         ...result.data,
       };
@@ -320,13 +360,33 @@ export default class SidebarRight extends mixins(BaseMixin) {
 
   getDevices() {
     const devicesMap: Record<string, string> = {};
-    this.selectedConversations.forEach((inboxLog: InboxLog) => {
-      if (inboxLog.type === InboxLogType.REQUEST) {
-        devicesMap[AlexaUtil.getFriendlyDeviceName(inboxLog.payload)] = true;
+    this.devices = [];
+    const duplicates: string = [];
+
+    this.selectedConversations.forEach((log: InboxLog) => {
+      if (log.type === InboxLogType.REQUEST) {
+        // todo: temporary solution
+        let request: JovoInboxPlatformRequest;
+        let platform;
+        if (AlexaRequest.isPlatformRequest(log.payload)) {
+          request = new AlexaRequest();
+          request = Object.assign(request, log.payload);
+          platform = 'alexa';
+        } else if (ConversationalActionRequest.isPlatformRequest(log.payload)) {
+          request = new ConversationalActionRequest();
+          request = Object.assign(request, log.payload);
+          platform = 'googleassistant';
+        }
+
+        if (!duplicates.includes(platform + '-' + request.getDeviceName())) {
+          this.devices.push({
+            name: request.getDeviceName(),
+            platform: platform,
+          });
+          duplicates.push(platform + '-' + request.getDeviceName());
+        }
       }
     });
-
-    this.devices = Object.keys(devicesMap);
   }
 }
 </script>

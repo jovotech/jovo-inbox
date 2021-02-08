@@ -77,6 +77,7 @@ import { InboxLog } from 'jovo-inbox-core';
 })
 export default class MainPanel extends Vue {
   loading = false;
+  u;
   isContentHovered = false;
   sessionsCount = 0;
 
