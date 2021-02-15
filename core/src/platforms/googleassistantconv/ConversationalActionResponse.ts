@@ -12,7 +12,7 @@ export class ConversationalActionResponse extends JovoInboxPlatformResponse {
   device?: Device;
   expected?: Expected;
 
-  static isPlatformResponse(json: any) {
+  isPlatformResponse(json: any) {
     return !!json.user  && !!json.prompt;
   }
 
@@ -28,10 +28,9 @@ export class ConversationalActionResponse extends JovoInboxPlatformResponse {
 
     const firstSimple =  this.prompt?.firstSimple?.speech;
 
-
     return {
       type: 'user',
-      text: firstSimple!,
+      text: this.formatMessage(firstSimple!),
     };
   }
 

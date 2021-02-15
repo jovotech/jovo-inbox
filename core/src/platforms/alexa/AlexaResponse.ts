@@ -7,7 +7,7 @@ export class AlexaResponse extends JovoInboxPlatformResponse {
   response: any; // TODO temporary, change to Response after release of jovo-platform-alexa@3.4.1
   sessionAttributes?: SessionAttributes;
 
-  static isPlatformResponse(json: any) {
+  isPlatformResponse(json: any) {
     return !!json.version && !!json.response;
   }
 

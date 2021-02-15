@@ -1,6 +1,6 @@
-import {JovoInboxPlatformRequest, Type} from '../JovoInboxPlatformRequest';
+import {JovoInboxPlatformRequest, Out, Type} from '../JovoInboxPlatformRequest';
 import type {Context, Request, Session} from 'jovo-platform-alexa'
-import _get = require('lodash.get');
+import _get from 'lodash.get';
 
 export class AlexaRequest extends JovoInboxPlatformRequest {
   version?: string;
@@ -8,7 +8,7 @@ export class AlexaRequest extends JovoInboxPlatformRequest {
   session?: Session;
   request?: Request;
 
-  static isPlatformRequest(json: any): boolean {
+  isPlatformRequest(json: any): boolean {
     return !!json.request && !!json.version;
   }
 
@@ -97,7 +97,7 @@ export class AlexaRequest extends JovoInboxPlatformRequest {
     return false;
   }
 
-  getText(): { type: Type; text: string } {
+  getText(): Out {
     if (this.request?.type === 'LaunchRequest') {
       return {
         type: 'user',
@@ -107,6 +107,12 @@ export class AlexaRequest extends JovoInboxPlatformRequest {
       return {
         type: 'user',
         text: this.request?.intent?.name,
+      };
+    } else if (this.request?.type === 'SessionEndedRequest' && this.request.reason === 'ERROR') {
+      return {
+        type: 'platform',
+        text: `ERROR: ${this.request.error?.type}`,
+        subtext: `${this.request.error?.message}`
       };
     } else if (this.request?.type === 'SessionEndedRequest') {
       return {

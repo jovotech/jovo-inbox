@@ -4,6 +4,7 @@ import {
   JovoAppMetaData,
   SelectUserConversationsDto,
   InboxLogUser,
+  GetLastConversationsDto,
 } from 'jovo-inbox-core';
 import { Api } from '@/Api';
 export enum DataAction {
@@ -14,6 +15,7 @@ export enum DataAction {
   buildAppUsersMap = 'buildAppUsersMap',
 
   selectApp = 'selectApp',
+  selectInboxLog = 'selectInboxLog',
 }
 
 export interface DataState {
@@ -21,6 +23,7 @@ export interface DataState {
   conversations: InboxLog[];
   selectedUserConversations: InboxLog[];
   selectedApp: JovoAppMetaData[];
+  selectedInboxLog: InboxLog;
   nameMap: Record<
     string,
     {
@@ -35,6 +38,9 @@ export class DataModule extends VuexModule<DataState> {
   apps: JovoAppMetaData[] = [];
   conversations: InboxLog[] = [];
   selectedUserConversations: InboxLog[] = [];
+
+  selectedInboxLog: InboxLog | null = null;
+
   selectedApp: JovoAppMetaData | null = null;
   nameMap: Record<
     string,
@@ -57,8 +63,8 @@ export class DataModule extends VuexModule<DataState> {
   }
 
   @MutationAction({ mutate: ['conversations'], rawError: true })
-  async [DataAction.fetchConversations]() {
-    const result = await Api.getLastConversations();
+  async [DataAction.fetchConversations](getLastConversationsDto: GetLastConversationsDto) {
+    const result = await Api.getLastConversations(getLastConversationsDto);
     return { conversations: result };
   }
 
@@ -68,6 +74,11 @@ export class DataModule extends VuexModule<DataState> {
   ) {
     const result = await Api.getUserConversations(selectUserConversationsDto);
     return { selectedUserConversations: result.logs };
+  }
+
+  @MutationAction({ mutate: ['selectedInboxLog'], rawError: true })
+  async [DataAction.selectInboxLog](inboxLog: InboxLog) {
+    return { selectedInboxLog: inboxLog };
   }
 
   @MutationAction({ mutate: ['nameMap'], rawError: true })

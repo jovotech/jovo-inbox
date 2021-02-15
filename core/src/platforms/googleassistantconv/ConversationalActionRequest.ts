@@ -1,6 +1,5 @@
 import {JovoInboxPlatformRequest, Type} from '../JovoInboxPlatformRequest';
 import type {Context, Device, Handler, Home, Intent, Scene, Session, User} from 'jovo-platform-googleassistantconv'
-import _get = require('lodash.get');
 
 export class ConversationalActionRequest extends JovoInboxPlatformRequest {
   handler?: Handler;
@@ -12,7 +11,7 @@ export class ConversationalActionRequest extends JovoInboxPlatformRequest {
   device?: Device;
   context?: Context;
 
-  static isPlatformRequest(json: any): boolean {
+  isPlatformRequest(json: any): boolean {
     return !!json.handler && !!json.scene && !!json.intent && !!json.user
   }
 
@@ -43,6 +42,18 @@ export class ConversationalActionRequest extends JovoInboxPlatformRequest {
       return {
         type: "user",
         text: this.intent?.query
+      }
+    } else if (this.scene?.name.endsWith('_Notifications')) {
+      for (const [key, value] of Object.entries(this.scene.slots)) {
+        if (key.startsWith('NotificationsSlot_')) {
+          if (value.value['@type'] ===
+              'type.googleapis.com/google.actions.conversation.v3.PermissionValue') {
+            return {
+              type: "platform",
+              text: 'Notification permission: ' + value.value.permissionStatus
+            }
+          }
+        }
       }
     }
 
