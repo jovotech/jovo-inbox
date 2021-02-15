@@ -25,9 +25,6 @@ import ConversationPart from '@/components/conversation/ConversationPart.vue';
 import DetailConversationPart from '@/components/conversation/DetailConversationPart.vue';
 
 import { InboxIcon } from 'vue-feather-icons';
-import { AlexaUtil } from '@/utils/AlexaUtil';
-import { FormatUtil } from '@/utils/FormatUtil';
-import { DisplayHelper } from '@/utils/DisplayHelper';
 
 @Component({
   name: 'inbox',
@@ -36,39 +33,21 @@ import { DisplayHelper } from '@/utils/DisplayHelper';
 export default class Inbox extends Vue {
   lastConversations: InboxLog[] = [];
   selectedConversation: InboxLog[] = [];
-  isLeftSidebarHovered = false;
-  isContentHovered = false;
 
   loading = false;
 
   async mounted() {
-    this.lastConversations = await Api.getLastConversations();
+    // this.lastConversations = await Api.getLastConversations();
   }
 
-  shortenUserId(userId: string) {
-    return userId.substr(userId.indexOf('account.') + 8, 10);
-  }
-
-  lastConversationItemDevice(inboxLog: InboxLog) {
-    return AlexaUtil.getFriendlyDeviceName(inboxLog.payload);
-  }
-
-  lastConversationItemDate(inboxLog: InboxLog) {
-    return FormatUtil.formatDate(inboxLog.createdAt);
-  }
-
-  lastConversationItemRequest(inboxLog: InboxLog) {
-    return AlexaUtil.getFriendlyRequestName(inboxLog.payload);
-  }
-
-  async handleSelectConversation(userId: string) {
-    this.loading = true;
-    this.selectedConversation = await Api.getUserConversations(userId);
-    this.loading = false;
-    this.$nextTick(() => {
-      this.scrollToBottom();
-    });
-  }
+  // lastConversationItemDevice(inboxLog: InboxLog) {
+  //   // return AlexaUtil.getFriendlyDeviceName(inboxLog.payload);
+  // }
+  //
+  //
+  // lastConversationItemRequest(inboxLog: InboxLog) {
+  //   // return AlexaUtil.getFriendlyRequestName(inboxLog.payload);
+  // }
 
   isConversationSelected(conversationPart: InboxLog) {
     return (
@@ -77,24 +56,8 @@ export default class Inbox extends Vue {
     );
   }
 
-  scrollToBottom() {
-    const partContainer = this.$refs.partContainer as HTMLDivElement;
-    partContainer.scrollTop = partContainer.scrollHeight;
-  }
-
-  createIcon(id: string, size = 20) {
-    return DisplayHelper.toDisplayIcon(id, {
-      size,
-      format: 'svg',
-      // @ts-ignore
-      saturation: 0.2,
-      brightness: 0.5,
-      background: [229, 231, 235, 1],
-    });
-  }
-
   countSessions(selectedConversation: InboxLog[]) {
-    const counts: any = {};
+    const counts: Record<string, boolean> = {};
     selectedConversation.forEach((inboxLog: InboxLog) => {
       counts[inboxLog.sessionId] = true;
     });

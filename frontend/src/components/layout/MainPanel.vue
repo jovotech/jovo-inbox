@@ -62,6 +62,7 @@
         :index="index"
       />
     </div>
+    <detail-conversation-part></detail-conversation-part>
     <!-- End main area -->
   </main>
 </template>
@@ -70,18 +71,18 @@
 import { Component, Vue, Watch } from 'vue-property-decorator';
 import ConversationPart from '@/components/conversation/ConversationPart.vue';
 import { InboxLog } from 'jovo-inbox-core';
+import DetailConversationPart from '@/components/conversation/DetailConversationPart.vue';
 
 @Component({
   name: 'main-panel',
-  components: { ConversationPart },
+  components: { ConversationPart, DetailConversationPart },
 })
 export default class MainPanel extends Vue {
   loading = false;
-  u;
   isContentHovered = false;
   sessionsCount = 0;
 
-  get selectedConversation() {
+  get selectedConversation(): InboxLog[] {
     return this.$store.state.DataModule.selectedUserConversations;
   }
 

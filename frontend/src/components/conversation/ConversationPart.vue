@@ -1,20 +1,71 @@
 <template>
-  <div class="group w-full flex-grow flex flex-col">
+  <div
+    ref="conversation-part"
+    class="group w-full flex-grow flex flex-col p-4 rounded-l"
+    :class="isSelectedInboxLog ? 'border-jovo-blue border-l-4 inset-0' : ''"
+  >
     <div v-if="isSessionStart" class="text-center" :title="sessionStart">
-      <div class="my-10 mx-auto w-4/5 new-session">
-        <span class="bg-gray-100 ">{{ newSessionDate(sessionStart) }}</span>
+      <div class="my-10 mx-auto w-4/5">
+        <span class="text-gray-400 text-xs ">{{ newSessionDate(sessionStart) }}</span>
       </div>
     </div>
-    <div class="inline-flex w-full max-w-3/4" :class="isResponse ? 'ml-auto justify-end' : ''">
-      <div class="inline-flex flex-col">
-        <div class="flex items-start space-x-2">
-          <!--          <div v-if="isRequest" class="response-avatar">-->
-          <!--            &lt;!&ndash;            <user-icon size="14" class="text-gray-500"></user-icon>&ndash;&gt;-->
-          <!--          </div>-->
-          <div
-            v-if="isRequest"
-            class="rounded-full  flex text-center items-center justify-center flex-shrink-0"
-          >
+    <div class="inline-flex w-full " :class="isResponse ? 'ml-auto justify-end' : ''">
+      <div class="inline-flex flex-col " :class="isResponse || isRequest ? 'max-w-3/4' : 'w-full'">
+        <div v-if="isError" class="rounded-md bg-red-50 p-4 m-auto w-5/6 text-sm mb-6">
+          <div class="flex">
+            <div class="flex-shrink-0">
+              <!-- Heroicon name: solid/x-circle -->
+              <svg
+                class="h-5 w-5 text-red-400"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+            </div>
+            <div class="ml-3 flex-1 md:flex md:justify-between">
+              <p class="text-sm text-red-800">
+                An error has occurred.
+              </p>
+              <p class="mt-3 text-sm md:mt-0 md:ml-6">
+                <a
+                  @click="isErrorCollapsed = !isErrorCollapsed"
+                  href="#"
+                  class="whitespace-nowrap font-medium text-red-700 hover:text-red-800"
+                  >Details
+                  <chevron-down-icon
+                    v-if="!isErrorCollapsed"
+                    size="16"
+                    class="inline
+"
+                  ></chevron-down-icon
+                  ><chevron-up-icon
+                    v-if="isErrorCollapsed"
+                    size="16"
+                    class="inline
+"
+                  ></chevron-up-icon
+                ></a>
+              </p>
+            </div>
+          </div>
+          <div v-if="isErrorCollapsed" class="flex-1 md:flex md:justify-between p-3">
+            <p class="text-xs text-red-800">
+              {{ part.payload.message }}
+              <br /><br />
+              {{ part.payload.stackTrace }}
+            </p>
+          </div>
+        </div>
+
+        <div v-if="isRequest" class="flex text-center items-start justify-center flex-shrink-0">
+          <div class="mr-2">
             <img
               v-if="isRequest && getImage(part)"
               class="h-10 w-10 rounded-full"
@@ -37,89 +88,66 @@
           </div>
 
           <div
-            class="py-2 px-4 inline text-sm"
-            :class="[
-              isResponse
-                ? 'bg-white self-end text-gray-800 rounded-xl '
-                : 'bg-jovo-blue self-start text-right text-white rounded-xl',
-            ]"
+            v-if="printRequest(part).type === 'user'"
+            class="py-2 px-4 inline text-sm bg-jovo-blue self-start text-right text-white rounded-xl"
           >
-            <p
-              v-if="isRequest"
-              :class="[printRequest(part).type === 'platform' ? 'italic' : '']"
-              class="font-sans leading-6 whitespace-pre-wrap "
-              @click="handleClick"
-            >
+            <p class="font-sans leading-6 whitespace-pre-wrap " @click="handleClick">
               {{ printRequest(part).text }}
             </p>
+          </div>
+          <div
+            v-else-if="printRequest(part).type === 'platform'"
+            class="py-2 px-1 inline text-sm  self-start text-right text-gray-400 italic rounded-xl"
+          >
+            <p class="font-sans leading-6 whitespace-pre-wrap text-left" @click="handleClick">
+              {{ printRequest(part).text }}
 
+              <a
+                v-if="printRequest(part).subtext"
+                @click="isErrorCollapsed = !isErrorCollapsed"
+                href="#"
+                class="whitespace-nowrap font-medium text-gray-400 ml-3 hover:text-gray-500"
+                >Details
+                <chevron-down-icon
+                  v-if="!isErrorCollapsed"
+                  size="16"
+                  class="inline
+"
+                ></chevron-down-icon
+                ><chevron-up-icon
+                  v-if="isErrorCollapsed"
+                  size="16"
+                  class="inline
+"
+                ></chevron-up-icon
+              ></a>
+            </p>
+            <span v-if="isErrorCollapsed" class="text-left text-xs block px-1 ">
+              {{ printRequest(part).subtext }}
+            </span>
+          </div>
+        </div>
+
+        <div v-if="isResponse" class="flex items-center justify-center flex-shrink-0">
+          <div class="py-2 px-4 inline text-sm bg-white self-end text-gray-800 rounded-xl">
             <p
-              v-if="isResponse"
               :class="[printResponse(part).type === 'Action' ? 'italic' : '']"
               class="font-sans leading-6 whitespace-pre-wrap"
               v-html="$sanitize(printResponse(part).text)"
               @click="handleClick"
             ></p>
-            <ScreenConversationPart
-              :visible="isScreenViewVisible"
-              @hide="isScreenViewVisible = false"
-              :part="part"
-            ></ScreenConversationPart>
-            <detail-conversation-part
-              :visible="isDetailVisible"
-              @hide="isDetailVisible = false"
-              :part="part"
-            ></detail-conversation-part>
           </div>
-          <!--          <div v-if="isRequest"-->
-          <!--               class="rounded-full h-8 w-8 bg-gray-200 flex items-center justify-center flex-shrink-0"></div>-->
-
           <div
-            v-if="isResponse"
-            class="rounded-full h-10 w-12  flex mr-3 text-center items-center justify-center flex-shrink-0"
+            class="rounded-full h-10 w-12  flex ml-1.5 text-center items-center justify-center flex-shrink-0"
           >
-            <svg
-              v-if="platformType === 'googleassistant'"
-              class="h-7 w-7 fill-current"
-              xmlns="http://www.w3.org/2000/svg"
-              xmlns:xlink="http://www.w3.org/1999/xlink"
-              baseProfile="tiny"
-              id="Layer_1"
-              version="1.2"
-              viewBox="0 0 512 512"
-              xml:space="preserve"
-            >
-              <g>
-                <circle cx="156.268" cy="167.705" fill="#4285F4" r="156.268" />
-                <path
-                  d="M512,182.95c0,17.544-14.224,31.762-31.762,31.762s-31.762-14.218-31.762-31.762   c0-17.543,14.224-31.762,31.762-31.762S512,165.407,512,182.95z"
-                  fill="#34A853"
-                />
-                <path
-                  d="M454.829,260.449c0,35.081-28.438,63.522-63.523,63.522c-35.088,0-63.524-28.441-63.524-63.522   c0-35.083,28.437-63.524,63.524-63.524C426.392,196.925,454.829,225.367,454.829,260.449z"
-                  fill="#EA4335"
-                />
-                <path
-                  d="M467.533,424.339c0,42.1-34.124,76.225-76.228,76.225c-42.104,0-76.229-34.125-76.229-76.225   c0-42.098,34.124-76.227,76.229-76.227C433.409,348.112,467.533,382.241,467.533,424.339z"
-                  fill="#FBBC05"
-                />
-              </g>
-            </svg>
-            <svg
-              v-if="platformType === 'alexa'"
-              class="h-8 w-8 fill-current text-alexa-blue"
-              height="24"
-              width="24"
-              viewBox="0 0 24 24"
-            >
-              <path
-                d="M0,10.0000489 C0,15.0707816 3.77428289,19.2594477 8.66667972,19.9113334 L8.66667972,17.8962718 C8.66667972,17.3281595 8.30829606,16.8174945 7.76974193,16.636736 C4.94690794,15.688512 2.927648,12.9904434 3.00202582,9.8313279 C3.09245359,5.9853886 6.22532565,2.96152397 10.0722248,3.00037678 C13.9049334,3.03913173 16.9999315,6.15812215 16.9999315,10.0000489 C16.9999315,10.087639 16.9977785,10.1747398 16.9945489,10.2614491 C16.9887748,10.4004189 16.9838815,10.4807669 16.9775203,10.5606256 C16.975563,10.5860707 16.9731163,10.611418 16.9707676,10.6367653 C16.9658743,10.692549 16.9601002,10.7479411 16.9538368,10.8032355 C16.9466926,10.8660654 16.9385698,10.928504 16.9298598,10.9906489 C16.9258473,11.01903 16.9220305,11.0475091 16.9177244,11.0756945 C16.0607158,16.7212922 8.70778325,19.8942068 8.66756051,19.9115291 C9.10355154,19.9694658 9.54815475,20 9.99990213,20 C15.5228467,20 20,15.5229227 20,10.0000489 C20,4.47717519 15.5228467,0 9.99990213,0 C4.47715329,0 0,4.47717519 0,10.0000489 Z"
-                transform="translate(2 2)"
-              ></path>
-            </svg>
+            <img class="h-8 w-8 flex-shrink-0" :src="platformImage" />
           </div>
         </div>
-        <div class="invisible group-hover:visible" :class="isResponse ? 'ml-auto' : ''">
+        <div
+          v-if="isResponse || isRequest"
+          class="invisible group-hover:visible"
+          :class="isResponse ? 'ml-auto' : ''"
+        >
           <monitor-icon
             v-if="isResponse && hasScreenInterface"
             class="inline-block mt-2 text-gray-500 hover:text-gray-800 cursor-pointer"
@@ -129,11 +157,16 @@
           ></monitor-icon>
           <code-icon
             class="inline-block mt-2 text-gray-500 hover:text-gray-800 cursor-pointer"
-            :class="[isResponse ? 'self-end text-right ml-auto mr-3' : ' self-start  ml-3']"
+            :class="[isResponse ? 'self-end text-right ml-auto mr-3.5' : ' self-start  ml-3.5']"
             size="14"
-            @click="isDetailVisible = true"
+            @click="selectInboxLog"
           ></code-icon>
         </div>
+        <ScreenConversationPart
+          :visible="isScreenViewVisible"
+          @hide="isScreenViewVisible = false"
+          :part="part"
+        ></ScreenConversationPart>
       </div>
     </div>
   </div>
@@ -142,23 +175,13 @@
 <script lang="ts">
 import DetailConversationPart from '@/components/conversation/DetailConversationPart.vue';
 import ScreenConversationPart from '@/components/conversation/ScreenConversationPart.vue';
-import { AlexaUtil, FriendlyRequest } from '@/utils/AlexaUtil';
-import {
-  AlexaRequest,
-  AlexaResponse,
-  ConversationalActionRequest,
-  ConversationalActionResponse,
-  InboxLog,
-  InboxLogType,
-  JovoInboxPlatformRequest,
-  JovoInboxPlatformResponse,
-} from 'jovo-inbox-core';
-import { CodeIcon, MonitorIcon, UserIcon } from 'vue-feather-icons';
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import { AlexaUtil } from '@/utils/AlexaUtil';
+import { InboxLog, InboxLogType } from 'jovo-inbox-core';
+import { ChevronDownIcon, ChevronUpIcon, CodeIcon, MonitorIcon, UserIcon } from 'vue-feather-icons';
+import { Component, Prop, Watch } from 'vue-property-decorator';
 import Plyr from 'plyr';
 import 'plyr/src/sass/plyr.scss';
 import { FormatUtil } from '@/utils/FormatUtil';
-import { Alexa } from 'jovo-platform-alexa';
 import { BaseMixin } from '@/mixins/BaseMixin';
 import { mixins } from 'vue-class-component';
 
@@ -170,6 +193,8 @@ import { mixins } from 'vue-class-component';
     CodeIcon,
     ScreenConversationPart,
     UserIcon,
+    ChevronDownIcon,
+    ChevronUpIcon,
   },
 })
 export default class ConversationPart extends mixins(BaseMixin) {
@@ -185,15 +210,22 @@ export default class ConversationPart extends mixins(BaseMixin) {
   isDetailVisible = false;
   isScreenViewVisible = false;
 
+  isErrorCollapsed = false;
+
   get isRequest(): boolean {
     return this.part.type === InboxLogType.REQUEST;
   }
 
+  async selectInboxLog() {
+    await this.$store.dispatch('DataModule/selectInboxLog', this.part);
+  }
+
   mounted() {
     this.$nextTick(() => {
-      Array.from(document.querySelectorAll('.audio-player')).map(
+      const element = this.$refs['conversation-part'] as HTMLElement;
+      Array.from(element.querySelectorAll('.audio-player')).map(
         (p) =>
-          new Plyr(p, {
+          new Plyr(p as HTMLElement, {
             controls: ['play', 'current-time'],
           }),
       );
@@ -202,6 +234,10 @@ export default class ConversationPart extends mixins(BaseMixin) {
 
   get isResponse(): boolean {
     return this.part.type === InboxLogType.RESPONSE;
+  }
+
+  get isError(): boolean {
+    return this.part.type === InboxLogType.ERROR;
   }
 
   get hasScreenInterface(): boolean {
@@ -250,65 +286,60 @@ export default class ConversationPart extends mixins(BaseMixin) {
     }
   }
 
-  printRequest(log: InboxLog): FriendlyRequest {
-    // todo: temporary solution
-    let request: JovoInboxPlatformRequest;
+  printRequest(log: InboxLog) {
+    const platformRequest = this.getPlatformRequest(log);
+    if (platformRequest) {
+      return platformRequest.getText();
+    }
 
-    if (AlexaRequest.isPlatformRequest(log.payload)) {
-      request = new AlexaRequest();
-      request = Object.assign(request, log.payload);
-    } else if (ConversationalActionRequest.isPlatformRequest(log.payload)) {
-      request = new ConversationalActionRequest();
-      request = Object.assign(request, log.payload);
-    }
-    if (!request) {
-      return {
-        type: 'user',
-        text: 'error',
-      };
-    }
-    return request.getText();
+    return {
+      type: 'user',
+      text: 'error',
+    };
   }
 
   get platformType() {
-    if (AlexaResponse.isPlatformResponse(this.part.payload)) {
-      return 'alexa';
-    } else if (ConversationalActionResponse.isPlatformResponse(this.part.payload)) {
-      return 'googleassistant';
-    }
-    return '';
+    return this.getPlatform(this.part)?.name;
+  }
+
+  get platformImage() {
+    return this.getPlatform(this.part)?.image64x64;
   }
 
   printResponse(log: InboxLog) {
-    let response: JovoInboxPlatformResponse;
-
-    if (AlexaResponse.isPlatformResponse(log.payload)) {
-      response = new AlexaResponse();
-      response = Object.assign(response, log.payload);
-    } else if (ConversationalActionResponse.isPlatformResponse(log.payload)) {
-      response = new ConversationalActionResponse();
-      response = Object.assign(response, log.payload);
+    const platformResponse = this.getPlatformResponse(log);
+    if (platformResponse) {
+      return platformResponse.getSpeech();
     }
-    if (!response) {
-      return {
-        type: 'user',
-        text: 'error',
-      };
-    }
-    return response.getSpeech();
+    return {
+      type: 'user',
+      text: 'error',
+    };
   }
 
-  handleClick(e: Event) {
-    console.log(e.target);
+  handleClick() {
+    // console.log(e.target);
     // if ((e.target as string).includes('.tag-audio')) {
     //   console.log('Got a click on .play-video or a child element')
     // }
   }
   @Watch('selectedConversation')
   onSelectedConversationChange() {
-    new Plyr('.audio-player', {
-      controls: ['play', 'current-time'],
+    this.$nextTick(() => {
+      const element = this.$refs['conversation-part'] as HTMLElement;
+      Array.from(element.querySelectorAll('.audio-player')).map(
+        (p) =>
+          new Plyr(p as HTMLElement, {
+            controls: ['play', 'current-time'],
+          }),
+      );
     });
+  }
+  get selectedInboxLog(): InboxLog | null {
+    return this.$store.state.DataModule.selectedInboxLog;
+  }
+  get isSelectedInboxLog() {
+    return this.selectedInboxLog && this.selectedInboxLog.id === this.part.id;
   }
 
   newSessionDate(date: string) {
@@ -316,20 +347,4 @@ export default class ConversationPart extends mixins(BaseMixin) {
   }
 }
 </script>
-<style lang="postcss">
-.response-avatar {
-  @apply rounded-full h-8 w-8 bg-gray-200 flex mr-1 items-center justify-center flex-shrink-0;
-}
-
-div.new-session {
-  opacity: 0.3;
-  text-align: center;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.3);
-  line-height: 0.1em;
-  font-size: smaller;
-}
-
-div.new-session span {
-  padding: 0 10px;
-}
-</style>
+<style lang="postcss"></style>

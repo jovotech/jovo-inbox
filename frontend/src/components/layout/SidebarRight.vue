@@ -136,47 +136,9 @@
         <span
           v-for="device in devices"
           v-bind:key="device.platform + '-' + device.name"
-          class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-50 text-indigo-800 mr-1"
+          class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-50 text-gray-700 mr-1 mb-1"
         >
-          <svg
-            v-if="device.platform === 'alexa'"
-            class="h-4 w-4 fill-current text-alexa-blue mr-1"
-            height="24"
-            width="24"
-            viewBox="0 0 24 24"
-          >
-            <path
-              d="M0,10.0000489 C0,15.0707816 3.77428289,19.2594477 8.66667972,19.9113334 L8.66667972,17.8962718 C8.66667972,17.3281595 8.30829606,16.8174945 7.76974193,16.636736 C4.94690794,15.688512 2.927648,12.9904434 3.00202582,9.8313279 C3.09245359,5.9853886 6.22532565,2.96152397 10.0722248,3.00037678 C13.9049334,3.03913173 16.9999315,6.15812215 16.9999315,10.0000489 C16.9999315,10.087639 16.9977785,10.1747398 16.9945489,10.2614491 C16.9887748,10.4004189 16.9838815,10.4807669 16.9775203,10.5606256 C16.975563,10.5860707 16.9731163,10.611418 16.9707676,10.6367653 C16.9658743,10.692549 16.9601002,10.7479411 16.9538368,10.8032355 C16.9466926,10.8660654 16.9385698,10.928504 16.9298598,10.9906489 C16.9258473,11.01903 16.9220305,11.0475091 16.9177244,11.0756945 C16.0607158,16.7212922 8.70778325,19.8942068 8.66756051,19.9115291 C9.10355154,19.9694658 9.54815475,20 9.99990213,20 C15.5228467,20 20,15.5229227 20,10.0000489 C20,4.47717519 15.5228467,0 9.99990213,0 C4.47715329,0 0,4.47717519 0,10.0000489 Z"
-              transform="translate(2 2)"
-            ></path>
-          </svg>
-          <svg
-            v-if="device.platform === 'googleassistant'"
-            class="h-4 w-4 fill-current  mr-1"
-            xmlns="http://www.w3.org/2000/svg"
-            xmlns:xlink="http://www.w3.org/1999/xlink"
-            baseProfile="tiny"
-            id="Layer_1"
-            version="1.2"
-            viewBox="0 0 512 512"
-            xml:space="preserve"
-          >
-            <g>
-              <circle cx="156.268" cy="167.705" fill="#4285F4" r="156.268" />
-              <path
-                d="M512,182.95c0,17.544-14.224,31.762-31.762,31.762s-31.762-14.218-31.762-31.762   c0-17.543,14.224-31.762,31.762-31.762S512,165.407,512,182.95z"
-                fill="#34A853"
-              />
-              <path
-                d="M454.829,260.449c0,35.081-28.438,63.522-63.523,63.522c-35.088,0-63.524-28.441-63.524-63.522   c0-35.083,28.437-63.524,63.524-63.524C426.392,196.925,454.829,225.367,454.829,260.449z"
-                fill="#EA4335"
-              />
-              <path
-                d="M467.533,424.339c0,42.1-34.124,76.225-76.228,76.225c-42.104,0-76.229-34.125-76.229-76.225   c0-42.098,34.124-76.227,76.229-76.227C433.409,348.112,467.533,382.241,467.533,424.339z"
-                fill="#FBBC05"
-              />
-            </g>
-          </svg>
+          <img class="h-3 w-3 mr-1" :src="device.image" />
           {{ device.name }}
         </span>
       </div>
@@ -199,24 +161,17 @@
 
 <script lang="ts">
 import { Component, Watch } from 'vue-property-decorator';
-import { Share2Icon, CheckIcon } from 'vue-feather-icons';
+import { CheckIcon, Share2Icon } from 'vue-feather-icons';
 import { BaseMixin } from '@/mixins/BaseMixin';
 import { mixins } from 'vue-class-component';
-import {
-  AlexaRequest,
-  ConversationalActionRequest,
-  InboxLog,
-  InboxLogType,
-  JovoInboxPlatformRequest,
-} from 'jovo-inbox-core';
+import { InboxLog, InboxLogType } from 'jovo-inbox-core';
 import { InboxLogUser } from 'jovo-inbox-core/dist/InboxLogUser';
 import { Api } from '@/Api';
-import { AlexaUtil } from '@/utils/AlexaUtil';
-import { BASE_URL } from '@/main';
 
 interface Device {
   name: string;
   platform: string;
+  image: string;
 }
 @Component({
   name: 'sidebar-right',
@@ -253,7 +208,7 @@ export default class SidebarRight extends mixins(BaseMixin) {
   }
 
   async handleFileUpload() {
-    const file = (this.$refs.file as any).files[0];
+    const file = (this.$refs.file as HTMLFormElement).files[0];
     const formData = new FormData();
 
     if (!this.conversation) {
@@ -269,7 +224,7 @@ export default class SidebarRight extends mixins(BaseMixin) {
         },
         formData,
       );
-      (this.$refs.file as any).value = '';
+      (this.$refs.file as HTMLFormElement).value = '';
       await this.getInboxLogUserData();
       await this.$store.dispatch('DataModule/buildAppUsersMap', this.app.id);
     } catch (e) {
@@ -286,7 +241,9 @@ export default class SidebarRight extends mixins(BaseMixin) {
 
   editName() {
     this.isNameEdit = true;
-    this.oldNameValue = this.user.name!;
+    if (this.user?.name) {
+      this.oldNameValue = this.user.name;
+    }
     // TODO: focus doesn't work
     // (this.$refs['name'] as HTMLElement).focus();
   }
@@ -298,12 +255,14 @@ export default class SidebarRight extends mixins(BaseMixin) {
 
   @Watch('conversation')
   async onConversationChange() {
-    this.user = {
-      name: this.shortenUserId(this.conversation!),
-    };
-    this.isCopied = false;
-    this.getDevices();
-    await this.getInboxLogUserData();
+    if (this.conversation) {
+      this.user = {
+        name: this.shortenUserId(this.conversation),
+      };
+      this.isCopied = false;
+      this.getDevices();
+      await this.getInboxLogUserData();
+    }
   }
 
   async handleShareConversation() {
@@ -329,12 +288,15 @@ export default class SidebarRight extends mixins(BaseMixin) {
 
   async handleDeleteImage() {
     try {
-      const result = await Api.deleteUserImage(this.user.id as string);
-      this.user = {
-        ...result.data,
-      };
-      await this.getInboxLogUserData();
-      await this.$store.dispatch('DataModule/buildAppUsersMap', this.app.id);
+      if (this.user?.id) {
+        await Api.deleteUserImage({
+          appId: this.app.id,
+          jovoAppUserId: this.user.id,
+        });
+        this.user.image = undefined;
+        await this.getInboxLogUserData();
+        await this.$store.dispatch('DataModule/buildAppUsersMap', this.app.id);
+      }
     } catch (e) {
       console.log(e);
     }
@@ -359,34 +321,31 @@ export default class SidebarRight extends mixins(BaseMixin) {
   }
 
   getDevices() {
-    const devicesMap: Record<string, string> = {};
     this.devices = [];
-    const duplicates: string = [];
 
+    const detectedDevices: Device[] = [];
     this.selectedConversations.forEach((log: InboxLog) => {
       if (log.type === InboxLogType.REQUEST) {
-        // todo: temporary solution
-        let request: JovoInboxPlatformRequest;
-        let platform;
-        if (AlexaRequest.isPlatformRequest(log.payload)) {
-          request = new AlexaRequest();
-          request = Object.assign(request, log.payload);
-          platform = 'alexa';
-        } else if (ConversationalActionRequest.isPlatformRequest(log.payload)) {
-          request = new ConversationalActionRequest();
-          request = Object.assign(request, log.payload);
-          platform = 'googleassistant';
-        }
+        const platform = this.getPlatform(log);
 
-        if (!duplicates.includes(platform + '-' + request.getDeviceName())) {
-          this.devices.push({
+        if (platform) {
+          const requestConstructor = platform?.requestClass;
+
+          const request = Object.assign(new requestConstructor(), log.payload);
+          detectedDevices.push({
             name: request.getDeviceName(),
-            platform: platform,
+            platform: platform.name,
+            image: platform?.image64x64,
           });
-          duplicates.push(platform + '-' + request.getDeviceName());
         }
       }
     });
+
+    // remove duplicates
+    this.devices = detectedDevices.filter(
+      (v: Device, i: number, a: Device[]) =>
+        a.findIndex((t: Device) => JSON.stringify(t) === JSON.stringify(v)) === i,
+    );
   }
 }
 </script>

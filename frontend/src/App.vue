@@ -14,7 +14,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
 
 import Inbox from '@/components/Inbox.vue';
 import InboxHeader from '@/components/layout/InboxHeader.vue';
@@ -31,11 +31,21 @@ export default class App extends mixins(BaseMixin) {
   async mounted() {
     try {
       await this.$store.dispatch('DataModule/fetchApps');
-      await this.$store.dispatch('DataModule/selectApp', this.$store.state.DataModule.apps[0]);
+      if (!this.app) {
+        await this.$store.dispatch('DataModule/selectApp', this.$store.state.DataModule.apps[0]);
+      }
       await this.$store.dispatch('DataModule/buildAppUsersMap', this.app.id);
+      await this.$store.dispatch('DataModule/fetchConversations', {
+        appId: this.app.id,
+      });
     } catch (e) {
       console.log(e);
     }
+  }
+
+  @Watch('app')
+  async onAppChanged() {
+    await this.$store.dispatch('DataModule/buildAppUsersMap', this.app.id);
   }
 }
 </script>
