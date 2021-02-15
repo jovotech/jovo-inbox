@@ -11,7 +11,11 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { InboxLogUserService } from './inbox-log-user.service';
-import { GetInboxLogUserDto, UpdateInboxLogUserDto } from 'jovo-inbox-core';
+import {
+  DeleteUserImageDto,
+  GetInboxLogUserDto,
+  UpdateInboxLogUserDto,
+} from 'jovo-inbox-core';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { UploadedFile } from 'jovo-inbox-core/dist/UploadedFile';
 
@@ -50,8 +54,8 @@ export class InboxLogUserController {
     return this.service.uploadImage(updateInboxLogUserDto, images);
   }
 
-  @Delete('/:jovoAppUserId/delete-image')
-  deleteImage(@Param('jovoAppUserId') jovoAppUserId: string) {
-    return this.service.deleteImage(jovoAppUserId);
+  @Delete('/delete-image')
+  deleteImage(@Body() deleteUserImageDto: DeleteUserImageDto) {
+    return this.service.deleteImage(deleteUserImageDto);
   }
 }

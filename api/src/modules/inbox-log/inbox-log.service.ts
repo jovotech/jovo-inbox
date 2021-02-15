@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { MikroORM, QueryOrder } from '@mikro-orm/core';
 import { InboxLogEntity } from '../../entity/inbox-log.entity';
 import {
+  GetLastConversationsDto,
   InboxLog,
   InboxLogType,
   SelectUserConversationsDto,
@@ -15,13 +16,17 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserConversationsResponse } from 'jovo-inbox-core/dist/UserConversationsResponse';
 import { LOGS_PER_REQUEST } from '../../constants';
+import { connectionName } from '../../util';
 
 @Injectable()
 export class InboxLogService {
-  async getConversations(): Promise<any> {
-    const qb = await getRepository(InboxLogEntity).createQueryBuilder(
-      'inboxlog',
-    );
+  async getConversations(
+    getLastConversationsDto: GetLastConversationsDto,
+  ): Promise<any> {
+    const qb = await getRepository(
+      InboxLogEntity,
+      connectionName(getLastConversationsDto.appId),
+    ).createQueryBuilder('inboxlog');
     const logs = await qb
       .where(
         'inboxlog.id IN ' +
@@ -33,7 +38,9 @@ export class InboxLogService {
             .groupBy('log.userId')
             .getQuery(),
       )
+      .andWhere('appId = :appId')
       .setParameter('type', InboxLogType.REQUEST)
+      .setParameter('appId', getLastConversationsDto.appId)
       .orderBy('inboxlog.id', 'DESC')
       .getMany();
 
@@ -43,7 +50,10 @@ export class InboxLogService {
   async getUserConversations(
     selectUserConversationsDto: SelectUserConversationsDto,
   ): Promise<UserConversationsResponse> {
-    const result = await getRepository(InboxLogEntity).findAndCount({
+    const result = await getRepository(
+      InboxLogEntity,
+      connectionName(selectUserConversationsDto.appId),
+    ).findAndCount({
       where: {
         appId: selectUserConversationsDto.appId,
         userId: selectUserConversationsDto.userId,

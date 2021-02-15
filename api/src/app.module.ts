@@ -14,19 +14,41 @@ import { InboxLogUserModule } from './modules/inbox-log-user/inbox-log-user.modu
 import { join } from 'path';
 import { ServeStaticModule } from '@nestjs/serve-static';
 
-@Module({
-  imports: [
-    ConfigModule.forRoot(),
-
+// TODO:
+const dbImports = () => {
+  if (config.apps.length === 0) {
+    console.error('No app available');
+    return;
+  }
+  const imports = [
     TypeOrmModule.forRoot({
       entities: [InboxLogEntity, InboxLogUserEntity],
       synchronize: true,
       ...(config.apps[0].connection as Partial<TypeOrmModuleOptions>),
     }),
+  ];
+  config.apps.forEach((app: any) => {
+    imports.push(
+      TypeOrmModule.forRoot({
+        name: app.id,
+        entities: [InboxLogEntity, InboxLogUserEntity],
+        synchronize: true,
+        ...(app.connection as Partial<TypeOrmModuleOptions>),
+      }),
+    );
+  });
+  return imports;
+};
+
+@Module({
+  imports: [
+    ConfigModule.forRoot(),
+    ...dbImports(),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '../..', 'public'),
       serveRoot: '/public/',
     }),
+
     InboxLogModule,
     JovoAppModule,
     InboxLogUserModule,
