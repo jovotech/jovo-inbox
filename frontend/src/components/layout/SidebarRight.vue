@@ -91,6 +91,7 @@
           type="text"
           name="first_name"
           v-model="user.name"
+          @keydown.enter="handleSaveUserName"
           ref="name"
           id="name"
           placeholder="Name"
