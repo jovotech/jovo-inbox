@@ -1,29 +1,37 @@
 <template>
   <div
     v-if="visible"
-    class="fixed inset-0 overflow-hidden z-40"
+    class="fixed inset-0 overflow-hidden z-40 bg-opacityblack"
     @keydown.esc="hide"
     @keydown.up="previous"
     @keydown.down="next"
     tabindex="0"
+    ref="sidebarcontainer"
+    @mousemove="move"
+    @mouseup="resizeEnd"
+    @click="close"
   >
-    <div class="q">
+    <div class="flex flex-row bg-gray-50">
       <section
-        class="absolute inset-y-0 right-0 pl-10  flex sm:pl-16"
+        ref="sidebar"
+        class="absolute inset-y-0 right-0 shadow-xl flex "
+        style="width: 450px"
         aria-labelledby="slide-over-heading"
       >
-        <!--
-          Slide-over panel, show/hide based on slide-over state.
-
-          Entering: "transform transition ease-in-out duration-500 sm:duration-700"
-            From: "translate-x-full"
-            To: "translate-x-0"
-          Leaving: "transform transition ease-in-out duration-500 sm:duration-700"
-            From: "translate-x-0"
-            To: "translate-x-full"
-        -->
-        <div class="w-screen max-w-xl w-3/12">
-          <div class="h-full flex flex-col py-6 bg-white shadow-xl overflow-y-scroll">
+        <div
+          class="w-6 cursor-col-resize flex sm:items-center bg-gray-50 hover:bg-gray-100"
+          @mousedown="resizeStart"
+        >
+          <svg
+            class="h-4 w-4 text-gray-600 pointer-events-none"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path d="M8 5h2v14H8zM14 5h2v14h-2z"></path>
+          </svg>
+        </div>
+        <div class="w-screen ">
+          <div class="h-full flex flex-col py-6 bg-white  overflow-y-scroll">
             <div class="px-4 sm:px-6">
               <div class="flex items-start justify-between">
                 <h2 id="slide-over-heading" class="text-lg font-medium text-gray-900">
@@ -69,9 +77,24 @@
             <div class="mt-6 relative flex-1 px-4 sm:px-6">
               <!-- Replace with your content -->
               <div class="absolute inset-0 px-4 sm:px-6">
-                <h3 class="mb-1">Payload</h3>
+                <div class="flex items-center justify-between">
+                  <h3>Payload</h3>
+                  <chevron-down-icon
+                    v-if="expandedPayload"
+                    size="16"
+                    class="flex-shrink-1 mr-1 cursor-pointer"
+                    @click="expandedPayload = !expandedPayload"
+                  ></chevron-down-icon>
+                  <chevron-up-icon
+                    v-else-if="!expandedPayload"
+                    size="16"
+                    class="flex-shrink-1 mr-1 cursor-pointer"
+                    @click="expandedPayload = !expandedPayload"
+                  ></chevron-up-icon>
+                </div>
                 <div
-                  class="h-96 bg-gray-50 overflow-x-hidden p-3 rounded-lg"
+                  v-if="expandedPayload"
+                  class="h-96 mt-2 bg-gray-50 overflow-x-hidden p-3 rounded-lg"
                   aria-hidden="true"
                   :class="[isContentHovered ? 'scrollbar' : 'scrollbar-invisible']"
                   @mouseenter="isContentHovered = true"
@@ -94,29 +117,24 @@ import { Component, Vue, Watch } from 'vue-property-decorator';
 import { InboxLog } from 'jovo-inbox-core';
 import VueJsonPretty from 'vue-json-pretty';
 import 'vue-json-pretty/lib/styles.css';
-import { ArrowUpIcon, ArrowDownIcon } from 'vue-feather-icons';
+import { ArrowUpIcon, ArrowDownIcon, ChevronDownIcon, ChevronUpIcon } from 'vue-feather-icons';
 
 @Component({
   name: 'detail-conversation-part',
-  components: { VueJsonPretty, ArrowUpIcon, ArrowDownIcon },
+  components: { VueJsonPretty, ArrowUpIcon, ArrowDownIcon, ChevronDownIcon, ChevronUpIcon },
 })
 export default class DetailConversationPart extends Vue {
-  // @Prop({ required: true, type: Object })
-  // part!: InboxLog;
-  //
-  // @Prop({ required: false, type: Array })
-  // sessionLogs!: InboxLog[];
-  //
-  // @Prop()
-  // visible = false;
-
   isContentHovered = false;
+
+  expandedPayload = true;
 
   isArrowUpEnabled = true;
   arrowUpActive = false;
 
   isArrowDownEnabled = true;
   arrowDownActive = false;
+
+  resizeActive = false;
 
   get selectedInboxLog(): InboxLog | null {
     return this.$store.state.DataModule.selectedInboxLog;
@@ -146,6 +164,12 @@ export default class DetailConversationPart extends Vue {
   @Watch('selectedInboxLog', { deep: true })
   private async onSelectedInboxLogChange() {
     this.activateButtons();
+
+    this.$nextTick(() => {
+      if (this.$refs['sidebarcontainer']) {
+        (this.$refs['sidebarcontainer'] as HTMLElement).focus();
+      }
+    });
   }
 
   get selectedConversation(): InboxLog[] {
@@ -153,6 +177,10 @@ export default class DetailConversationPart extends Vue {
   }
 
   get json() {
+    return this.selectedInboxLog?.payload;
+  }
+
+  get sessionjson() {
     return this.selectedInboxLog?.payload;
   }
 
@@ -170,7 +198,6 @@ export default class DetailConversationPart extends Vue {
         (item: InboxLog) => item.id === this.selectedInboxLog?.id,
       );
 
-      console.log('new index: ' + index);
       if (index + 1 < this.selectedConversation.length) {
         await this.$store.dispatch(
           'DataModule/selectInboxLog',
@@ -198,6 +225,31 @@ export default class DetailConversationPart extends Vue {
 
       this.activateButtons();
     }, 100);
+  }
+  resizeStart() {
+    this.resizeActive = true;
+  }
+  resizeEnd() {
+    if (this.resizeActive) {
+      this.resizeActive = false;
+    }
+  }
+  move(evt: MouseEvent) {
+    if (!this.resizeActive) {
+      return;
+    }
+    const screenWidth =
+      window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+
+    const sidebarWidth = screenWidth - evt.x;
+    const sidebarElement = this.$refs['sidebar'] as HTMLElement;
+    sidebarElement.style.width = sidebarWidth + 'px';
+  }
+
+  close(event: MouseEvent) {
+    if (!(this.$refs.sidebar as HTMLElement).contains(event.target as HTMLElement)) {
+      this.hide();
+    }
   }
 }
 </script>
