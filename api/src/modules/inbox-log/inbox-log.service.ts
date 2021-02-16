@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { MikroORM, QueryOrder } from '@mikro-orm/core';
 import { InboxLogEntity } from '../../entity/inbox-log.entity';
 import {
   GetLastConversationsDto,
