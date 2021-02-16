@@ -9,7 +9,11 @@
         <span class="text-gray-400 text-xs ">{{ newSessionDate(sessionStart) }}</span>
       </div>
     </div>
-    <div class="inline-flex w-full " :class="isResponse ? 'ml-auto justify-end' : ''">
+    <div
+      v-on:dblclick="selectInboxLog"
+      class="inline-flex w-full "
+      :class="isResponse ? 'ml-auto justify-end' : ''"
+    >
       <div class="inline-flex flex-col " :class="isResponse || isRequest ? 'max-w-3/4' : 'w-full'">
         <div v-if="isError" class="rounded-md bg-red-50 p-4 m-auto w-5/6 text-sm mb-6">
           <div class="flex">
@@ -91,7 +95,7 @@
             v-if="printRequest(part).type === 'user'"
             class="py-2 px-4 inline text-sm bg-jovo-blue self-start text-right text-white rounded-xl"
           >
-            <p class="font-sans leading-6 whitespace-pre-wrap " @click="handleClick">
+            <p class="font-sans leading-6 whitespace-pre-wrap ">
               {{ printRequest(part).text }}
             </p>
           </div>
@@ -99,7 +103,7 @@
             v-else-if="printRequest(part).type === 'platform'"
             class="py-2 px-1 inline text-sm  self-start text-right text-gray-400 italic rounded-xl"
           >
-            <p class="font-sans leading-6 whitespace-pre-wrap text-left" @click="handleClick">
+            <p class="font-sans leading-6 whitespace-pre-wrap text-left">
               {{ printRequest(part).text }}
 
               <a
@@ -134,7 +138,6 @@
               :class="[printResponse(part).type === 'Action' ? 'italic' : '']"
               class="font-sans leading-6 whitespace-pre-wrap"
               v-html="$sanitize(printResponse(part).text)"
-              @click="handleClick"
             ></p>
           </div>
           <div
@@ -175,7 +178,6 @@
 <script lang="ts">
 import DetailConversationPart from '@/components/conversation/DetailConversationPart.vue';
 import ScreenConversationPart from '@/components/conversation/ScreenConversationPart.vue';
-import { AlexaUtil } from '@/utils/AlexaUtil';
 import { InboxLog, InboxLogType } from 'jovo-inbox-core';
 import { ChevronDownIcon, ChevronUpIcon, CodeIcon, MonitorIcon, UserIcon } from 'vue-feather-icons';
 import { Component, Prop, Watch } from 'vue-property-decorator';
@@ -240,9 +242,9 @@ export default class ConversationPart extends mixins(BaseMixin) {
     return this.part.type === InboxLogType.ERROR;
   }
 
+  // TODO: get hasScreen from platform request class
   get hasScreenInterface(): boolean {
-    const lastRequest = this.findLastRequest();
-    return !!lastRequest && AlexaUtil.hasAplInterface(lastRequest.payload);
+    return false;
   }
 
   get isNextSession() {
@@ -315,13 +317,6 @@ export default class ConversationPart extends mixins(BaseMixin) {
       type: 'user',
       text: 'error',
     };
-  }
-
-  handleClick() {
-    // console.log(e.target);
-    // if ((e.target as string).includes('.tag-audio')) {
-    //   console.log('Got a click on .play-video or a child element')
-    // }
   }
   @Watch('selectedConversation')
   onSelectedConversationChange() {

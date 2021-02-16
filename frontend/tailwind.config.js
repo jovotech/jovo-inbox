@@ -12,16 +12,21 @@ module.exports = {
     fontFamily: {
       sans: ['Roboto', 'sans-serif'],
     },
+
     extend: {
       inset: {
         0.5: '0.5rem',
         1: '1rem',
         2: '2rem',
       },
+      cursor: {
+        'col-resize': 'col-resize',
+      },
       colors: {
         'alexa-blue': '#78e5ff',
         'blueGray': colors.blueGray,
         'jovo-blue': '#272f48',
+        'opacityblack': 'rgba(0,0,0,0.5)',
       },
       spacing: {
         72: '18rem',

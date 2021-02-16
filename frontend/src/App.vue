@@ -6,6 +6,7 @@
       <div class="flex flex-col min-w-0 flex-1 overflow-hidden">
         <div class="flex-1 relative z-0 flex overflow-hidden">
           <main-panel></main-panel>
+
           <sidebar-right></sidebar-right>
         </div>
       </div>
@@ -16,7 +17,6 @@
 <script lang="ts">
 import { Component, Watch } from 'vue-property-decorator';
 
-import Inbox from '@/components/Inbox.vue';
 import InboxHeader from '@/components/layout/InboxHeader.vue';
 import SidebarLeft from '@/components/layout/SidebarLeft.vue';
 import SidebarRight from '@/components/layout/SidebarRight.vue';
@@ -25,7 +25,7 @@ import { BaseMixin } from '@/mixins/BaseMixin';
 import { mixins } from 'vue-class-component';
 
 @Component({
-  components: { MainPanel, SidebarRight, SidebarLeft, InboxHeader, Inbox },
+  components: { MainPanel, SidebarRight, SidebarLeft, InboxHeader },
 })
 export default class App extends mixins(BaseMixin) {
   async mounted() {

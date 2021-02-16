@@ -1,7 +1,7 @@
 import Vue from 'vue';
 declare module 'vue/types/vue' {
   interface Vue {
-    $clipboard(value: any): void;
+    $clipboard(value: string): void;
   }
 }
 import App from './App.vue';

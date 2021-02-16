@@ -64,7 +64,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
-import { InboxLog, InboxLogType } from 'jovo-inbox-core';
+import { InboxLog } from 'jovo-inbox-core';
 import VueJsonPretty from 'vue-json-pretty';
 import 'vue-json-pretty/lib/styles.css';
 import * as AplRenderer from 'apl-viewhost-web';
@@ -83,11 +83,8 @@ export default class ScreenConversationPart extends Vue {
   @Prop()
   visible = false;
 
+  // eslint-disable-next-line
   renderer: any;
-
-  async mounted() {
-    //
-  }
 
   @Watch('visible', { deep: true })
   private async onVisibilityChange() {
