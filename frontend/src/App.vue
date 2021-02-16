@@ -33,6 +33,8 @@ export default class App extends mixins(BaseMixin) {
       await this.$store.dispatch('DataModule/fetchApps');
       if (!this.app) {
         await this.$store.dispatch('DataModule/selectApp', this.$store.state.DataModule.apps[0]);
+      } else {
+        await this.$store.dispatch('DataModule/selectApp', this.app);
       }
       await this.$store.dispatch('DataModule/buildAppUsersMap', this.app.id);
       await this.$store.dispatch('DataModule/fetchConversations', {
