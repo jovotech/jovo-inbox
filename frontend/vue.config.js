@@ -2,6 +2,7 @@ const webpack = require('webpack');
 const path = require('path');
 module.exports = {
   parallel: false,
+  outputDir: './../api/public/client',
   chainWebpack: (config) => {
     config.resolve.symlinks(false);
 
@@ -23,57 +24,7 @@ module.exports = {
     //     return opti2ons;
     //   });
   },
-  configureWebpack: {
-    // module: {
-    //   rules: [
-    //     {
-    //       // Test for a polyfill (or any file) and it won't be included in your
-    //       // bundle
-    //       test: path.resolve(__dirname, './node_modules/asyncctx/ContinuationLocalStorage.js'),
-    //       use: 'null-loader',
-    //     },
-    //     {
-    //       // Test for a polyfill (or any file) and it won't be included in your
-    //       // bundle
-    //       test: path.resolve(__dirname, './node_modules/jovo-core/dist/src/index.js'),
-    //       use: 'null-loader',
-    //     },
-    //     {
-    //       // Test for a polyfill (or any file) and it won't be included in your
-    //       // bundle
-    //       test: path.resolve(
-    //         __dirname,
-    //         './node_modules/jovo-platform-alexa/dist/src/core/AlexaSpeechBuilder.js',
-    //       ),
-    //       use: 'null-loader',
-    //     },
-    //     {
-    //       // Test for a polyfill (or any file) and it won't be included in your
-    //       // bundle
-    //       test: path.resolve(
-    //         __dirname,
-    //         './node_modules/jovo-platform-alexa/dist/src/core/AlexaSkill.js',
-    //       ),
-    //       use: 'null-loader',
-    //     },
-    //     {
-    //       // Test for a polyfill (or any file) and it won't be included in your
-    //       // bundle
-    //       test: path.resolve(
-    //         __dirname,
-    //         './node_modules/jovo-platform-alexa/dist/src/core/AlexaUser.js',
-    //       ),
-    //       use: 'null-loader',
-    //     },
-    //     {
-    //       // Test for a polyfill (or any file) and it won't be included in your
-    //       // bundle
-    //       test: path.resolve(__dirname, './node_modules/jovo-platform-alexa/dist/src/Alexa.js'),
-    //       use: 'null-loader',
-    //     },
-    //   ],
-    // },
-  },
+  configureWebpack: {},
   css: {
     loaderOptions: {
       postcss: {

@@ -56,3 +56,46 @@ Then open  http://localhost:8080
 ### Connect to Jovo App
 
 Install the Jovo Inbox plugin as explained here: https://github.com/jovotech/jovo-framework/tree/master/jovo-integrations/jovo-plugin-inbox
+
+
+
+### Deploy on server
+
+This is not the best way, but sufficient for the beginning. Better approaches will follow.
+
+Copy `.env.example`, rename it to `.env.production`.
+```
+cd /frontend
+cp .env.example .env.production
+```
+
+Change the `VUE_APP_BACKEND_URL` env variable to
+`http://<MY_SERVER>:4000/api`
+
+Build the frontend files into `api/public/client` 
+
+```shell
+cd /frontend
+npm run build
+```
+
+Run the api and open `http://<MY_SERVER>:4000`
+
+```shell
+cd /api
+npm start
+```
+
+
+### Basic Auth
+Uncomment `BASIC_AUTH_USER` and `BASIC_AUTH_PASSWORD` in `/api/.env` to provide 
+basic authentication
+
+
+
+
+
+
+
+
+

@@ -147,13 +147,13 @@ export class InboxLogUserService {
       connectionName(updateInboxLogUserDto.appId),
     ).save(user);
 
-    // TODO: better error mgmt
-    const filePath = path.join(
-      __dirname,
-      './../../../../public/images',
-      user.image,
-    );
-    fs.writeFileSync(filePath, image.buffer);
+    const filesDirectory = path.join(__dirname, './../../../../public/images');
+
+    if (!fs.existsSync(filesDirectory)) {
+      fs.mkdirSync(filesDirectory, { recursive: true });
+    }
+
+    fs.writeFileSync(path.join(filesDirectory, user.image), image.buffer);
   }
 
   async deleteImage(deleteUserImageDto: DeleteUserImageDto) {

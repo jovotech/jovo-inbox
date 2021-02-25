@@ -278,7 +278,6 @@ export default class ConversationPart extends mixins(BaseMixin) {
 
   printRequest(log: InboxLog) {
     const platformRequest = this.getPlatformRequest(log);
-    console.log(platformRequest);
     if (platformRequest) {
       return platformRequest.getText();
     }

@@ -37,7 +37,7 @@ export class BaseMixin extends Vue {
 
   getImage(conversation: InboxLog) {
     if (this.nameMap[conversation.userId] && this.nameMap[conversation.userId].image) {
-      return `${API_BASE_URL}/public/images/${this.nameMap[conversation.userId].image}`;
+      return `${API_BASE_URL}/avatars/${this.nameMap[conversation.userId].image}`;
     }
     // return this.createIcon(conversation.userId);
   }
