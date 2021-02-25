@@ -15,16 +15,24 @@ $ npm run setup:api
 $ npm run setup:frontend
 ```
 
-Create `.env` file in `/api` with the following attributes:
+In `/api` , do 2 things:
+
+* Copy `inbox.config.example.ts` and rename it to `inbox.config.ts`
+* Copy the `.env.example` file and rename it to `.env`
+
+You can add your first app by updating the `.env` file:
 
 ```
-INBOX_MYSQL_DATABASE=
-INBOX_MYSQL_USER=
-INBOX_MYSQL_PASSWORD=
-INBOX_MYSQL_HOST=
+APP1_NAME=
+APP1_ID=
+APP1_DB_TYPE=mysql
+APP1_DB_HOST=
+APP1_DB_USER=
+APP1_DB_PASSWORD=
+APP1_DB_DATABASE=
 ```
 
-For other database configurations, take a look at the `inbox.config.ts` file in `src/api`.
+More apps can be added in the `inbox.config.ts` file.
 
 ### Start Services
 
