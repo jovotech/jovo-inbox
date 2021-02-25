@@ -11,12 +11,12 @@
           class="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto"
           :class="[isContentHovered ? 'scrollbar' : 'scrollbar-invisible']"
         >
-          <div class="flex items-center flex-shrink-0 px-2">
+          <div class="flex items-center flex-shrink-0 px-3">
             <div class="w-full ">
               <select-app-list @selectConversation="selectConversation"></select-app-list>
             </div>
           </div>
-          <div class="px-3 my-5">
+          <div class="px-3 my-3.5">
             <filter-settings
               @loadConversations="loadConversations"
               @updateSearchMode="updateSearchMode"
@@ -61,33 +61,30 @@
                   class="group block hover:bg-gray-100 focus:bg-gray-200"
                   :class="[isSelected(conversation) ? 'bg-gray-200' : '']"
                 >
-                  <div class="px-2 py-2 sm:px-3 flex text-xs">
+                  <div class="px-2 py-2 sm:px-3 n flex text-xs">
                     <img
                       v-if="getImage(conversation)"
-                      class="h-10 w-10 rounded-full"
+                      class="h-10 w-10 rounded-full ml-0.5 mr-0.5"
                       :src="getImage(conversation)"
                       :title="conversation.userId"
                       alt=""
                     />
-                    <svg
-                      v-else
-                      class="h-auto w-14 text-gray-400"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path
-                        fill-rule="evenodd"
-                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z"
-                        clip-rule="evenodd"
-                      />
-                    </svg>
+                    <span v-else class="h-auto w-14">
+                      <svg class="text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path
+                          fill-rule="evenodd"
+                          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z"
+                          clip-rule="evenodd"
+                        />
+                      </svg>
+                    </span>
 
-                    <div class="w-full ml-2">
+                    <div class="w-full ml-2 mt-0.5">
                       <div class="flex items-center justify-between">
                         <p class="text-sm font-medium truncate" :title="conversation.userId">
                           {{ getName(conversation) }}
                         </p>
-                        <div class="ml-2 flex-shrink-0 flex">
+                        <div class="mr-2.5 flex-shrink-0 flex">
                           <p
                             v-if="loadingConversation !== conversation.userId"
                             class=" inline-flex text-xs leading-5 text-gray-400 group-hover:text-gray-500 group-focus:text-gray-600"

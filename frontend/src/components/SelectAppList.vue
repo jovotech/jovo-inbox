@@ -5,7 +5,7 @@
         @click="open"
         type="button"
         ref="button"
-        class="group w-full bg-gray-50 rounded-md px-3.5 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-purple-500"
+        class="group w-full bg-gray-50 rounded-md px-2.5 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-purple-500"
         id="options-menu"
         aria-haspopup="true"
       >
@@ -20,7 +20,7 @@
             </span>
           </span>
           <svg
-            class="flex-shrink-0 h-5 w-5 text-gray-400 group-hover:text-gray-500"
+            class="flex-shrink-0 h-5 w-5 text-gray-400 group-hover:text-gray-500 "
             x-description="Heroicon name: solid/selector"
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 20 20"

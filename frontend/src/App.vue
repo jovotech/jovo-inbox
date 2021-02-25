@@ -6,7 +6,6 @@
       <div class="flex flex-col min-w-0 flex-1 overflow-hidden">
         <div class="flex-1 relative z-0 flex overflow-hidden">
           <main-panel></main-panel>
-
           <sidebar-right></sidebar-right>
         </div>
       </div>
