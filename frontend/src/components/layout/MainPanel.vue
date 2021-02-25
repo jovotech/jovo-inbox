@@ -54,13 +54,18 @@
       ref="partContainer"
       :class="[isContentHovered ? 'scrollbar' : 'scrollbar-invisible']"
     >
-      <conversation-part
-        v-for="(part, index) in selectedConversation"
-        :key="index"
-        :part="part"
-        :selectedConversation="selectedConversation"
-        :index="index"
-      />
+      <div v-for="(part, index) in selectedConversation" :key="index">
+        <div v-if="isSessionStart(index)" class="text-center" :title="sessionStart(index)">
+          <div class="my-12 mb-14 mx-auto w-4/5 new-session">
+            <span class="bg-gray-100 ">{{ newSessionDate(sessionStart(index)) }}</span>
+          </div>
+        </div>
+        <conversation-part
+          :part="part"
+          :selectedConversation="selectedConversation"
+          :index="index"
+        />
+      </div>
     </div>
     <detail-conversation-part></detail-conversation-part>
     <!-- End main area -->
@@ -74,6 +79,7 @@ import { InboxLog, SelectUserConversationsDto } from 'jovo-inbox-core';
 import DetailConversationPart from '@/components/conversation/DetailConversationPart.vue';
 import { mixins } from 'vue-class-component';
 import { BaseMixin } from '@/mixins/BaseMixin';
+import { FormatUtil } from '@/utils/FormatUtil';
 
 @Component({
   name: 'main-panel',
@@ -89,6 +95,17 @@ export default class MainPanel extends mixins(BaseMixin) {
     return this.$store.state.DataModule.selectedUserConversations;
   }
 
+  isSessionStart(index: number) {
+    return (
+      index === 0 ||
+      this.selectedConversation[index - 1].sessionId !== this.selectedConversation[index].sessionId
+    );
+  }
+
+  newSessionDate(date: string) {
+    return FormatUtil.formatDate(date);
+  }
+
   @Watch('selectedConversation')
   onSelectedConversation() {
     this.$nextTick(() => {
@@ -101,6 +118,10 @@ export default class MainPanel extends mixins(BaseMixin) {
   scrollToBottom() {
     const partContainer = this.$refs.partContainer as HTMLDivElement;
     partContainer.scrollTop = partContainer.scrollHeight;
+  }
+
+  sessionStart(index: number) {
+    return this.selectedConversation[index].createdAt;
   }
 
   countSessions() {

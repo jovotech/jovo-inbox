@@ -48,7 +48,7 @@ export class WebAppRequest extends JovoInboxPlatformRequest {
 
     return {
       type: 'platform',
-      text: `Unspecified123`,
+      text: `Unspecified`,
     };
 
   }

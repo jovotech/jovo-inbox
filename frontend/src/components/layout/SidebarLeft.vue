@@ -24,7 +24,7 @@
             ></filter-settings>
           </div>
           <div
-            class="bg-white  sm:rounded-md w-auto flex-1 flex flex-col overflow-y-auto"
+            class="bg-white  w-auto ml-1 flex-1 flex flex-col overflow-y-auto"
             :class="[isContentHovered ? 'scrollbar' : 'scrollbar-invisible']"
             @scroll="handleScroll"
           >

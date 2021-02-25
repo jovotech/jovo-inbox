@@ -9,7 +9,7 @@ export class AlexaRequest extends JovoInboxPlatformRequest {
   request?: Request;
 
   isPlatformRequest(json: any): boolean {
-    return !!json.request && !!json.version;
+    return !!json.request && !!json.version && !!json.session;
   }
 
   getDeviceName(): string {

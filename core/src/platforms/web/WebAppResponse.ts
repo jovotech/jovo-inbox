@@ -34,17 +34,16 @@ export class WebAppResponse extends JovoInboxPlatformResponse {
   }
 
   getSpeech(): Out {
-    console.log(this.actions?.length)
     if (this.actions?.length > 0) {
       return {
-        text: this.actions[0].ssml,
+        text: this.actions[0].ssml || this.actions[0].text,
         type: 'user',
       };
     }
 
     return {
       type: 'platform',
-      text: 'Unspecifieadaa',
+      text: 'Unspecifiead',
     };
   }
 

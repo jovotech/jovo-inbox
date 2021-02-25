@@ -1,17 +1,13 @@
 <template>
   <div
     ref="conversation-part"
-    class="group w-full flex-grow flex flex-col p-4 rounded-l"
+    class="group w-full flex-grow flex flex-col rounded-l"
     :class="isSelectedInboxLog ? 'border-jovo-blue border-l-4 inset-0' : ''"
   >
-    <div v-if="isSessionStart" class="text-center" :title="sessionStart">
-      <div class="my-12 mb-14 mx-auto w-4/5 new-session">
-        <span class="bg-gray-100 ">{{ newSessionDate(sessionStart) }}</span>
-      </div>
-    </div>
     <div
       v-on:dblclick="selectInboxLog"
-      class="inline-flex w-full "
+      class="inline-flex w-full p-4"
+      :data-session-id="part.sessionId"
       :class="isResponse ? 'ml-auto justify-end' : ''"
     >
       <div class="inline-flex flex-col " :class="isResponse || isRequest ? 'max-w-3/4' : 'w-full'">
@@ -255,20 +251,8 @@ export default class ConversationPart extends mixins(BaseMixin) {
     );
   }
 
-  get isSessionStart() {
-    return (
-      this.index === 0 ||
-      this.selectedConversation[this.index - 1].sessionId !==
-        this.selectedConversation[this.index].sessionId
-    );
-  }
-
   get nextSessionStart() {
     return this.selectedConversation[this.index + 1].createdAt;
-  }
-
-  get sessionStart() {
-    return this.selectedConversation[this.index].createdAt;
   }
 
   print(log: InboxLog) {
@@ -294,6 +278,7 @@ export default class ConversationPart extends mixins(BaseMixin) {
 
   printRequest(log: InboxLog) {
     const platformRequest = this.getPlatformRequest(log);
+    console.log(platformRequest);
     if (platformRequest) {
       return platformRequest.getText();
     }
@@ -339,10 +324,6 @@ export default class ConversationPart extends mixins(BaseMixin) {
   }
   get isSelectedInboxLog() {
     return this.selectedInboxLog && this.selectedInboxLog.id === this.part.id;
-  }
-
-  newSessionDate(date: string) {
-    return FormatUtil.formatDate(date);
   }
 }
 </script>
