@@ -1,13 +1,19 @@
 <template>
-  <div class="hidden lg:flex lg:flex-shrink-0">
+  <div
+    class="hidden lg:flex lg:flex-shrink-0"
+    @mouseenter="isContentHovered = true"
+    @mouseleave="isContentHovered = false"
+  >
     <div class="flex flex-col w-80">
       <!-- Sidebar component, swap this element with another sidebar if you like -->
       <div class="flex flex-col h-0 flex-1 border-r border-gray-200 bg-gray-50">
-        <div class="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">
+        <div
+          class="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto"
+          :class="[isContentHovered ? 'scrollbar' : 'scrollbar-invisible']"
+        >
           <div class="flex items-center flex-shrink-0 px-4">
-            <!--                select-->
-            <div class="w-full">
-              <div class=" mt-6 relative inline-block text-left w-full">
+            <div class="w-full ">
+              <div class=" relative inline-block text-left w-full">
                 <div>
                   <button
                     @click="open"
@@ -87,19 +93,37 @@
                       </span>
                     </a>
                   </div>
-                  <div class="py-1" v-if="false">
-                    <a
+                  <div class="py-1">
+                    <div
                       href="#"
-                      class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                      class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 flex justify-between items-center"
                       role="menuitem"
-                      >Upload app logo</a
                     >
+                      <span>Live Mode</span>
+                      <!-- Enabled: "bg-indigo-600", Not Enabled: "bg-gray-200" -->
+                      <button
+                        type="button"
+                        @click="toggleLiveMode"
+                        class="ml-3 relative inline-flex flex-shrink-0 h-4 w-6 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        aria-pressed="false"
+                        aria-labelledby="annual-billing-label"
+                        :class="[isLiveMode ? 'bg-indigo-600' : 'bg-gray-200']"
+                      >
+                        <span class="sr-only">Use setting</span>
+                        <!-- Enabled: "translate-x-5", Not Enabled: "translate-x-0" -->
+                        <span
+                          aria-hidden="true"
+                          class="pointer-events-none inline-block h-3 w-3 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200"
+                          :class="[isLiveMode ? 'translate-x-2' : 'translate-x-0']"
+                        ></span>
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-          <div class="px-7 mt-5">
+          <div class="px-5 my-5">
             <label for="search" class="sr-only">Search</label>
             <div class="mt-1 relative rounded-md shadow-sm">
               <div
@@ -126,14 +150,133 @@
                 name="search"
                 id="search"
                 v-model="search"
+                @change="handleSearch"
+                @keydown="handleSearch"
                 class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-9 sm:text-sm border-gray-300 rounded-md"
                 placeholder="Search users"
               />
+
+              <div
+                class="absolute inset-y-0 right-0 pl-3 flex items-center  text-gray-400 hover:text-gray-600 cursor-pointer"
+                aria-hidden="true"
+                @click="openFilterPopover = !openFilterPopover"
+              >
+                <!-- Heroicon name: search -->
+                <svg
+                  class="mr-3 h-4 w-4"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
+                  />
+                </svg>
+              </div>
+              <div
+                v-if="openFilterPopover"
+                class="z-40 origin-top absolute right-0 left-0 mt-1 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-200"
+                role="menu"
+                ref="popover"
+                aria-orientation="vertical"
+                aria-labelledby="options-menu"
+              >
+                <div class="py-1">
+                  <div
+                    @click="handleFilterSelectedWithErrors()"
+                    href="#"
+                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 flex justify-between items-center"
+                    role="menuitem"
+                  >
+                    <span>Conversations with errors</span>
+                    <!-- Enabled: "bg-indigo-600", Not Enabled: "bg-gray-200" -->
+                    <span
+                      v-if="filterSelectedWithErrors"
+                      class="text-primary-600 group-hover:text-jovo-blue flex items-center"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        class="inline h-4 w-4"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                    </span>
+                  </div>
+                </div>
+                <div class="py-1">
+                  <div
+                    v-for="platform in filterPlatforms"
+                    v-bind:key="platform"
+                    @click="handleFilterSelectedPlatform(platform)"
+                    href="#"
+                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 flex justify-between items-center"
+                    role="menuitem"
+                  >
+                    <span>{{ platform }}</span>
+                    <span
+                      v-if="platform == filterSelectedPlatform"
+                      class="text-primary-600 group-hover:text-jovo-blue flex items-center"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        class="inline h-4 w-4"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-
-          <div class="bg-white  sm:rounded-md w-auto m-5">
+          <div
+            class="bg-white  sm:rounded-md w-auto flex-1 flex flex-col overflow-y-auto"
+            :class="[isContentHovered ? 'scrollbar' : 'scrollbar-invisible']"
+            @scroll="handleScroll"
+          >
             <ul class="divide-y divide-gray-200">
+              <li class="text-center justify-center" :class="[!searchLoading ? 'hidden' : '']">
+                <svg
+                  class="animate-spin h-5 w-5 text-jovo-blue mt-2 mb-2 m-auto"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    class="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    stroke-width="4"
+                  ></circle>
+                  <path
+                    class="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+              </li>
               <li
                 v-for="conversation in getConversations()"
                 v-bind:key="conversation.id"
@@ -177,7 +320,14 @@
                             :title="lastConversationItemDate(conversation, false)"
                             :class="[isSelected(conversation) ? 'text-gray-600' : '']"
                           >
-                            <span>{{ lastConversationItemDate(conversation) }}</span>
+                            <span>
+                              <span
+                                v-if="isUserActive(conversation)"
+                                class="inline-block h-2 w-2 mr-0.5 rounded-full  bg-green-400"
+                              ></span>
+
+                              {{ lastConversationItemDate(conversation) }}</span
+                            >
                           </p>
                           <svg
                             v-if="loadingConversation === conversation.userId"
@@ -208,13 +358,38 @@
                             class="flex items-center text-xs text-gray-400 group-hover:text-gray-500 group-focus:text-gray-600"
                             :class="[isSelected(conversation) ? 'text-gray-600' : '']"
                           >
-                            {{ lastConversationItemRequest(conversation).text }}
+                            {{ lastConversationItemRequestText(conversation) }}
                           </p>
                         </div>
                       </div>
                     </div>
                   </div>
                 </a>
+              </li>
+              <li
+                class="text-center justify-center"
+                :class="[lastConversationLoading ? 'visible' : 'invisible']"
+              >
+                <svg
+                  class="animate-spin h-5 w-5 text-jovo-blue mt-2 m-auto"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    class="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    stroke-width="4"
+                  ></circle>
+                  <path
+                    class="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
               </li>
             </ul>
           </div>
@@ -225,13 +400,18 @@
 </template>
 
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
-import { Api } from '@/Api';
-import { InboxLog, JovoAppMetaData, SelectUserConversationsDto } from 'jovo-inbox-core';
+import { Component, Watch } from 'vue-property-decorator';
+import {
+  GetInboxLogUserDto,
+  GetLastConversationsDto,
+  InboxLog,
+  JovoAppMetaData,
+} from 'jovo-inbox-core';
 
 import { FormatUtil } from '@/utils/FormatUtil';
 import { BaseMixin } from '@/mixins/BaseMixin';
 import { mixins } from 'vue-class-component';
+import { Api } from '@/Api';
 
 @Component({
   name: 'sidebar-left',
@@ -240,31 +420,88 @@ import { mixins } from 'vue-class-component';
 export default class SidebarLeft extends mixins(BaseMixin) {
   search = '';
   openAppPopover = false;
+  openFilterPopover = false;
   loadingConversation: string | undefined = '';
+  isContentHovered = false;
+  interval?: number;
+  searchTimeout?: number;
+  lastConversationLoading = false;
+  searchLoading = false;
+
+  filterPlatforms = [];
+  filterSelectedPlatform?: string;
+  filterSelectedWithErrors = false;
 
   async mounted() {
-    try {
-      if (this.$route.params.id) {
-        const result = await Api.getInboxLogUserConversations({
-          id: this.$route.params.id,
-        });
-        if (result.data?.logs.length > 0) {
-          await this.$store.dispatch('DataModule/fetchUserConversations', {
-            userId: result.data?.logs[0].userId,
-            appId: result.data?.logs[0].appId,
-          } as SelectUserConversationsDto);
-        }
-      } else {
-        if (this.getConversations().length > 0) {
-          await this.selectConversation(this.getConversations()[0]);
-        }
-      }
-    } catch (e) {
-      console.log(e);
-    }
-    await this.$store.dispatch('DataModule/fetchConversations', {
+    await this.loadConversations();
+
+    const response = await Api.getAppPlatforms(this.app.id);
+    this.filterPlatforms = response.data;
+  }
+
+  async loadMore() {
+    this.lastConversationLoading = true;
+    const latestConversations = this.$store.state.DataModule.conversations as InboxLog[];
+    const last = latestConversations[latestConversations.length - 1].createdAt;
+
+    await this.$store.dispatch('DataModule/appendLastConversations', {
       appId: this.app.id,
+      last,
     });
+    this.lastConversationLoading = false;
+  }
+
+  async handleFilter() {
+    this.openFilterPopover = false;
+    await this.loadConversations();
+  }
+
+  @Watch('filterSelectedWithErrors')
+  async watchFilterSelectedWithErrors() {
+    await this.loadConversations();
+  }
+
+  async handleFilterSelectedWithErrors() {
+    this.filterSelectedWithErrors = !this.filterSelectedWithErrors;
+    await this.handleFilter();
+  }
+
+  async handleFilterSelectedPlatform(platform: string) {
+    if (platform === this.filterSelectedPlatform) {
+      this.filterSelectedPlatform = undefined;
+    } else {
+      this.filterSelectedPlatform = platform;
+    }
+    await this.handleFilter();
+  }
+
+  async loadConversations() {
+    const dto: GetLastConversationsDto = {
+      appId: this.app.id,
+      withErrors: this.filterSelectedWithErrors,
+      platform: this.filterSelectedPlatform,
+    };
+
+    await this.$store.dispatch('DataModule/fetchConversations', dto);
+    // try {
+    //   if (this.$route.params.id) {
+    //     const result = await Api.getInboxLogUserConversations({
+    //       id: this.$route.params.id,
+    //     });
+    //     if (result.data?.logs.length > 0) {
+    //       await this.$store.dispatch('DataModule/fetchUserConversations', {
+    //         userId: result.data?.logs[0].userId,
+    //         appId: result.data?.logs[0].appId,
+    //       } as SelectUserConversationsDto);
+    //     }
+    //   } else {
+    //     if (this.getConversations().length > 0) {
+    //       await this.selectConversation(this.getConversations()[0]);
+    //     }
+    //   }
+    // } catch (e) {
+    //   console.log(e);
+    // }
   }
 
   async selectConversation(inboxLog?: InboxLog) {
@@ -289,16 +526,41 @@ export default class SidebarLeft extends mixins(BaseMixin) {
     return FormatUtil.formatDate(inboxLog.createdAt, simple);
   }
 
-  lastConversationItemRequest(log: InboxLog) {
-    const platformRequest = this.getPlatformRequest(log);
-    if (platformRequest) {
-      return platformRequest.getText();
+  lastConversationItemRequestText(log: InboxLog) {
+    // const platformRequest = this.getPlatformRequest(log);
+    // if (platformRequest) {
+    //   return platformRequest.getText();
+    // }
+
+    const platformResponse = this.getPlatformResponse(log);
+    if (platformResponse) {
+      const str = FormatUtil.formatMessageSimple(platformResponse.getSpeech().text);
+
+      if (str.length > 30) {
+        return str.substring(0, 30) + '...';
+      }
+
+      return str;
     }
 
-    return {
-      type: 'user',
-      text: 'error',
-    };
+    return '...';
+  }
+
+  isUserActive(log: InboxLog): boolean {
+    if (!this.isLiveMode) {
+      return false;
+    }
+
+    const platformResponse = this.getPlatformResponse(log);
+    if (platformResponse) {
+      const logCreatedAt = new Date(log.createdAt).getTime();
+      const now = new Date().getTime();
+      const lessThan5Minutes = logCreatedAt > now - 5 * 60 * 1000;
+      // TODO:
+      return !platformResponse.hasSessionEnded();
+    }
+
+    return false;
   }
 
   isSelected(inboxLog: InboxLog) {
@@ -338,15 +600,32 @@ export default class SidebarLeft extends mixins(BaseMixin) {
   }
 
   getConversations(): InboxLog[] {
-    if (this.search.length >= 2) {
-      return this.$store.state.DataModule.conversations.filter((log: InboxLog) => {
-        return (
-          log.userId.indexOf(this.search) > -1 ||
-          (this.nameMap[log.userId] && this.nameMap[log.userId].name.indexOf(this.search) > -1)
-        );
-      });
-    }
+    // if (this.search.length >= 2) {
+    //   return this.$store.state.DataModule.conversations.filter((log: InboxLog) => {
+    //     return (
+    //       log.userId.indexOf(this.search) > -1 ||
+    //       (this.nameMap[log.userId] &&
+    //         this.nameMap[log.userId].name.toLowerCase().indexOf(this.search.toLowerCase()) > -1)
+    //     );
+    //   });
+    // }
     return this.$store.state.DataModule.conversations;
+  }
+
+  async handleSearch() {
+    if (this.searchTimeout) {
+      clearTimeout(this.searchTimeout);
+    }
+
+    this.searchTimeout = window.setTimeout(async () => {
+      this.searchLoading = true;
+
+      await this.$store.dispatch('DataModule/fetchConversations', {
+        appId: this.app.id,
+        search: this.search,
+      });
+      this.searchLoading = false;
+    }, 500);
   }
 
   async selectApp(app: JovoAppMetaData) {
@@ -364,6 +643,31 @@ export default class SidebarLeft extends mixins(BaseMixin) {
       return this.nameMap[conversation.userId].name;
     }
     return this.shortenUserId(conversation);
+  }
+
+  async handleScroll(el: any) {
+    if (el.srcElement.offsetHeight + el.srcElement.scrollTop >= el.srcElement.scrollHeight) {
+      if (!this.lastConversationLoading && this.search.length === 0) {
+        await this.loadMore();
+      }
+    }
+  }
+  async toggleLiveMode() {
+    const val = !this.isLiveMode;
+    await this.$store.dispatch('PreferencesModule/updateLiveMode', val);
+  }
+
+  @Watch('isLiveMode')
+  async watchLiveMode() {
+    if (this.isLiveMode) {
+      this.interval = window.setInterval(async () => {
+        await this.loadConversations();
+      }, 5000);
+    } else {
+      if (this.interval) {
+        clearInterval(this.interval);
+      }
+    }
   }
 }
 </script>

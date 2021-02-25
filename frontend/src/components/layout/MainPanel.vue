@@ -70,17 +70,20 @@
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator';
 import ConversationPart from '@/components/conversation/ConversationPart.vue';
-import { InboxLog } from 'jovo-inbox-core';
+import { InboxLog, SelectUserConversationsDto } from 'jovo-inbox-core';
 import DetailConversationPart from '@/components/conversation/DetailConversationPart.vue';
+import { mixins } from 'vue-class-component';
+import { BaseMixin } from '@/mixins/BaseMixin';
 
 @Component({
   name: 'main-panel',
   components: { ConversationPart, DetailConversationPart },
 })
-export default class MainPanel extends Vue {
+export default class MainPanel extends mixins(BaseMixin) {
   loading = false;
   isContentHovered = false;
   sessionsCount = 0;
+  interval?: number;
 
   get selectedConversation(): InboxLog[] {
     return this.$store.state.DataModule.selectedUserConversations;
@@ -89,7 +92,9 @@ export default class MainPanel extends Vue {
   @Watch('selectedConversation')
   onSelectedConversation() {
     this.$nextTick(() => {
-      this.scrollToBottom();
+      setTimeout(() => {
+        this.scrollToBottom();
+      }, 100);
     });
     this.countSessions();
   }
@@ -105,6 +110,24 @@ export default class MainPanel extends Vue {
     });
 
     this.sessionsCount = Object.keys(sessionsMap).length;
+  }
+
+  @Watch('isLiveMode')
+  async watchLiveMode() {
+    if (this.isLiveMode) {
+      this.interval = window.setInterval(async () => {
+        const lastLog = this.selectedConversation[this.selectedConversation.length - 1];
+        await this.$store.dispatch('DataModule/appendUserConversations', {
+          userId: lastLog.userId,
+          appId: lastLog.appId,
+          lastId: lastLog.id,
+        } as SelectUserConversationsDto);
+      }, 5000);
+    } else {
+      if (this.interval) {
+        clearInterval(this.interval);
+      }
+    }
   }
 }
 </script>

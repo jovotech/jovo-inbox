@@ -77,6 +77,15 @@ export class Api {
     };
     return await axios.request<InboxLogUser[]>(config);
   }
+
+  static async getAppPlatforms(appId: string) {
+    const config: AxiosRequestConfig = {
+      method: 'GET',
+      url: `${BASE_URL}/inboxlog/platform/${appId}`,
+    };
+    return await axios.request<string[]>(config);
+  }
+
   static async getInboxLogUserConversations(getInboxLogUserDto: Pick<GetInboxLogUserDto, 'id'>) {
     const config: AxiosRequestConfig = {
       method: 'POST',

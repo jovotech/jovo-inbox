@@ -5,8 +5,8 @@
     :class="isSelectedInboxLog ? 'border-jovo-blue border-l-4 inset-0' : ''"
   >
     <div v-if="isSessionStart" class="text-center" :title="sessionStart">
-      <div class="my-10 mx-auto w-4/5">
-        <span class="text-gray-400 text-xs ">{{ newSessionDate(sessionStart) }}</span>
+      <div class="my-12 mb-14 mx-auto w-4/5 new-session">
+        <span class="bg-gray-100 ">{{ newSessionDate(sessionStart) }}</span>
       </div>
     </div>
     <div
@@ -137,7 +137,7 @@
             <p
               :class="[printResponse(part).type === 'Action' ? 'italic' : '']"
               class="font-sans leading-6 whitespace-pre-wrap"
-              v-html="$sanitize(printResponse(part).text)"
+              v-html="$sanitize(formatMessage(printResponse(part).text))"
             ></p>
           </div>
           <div
@@ -280,6 +280,10 @@ export default class ConversationPart extends mixins(BaseMixin) {
     }
   }
 
+  formatMessage(str: string) {
+    return FormatUtil.formatMessage(str);
+  }
+
   findLastRequest() {
     for (let i = this.index; i >= 0; i--) {
       if (this.selectedConversation[i].type === InboxLogType.REQUEST) {
@@ -342,4 +346,16 @@ export default class ConversationPart extends mixins(BaseMixin) {
   }
 }
 </script>
-<style lang="postcss"></style>
+<style lang="postcss">
+div.new-session {
+  opacity: 0.3;
+  text-align: center;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+  line-height: 0.1em;
+  font-size: smaller;
+}
+
+div.new-session span {
+  padding: 0 10px;
+}
+</style>

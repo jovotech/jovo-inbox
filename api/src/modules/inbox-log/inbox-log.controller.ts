@@ -25,4 +25,9 @@ export class InboxLogController {
       selectUserConversationsDto,
     );
   }
+
+  @Get('platform/:appId')
+  getPlatforms(@Param('appId') appId: string): Promise<any> {
+    return this.inboxLogService.getPlatforms(appId);
+  }
 }

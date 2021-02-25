@@ -102,6 +102,10 @@ export class BaseMixin extends Vue {
     }
   }
 
+  get isLiveMode(): boolean {
+    return this.$store.state.PreferencesModule.liveMode;
+  }
+
   get nameMap(): Record<
     string,
     {

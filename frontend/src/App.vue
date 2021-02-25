@@ -37,9 +37,6 @@ export default class App extends mixins(BaseMixin) {
         await this.$store.dispatch('DataModule/selectApp', this.app);
       }
       await this.$store.dispatch('DataModule/buildAppUsersMap', this.app.id);
-      await this.$store.dispatch('DataModule/fetchConversations', {
-        appId: this.app.id,
-      });
     } catch (e) {
       console.log(e);
     }

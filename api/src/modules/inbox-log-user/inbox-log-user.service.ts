@@ -9,12 +9,16 @@ import * as path from 'path';
 import {
   DeleteUserImageDto,
   GetInboxLogUserDto,
+  InboxLog,
+  SearchUserDto,
   UpdateInboxLogUserDto,
 } from 'jovo-inbox-core';
 import {
   EntityManager,
+  FindManyOptions,
   FindOneOptions,
   getRepository,
+  ILike,
   Repository,
 } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -23,6 +27,7 @@ import { UploadedFile } from 'jovo-inbox-core/dist/UploadedFile';
 import * as fs from 'fs';
 import { InboxLogService } from '../inbox-log/inbox-log.service';
 import { connectionName } from '../../util';
+import { LOGS_PER_REQUEST } from '../../constants';
 
 @Injectable()
 export class InboxLogUserService {
@@ -158,7 +163,6 @@ export class InboxLogUserService {
       './../../../../public/images',
       user.image,
     );
-    console.log(filePath);
     fs.writeFileSync(filePath, image.buffer);
   }
 

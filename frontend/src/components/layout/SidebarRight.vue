@@ -1,21 +1,26 @@
 <template>
   <aside class="hidden relative xl:flex xl:flex-col flex-shrink-0 w-4/12 border-l  border-gray-200">
     <!-- Start secondary column (hidden on smaller screens) -->
-    <div v-if="!!conversation" class="text-right px-5 py-5">
-      <button
-        v-if="!isCopied"
-        type="button"
-        @click="handleShareConversation"
-        class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-jovo-blue bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-      >
-        <!-- Heroicon name: mail -->
-        <share2-icon size="16" class="mr-2"></share2-icon>
-        Share
-      </button>
-      <span v-else class="inline-flex text-sm items-center px-3 py-2 "
-        >Link copied to clipboard!</span
-      >
+
+    <div class="flex justify-between">
+      <div class="flex items-center"></div>
+      <div v-if="!!conversation" class="text-right px-5 py-5">
+        <button
+          v-if="!isCopied"
+          type="button"
+          @click="handleShareConversation"
+          class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-jovo-blue bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+        >
+          <!-- Heroicon name: mail -->
+          <share2-icon size="16" class="mr-2"></share2-icon>
+          Share
+        </button>
+        <span v-else class="inline-flex text-sm items-center px-3 py-2 "
+          >Link copied to clipboard!</span
+        >
+      </div>
     </div>
+
     <div v-if="!!conversation" class="text-center">
       <div class="flex items-center">
         <div class="hidden relative rounded-full overflow-hidden lg:block m-auto">
