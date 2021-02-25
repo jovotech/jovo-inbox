@@ -1,4 +1,7 @@
-# compiled output
+# Config
+/src/inbox.config.ts
+
+# Compiled output
 /dist
 /node_modules
 
