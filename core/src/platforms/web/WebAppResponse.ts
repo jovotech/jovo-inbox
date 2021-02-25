@@ -37,7 +37,7 @@ export class WebAppResponse extends JovoInboxPlatformResponse {
     console.log(this.actions?.length)
     if (this.actions?.length > 0) {
       return {
-        text: this.formatMessage(this.actions[0].ssml),
+        text: this.actions[0].ssml,
         type: 'user',
       };
     }
@@ -50,5 +50,9 @@ export class WebAppResponse extends JovoInboxPlatformResponse {
 
   getSpeechPlain(): string | undefined {
     return undefined;
+  }
+
+  hasSessionEnded(): boolean {
+    return false;
   }
 }

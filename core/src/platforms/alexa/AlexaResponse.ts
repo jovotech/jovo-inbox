@@ -22,7 +22,7 @@ export class AlexaResponse extends JovoInboxPlatformResponse {
   getSpeech(): Out {
     if (this.response?.outputSpeech?.ssml) {
       return {
-        text: this.formatMessage(this.response?.outputSpeech?.ssml),
+        text: this.response?.outputSpeech?.ssml,
         type: 'user',
       };
     } else if (this.response?.directives) {
@@ -49,5 +49,9 @@ export class AlexaResponse extends JovoInboxPlatformResponse {
 
   getSpeechPlain(): string | undefined {
     return undefined;
+  }
+
+  hasSessionEnded(): boolean {
+    return this.response?.shouldEndSession;
   }
 }

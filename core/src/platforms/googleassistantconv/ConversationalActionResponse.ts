@@ -30,11 +30,15 @@ export class ConversationalActionResponse extends JovoInboxPlatformResponse {
 
     return {
       type: 'user',
-      text: this.formatMessage(firstSimple!),
+      text: firstSimple!,
     };
   }
 
   getSpeechPlain(): string | undefined {
     return undefined;
+  }
+
+  hasSessionEnded(): boolean {
+    return this.scene?.next?.name === 'actions.scene.END_CONVERSATION';
   }
 }

@@ -39,4 +39,8 @@ export class GoogleActionResponse extends JovoInboxPlatformResponse {
   getSpeechPlain(): string | undefined {
     return undefined;
   }
+
+  hasSessionEnded(): boolean {
+    return false; //TODO:
+  }
 }

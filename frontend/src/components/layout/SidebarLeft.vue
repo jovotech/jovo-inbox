@@ -11,243 +11,17 @@
           class="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto"
           :class="[isContentHovered ? 'scrollbar' : 'scrollbar-invisible']"
         >
-          <div class="flex items-center flex-shrink-0 px-4">
+          <div class="flex items-center flex-shrink-0 px-2">
             <div class="w-full ">
-              <div class=" relative inline-block text-left w-full">
-                <div>
-                  <button
-                    @click="open"
-                    type="button"
-                    ref="button"
-                    class="group w-full bg-gray-50 rounded-md px-3.5 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-purple-500"
-                    id="options-menu"
-                    aria-haspopup="true"
-                  >
-                    <span class="flex w-full justify-between items-center">
-                      <span class="flex min-w-0 items-center justify-between space-x-3">
-                        <div
-                          v-if="false"
-                          class="rounded-full h-10 w-10 flex items-center justify-center bg-jovo-blue"
-                        ></div>
-                        <span class="flex-1 min-w-0">
-                          <span class="text-gray-900 text-sm font-medium truncate">{{
-                            app.name
-                          }}</span>
-                        </span>
-                      </span>
-                      <svg
-                        class="flex-shrink-0 h-5 w-5 text-gray-400 group-hover:text-gray-500"
-                        x-description="Heroicon name: solid/selector"
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                        aria-hidden="true"
-                      >
-                        <path
-                          fill-rule="evenodd"
-                          d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
-                          clip-rule="evenodd"
-                        ></path>
-                      </svg>
-                    </span>
-                  </button>
-                </div>
-                <div
-                  v-if="openAppPopover"
-                  class="z-40 origin-top absolute right-0 left-0 mt-1 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-200"
-                  role="menu"
-                  ref="popover"
-                  aria-orientation="vertical"
-                  aria-labelledby="options-menu"
-                >
-                  <div
-                    class="max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto scrollbar focus:outline-none sm:text-sm"
-                  >
-                    <a
-                      v-for="a in apps"
-                      v-bind:key="a.id"
-                      @click="selectApp(a)"
-                      href="#"
-                      class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 group text-gray-900 cursor-default select-none relative pl-3 pr-9 hover:bg-primary-600 hover:text-white"
-                      role="menuitem"
-                      >{{ a.name }}
-
-                      <span
-                        v-if="a.id === app.id"
-                        class="text-primary-600 group-hover:text-jovo-blue absolute inset-y-0 right-0 flex items-center pr-4"
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          class="inline h-4 w-4"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M5 13l4 4L19 7"
-                          />
-                        </svg>
-                      </span>
-                    </a>
-                  </div>
-                  <div class="py-1">
-                    <div
-                      href="#"
-                      class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 flex justify-between items-center"
-                      role="menuitem"
-                    >
-                      <span>Live Mode</span>
-                      <!-- Enabled: "bg-indigo-600", Not Enabled: "bg-gray-200" -->
-                      <button
-                        type="button"
-                        @click="toggleLiveMode"
-                        class="ml-3 relative inline-flex flex-shrink-0 h-4 w-6 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                        aria-pressed="false"
-                        aria-labelledby="annual-billing-label"
-                        :class="[isLiveMode ? 'bg-indigo-600' : 'bg-gray-200']"
-                      >
-                        <span class="sr-only">Use setting</span>
-                        <!-- Enabled: "translate-x-5", Not Enabled: "translate-x-0" -->
-                        <span
-                          aria-hidden="true"
-                          class="pointer-events-none inline-block h-3 w-3 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200"
-                          :class="[isLiveMode ? 'translate-x-2' : 'translate-x-0']"
-                        ></span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <select-app-list @selectConversation="selectConversation"></select-app-list>
             </div>
           </div>
-          <div class="px-5 my-5">
-            <label for="search" class="sr-only">Search</label>
-            <div class="mt-1 relative rounded-md shadow-sm">
-              <div
-                class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
-                aria-hidden="true"
-              >
-                <!-- Heroicon name: search -->
-                <svg
-                  class="mr-3 h-4 w-4 text-gray-400"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                  aria-hidden="true"
-                >
-                  <path
-                    fill-rule="evenodd"
-                    d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                    clip-rule="evenodd"
-                  />
-                </svg>
-              </div>
-              <input
-                type="text"
-                name="search"
-                id="search"
-                v-model="search"
-                @change="handleSearch"
-                @keydown="handleSearch"
-                class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-9 sm:text-sm border-gray-300 rounded-md"
-                placeholder="Search users"
-              />
-
-              <div
-                class="absolute inset-y-0 right-0 pl-3 flex items-center  text-gray-400 hover:text-gray-600 cursor-pointer"
-                aria-hidden="true"
-                @click="openFilterPopover = !openFilterPopover"
-              >
-                <!-- Heroicon name: search -->
-                <svg
-                  class="mr-3 h-4 w-4"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
-                  />
-                </svg>
-              </div>
-              <div
-                v-if="openFilterPopover"
-                class="z-40 origin-top absolute right-0 left-0 mt-1 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-200"
-                role="menu"
-                ref="popover"
-                aria-orientation="vertical"
-                aria-labelledby="options-menu"
-              >
-                <div class="py-1">
-                  <div
-                    @click="handleFilterSelectedWithErrors()"
-                    href="#"
-                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 flex justify-between items-center"
-                    role="menuitem"
-                  >
-                    <span>Conversations with errors</span>
-                    <!-- Enabled: "bg-indigo-600", Not Enabled: "bg-gray-200" -->
-                    <span
-                      v-if="filterSelectedWithErrors"
-                      class="text-primary-600 group-hover:text-jovo-blue flex items-center"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        class="inline h-4 w-4"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M5 13l4 4L19 7"
-                        />
-                      </svg>
-                    </span>
-                  </div>
-                </div>
-                <div class="py-1">
-                  <div
-                    v-for="platform in filterPlatforms"
-                    v-bind:key="platform"
-                    @click="handleFilterSelectedPlatform(platform)"
-                    href="#"
-                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 flex justify-between items-center"
-                    role="menuitem"
-                  >
-                    <span>{{ platform }}</span>
-                    <span
-                      v-if="platform == filterSelectedPlatform"
-                      class="text-primary-600 group-hover:text-jovo-blue flex items-center"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        class="inline h-4 w-4"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M5 13l4 4L19 7"
-                        />
-                      </svg>
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
+          <div class="px-3 my-5">
+            <filter-settings
+              @loadConversations="loadConversations"
+              @updateSearchMode="updateSearchMode"
+              @updateSearchLoading="updateSearchLoading"
+            ></filter-settings>
           </div>
           <div
             class="bg-white  sm:rounded-md w-auto flex-1 flex flex-col overflow-y-auto"
@@ -255,7 +29,7 @@
             @scroll="handleScroll"
           >
             <ul class="divide-y divide-gray-200">
-              <li class="text-center justify-center" :class="[!searchLoading ? 'hidden' : '']">
+              <li class="text-center justify-center" :class="[!isSearchLoading ? 'hidden' : '']">
                 <svg
                   class="animate-spin h-5 w-5 text-jovo-blue mt-2 mb-2 m-auto"
                   xmlns="http://www.w3.org/2000/svg"
@@ -400,43 +174,38 @@
 </template>
 
 <script lang="ts">
-import { Component, Watch } from 'vue-property-decorator';
-import {
-  GetInboxLogUserDto,
-  GetLastConversationsDto,
-  InboxLog,
-  JovoAppMetaData,
-} from 'jovo-inbox-core';
+import { Component } from 'vue-property-decorator';
+import { GetLastConversationsDto, InboxLog } from 'jovo-inbox-core';
 
 import { FormatUtil } from '@/utils/FormatUtil';
 import { BaseMixin } from '@/mixins/BaseMixin';
 import { mixins } from 'vue-class-component';
-import { Api } from '@/Api';
+import SelectAppList from '@/components/SelectAppList.vue';
+import FilterSettings from '@/components/FilterSettings.vue';
 
 @Component({
   name: 'sidebar-left',
-  components: {},
+  components: { FilterSettings, SelectAppList },
 })
 export default class SidebarLeft extends mixins(BaseMixin) {
-  search = '';
-  openAppPopover = false;
-  openFilterPopover = false;
   loadingConversation: string | undefined = '';
   isContentHovered = false;
-  interval?: number;
-  searchTimeout?: number;
   lastConversationLoading = false;
-  searchLoading = false;
-
-  filterPlatforms = [];
-  filterSelectedPlatform?: string;
-  filterSelectedWithErrors = false;
+  inSearchMode = false;
+  isSearchLoading = false;
 
   async mounted() {
-    await this.loadConversations();
+    await this.loadConversations({
+      appId: this.app.id,
+    });
+  }
 
-    const response = await Api.getAppPlatforms(this.app.id);
-    this.filterPlatforms = response.data;
+  updateSearchMode(val: boolean) {
+    this.inSearchMode = val;
+  }
+
+  updateSearchLoading(val: boolean) {
+    this.isSearchLoading = val;
   }
 
   async loadMore() {
@@ -451,38 +220,15 @@ export default class SidebarLeft extends mixins(BaseMixin) {
     this.lastConversationLoading = false;
   }
 
-  async handleFilter() {
-    this.openFilterPopover = false;
-    await this.loadConversations();
-  }
-
-  @Watch('filterSelectedWithErrors')
-  async watchFilterSelectedWithErrors() {
-    await this.loadConversations();
-  }
-
-  async handleFilterSelectedWithErrors() {
-    this.filterSelectedWithErrors = !this.filterSelectedWithErrors;
-    await this.handleFilter();
-  }
-
-  async handleFilterSelectedPlatform(platform: string) {
-    if (platform === this.filterSelectedPlatform) {
-      this.filterSelectedPlatform = undefined;
-    } else {
-      this.filterSelectedPlatform = platform;
+  async loadConversations(dto: GetLastConversationsDto) {
+    if (!this.isLiveMode) {
+      await this.$store.dispatch('DataModule/clearConversations');
+      this.isSearchLoading = true;
     }
-    await this.handleFilter();
-  }
-
-  async loadConversations() {
-    const dto: GetLastConversationsDto = {
-      appId: this.app.id,
-      withErrors: this.filterSelectedWithErrors,
-      platform: this.filterSelectedPlatform,
-    };
 
     await this.$store.dispatch('DataModule/fetchConversations', dto);
+    this.isSearchLoading = false;
+
     // try {
     //   if (this.$route.params.id) {
     //     const result = await Api.getInboxLogUserConversations({
@@ -553,9 +299,9 @@ export default class SidebarLeft extends mixins(BaseMixin) {
 
     const platformResponse = this.getPlatformResponse(log);
     if (platformResponse) {
-      const logCreatedAt = new Date(log.createdAt).getTime();
-      const now = new Date().getTime();
-      const lessThan5Minutes = logCreatedAt > now - 5 * 60 * 1000;
+      // const logCreatedAt = new Date(log.createdAt).getTime();
+      // const now = new Date().getTime();
+      // const lessThan5Minutes = logCreatedAt > now - 5 * 60 * 1000;
       // TODO:
       return !platformResponse.hasSessionEnded();
     }
@@ -574,68 +320,8 @@ export default class SidebarLeft extends mixins(BaseMixin) {
     );
   }
 
-  onClick(event: MouseEvent) {
-    if (
-      event.target &&
-      (this.$refs.button as HTMLButtonElement | undefined)?.contains(event.target as HTMLElement)
-    ) {
-      return;
-    }
-    if (!this.openAppPopover || !event.target || !this.$refs.popover) return;
-    if (!(this.$refs.popover as HTMLElement).contains(event.target as HTMLElement)) {
-      this.close();
-    }
-  }
-
-  open() {
-    this.openAppPopover = true;
-    this.$emit('open');
-    document.body.addEventListener('click', this.onClick);
-  }
-
-  close() {
-    this.openAppPopover = false;
-    this.$emit('close');
-    document.body.removeEventListener('click', this.onClick);
-  }
-
   getConversations(): InboxLog[] {
-    // if (this.search.length >= 2) {
-    //   return this.$store.state.DataModule.conversations.filter((log: InboxLog) => {
-    //     return (
-    //       log.userId.indexOf(this.search) > -1 ||
-    //       (this.nameMap[log.userId] &&
-    //         this.nameMap[log.userId].name.toLowerCase().indexOf(this.search.toLowerCase()) > -1)
-    //     );
-    //   });
-    // }
     return this.$store.state.DataModule.conversations;
-  }
-
-  async handleSearch() {
-    if (this.searchTimeout) {
-      clearTimeout(this.searchTimeout);
-    }
-
-    this.searchTimeout = window.setTimeout(async () => {
-      this.searchLoading = true;
-
-      await this.$store.dispatch('DataModule/fetchConversations', {
-        appId: this.app.id,
-        search: this.search,
-      });
-      this.searchLoading = false;
-    }, 500);
-  }
-
-  async selectApp(app: JovoAppMetaData) {
-    await this.$store.dispatch('DataModule/selectApp', app);
-    await this.$store.dispatch('DataModule/fetchConversations', {
-      appId: app.id,
-    });
-
-    await this.selectConversation();
-    this.close();
   }
 
   getName(conversation: InboxLog) {
@@ -645,27 +331,11 @@ export default class SidebarLeft extends mixins(BaseMixin) {
     return this.shortenUserId(conversation);
   }
 
-  async handleScroll(el: any) {
-    if (el.srcElement.offsetHeight + el.srcElement.scrollTop >= el.srcElement.scrollHeight) {
-      if (!this.lastConversationLoading && this.search.length === 0) {
+  async handleScroll(event: any) {
+    const target = event.target;
+    if (target.offsetHeight + target.scrollTop >= target.scrollHeight) {
+      if (!this.lastConversationLoading && !this.inSearchMode) {
         await this.loadMore();
-      }
-    }
-  }
-  async toggleLiveMode() {
-    const val = !this.isLiveMode;
-    await this.$store.dispatch('PreferencesModule/updateLiveMode', val);
-  }
-
-  @Watch('isLiveMode')
-  async watchLiveMode() {
-    if (this.isLiveMode) {
-      this.interval = window.setInterval(async () => {
-        await this.loadConversations();
-      }, 5000);
-    } else {
-      if (this.interval) {
-        clearInterval(this.interval);
       }
     }
   }
