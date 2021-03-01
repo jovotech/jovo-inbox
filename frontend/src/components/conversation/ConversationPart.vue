@@ -2,12 +2,12 @@
   <div
     ref="conversation-part"
     class="group w-full flex-grow flex flex-col rounded-l"
+    :data-session-id="part.sessionId"
     :class="isSelectedInboxLog ? 'border-jovo-blue border-l-4 inset-0' : ''"
   >
     <div
       v-on:dblclick="selectInboxLog"
       class="inline-flex w-full p-4"
-      :data-session-id="part.sessionId"
       :class="isResponse ? 'ml-auto justify-end' : ''"
     >
       <div class="inline-flex flex-col " :class="isResponse || isRequest ? 'max-w-3/4' : 'w-full'">
