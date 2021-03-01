@@ -12,7 +12,9 @@ export class FormatUtil {
       return dateDayJs.format('h:mm a');
     } else if (dateDayJs.isYesterday()) {
       return 'yesterday,' + dateDayJs.format(' h:mm a');
-    } else if (dateDayJs.isAfter(dateDayJs.subtract(7, 'day'))) {
+    } else if (dateDayJs.isBefore(dayjs().subtract(7, 'day'))) {
+      return simple ? dateDayJs.format('MMM, DD') : dateDayJs.format('ddd, h:mm a');
+    } else if (dateDayJs.isAfter(dayjs().subtract(7, 'day'))) {
       return simple ? dateDayJs.format('ddd') : dateDayJs.format('ddd, h:mm a');
     } else {
       return dateDayJs.format('ddd, MMM, DD h:mm a');
