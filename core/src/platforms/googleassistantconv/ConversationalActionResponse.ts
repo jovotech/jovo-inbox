@@ -1,7 +1,6 @@
 import { JovoInboxPlatformResponse } from '../JovoInboxPlatformResponse';
-import type {Context, Request, Session, SessionAttributes} from 'jovo-platform-alexa'
 import {Out} from "../JovoInboxPlatformRequest";
-import {Device, Expected, Home, Prompt, Scene, User} from "jovo-platform-googleassistantconv";
+import type {Device, Expected, Home, Prompt, Scene, User, Session} from "jovo-platform-googleassistantconv";
 
 export class ConversationalActionResponse extends JovoInboxPlatformResponse {
   prompt?: Prompt;
@@ -22,6 +21,24 @@ export class ConversationalActionResponse extends JovoInboxPlatformResponse {
 
   getRepromptPlain(): string | undefined {
     return undefined;
+  }
+
+  getOutput(): Out[] {
+    const output: Out[] = [];
+
+    if (this.prompt?.firstSimple) {
+      output.push({
+        type: 'user',
+        text: this.prompt?.firstSimple.speech || this.prompt?.firstSimple.text || '',
+      })
+    }
+    if (this.prompt?.lastSimple) {
+      output.push({
+        type: 'user',
+        text: this.prompt?.lastSimple.speech || this.prompt?.lastSimple.text || '',
+      })
+    }
+    return output;
   }
 
   getSpeech(): Out {

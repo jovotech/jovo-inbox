@@ -22,6 +22,23 @@ export class GoogleActionResponse extends JovoInboxPlatformResponse {
     return undefined;
   }
 
+  getOutput(): Out[] {
+    const output: Out[] = [];
+
+    const items = _get(this.payload, 'google.richResponse.items', []);
+
+    items.forEach((item: any) => {
+      if (item.simpleResponse) {
+        output.push({
+          type: 'user',
+          text: item.simpleResponse.ssml || item.simpleResponse.text
+        });
+      }
+    })
+
+    return output;
+  }
+
   getSpeech(): Out {
     if (_get(this.payload, 'google.richResponse.items[0].simpleResponse.ssml')) {
       return  {

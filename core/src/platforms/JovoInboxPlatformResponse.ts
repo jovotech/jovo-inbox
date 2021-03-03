@@ -7,4 +7,5 @@ export abstract class JovoInboxPlatformResponse {
   abstract getSpeechPlain(): string | undefined;
   abstract getRepromptPlain(): string | undefined;
   abstract hasSessionEnded(): boolean;
+  abstract getOutput(): Out[];
 }

@@ -1,9 +1,10 @@
-import { JovoInboxPlatformResponse } from '../JovoInboxPlatformResponse';
-import type {Context, Request, Session, Action, } from 'jovo-platform-web'
+import {JovoInboxPlatformResponse} from '../JovoInboxPlatformResponse';
+import type {Action,ActionType} from 'jovo-platform-web'
 import {Out} from "../JovoInboxPlatformRequest";
 import type {AsrData, NluData} from "jovo-core";
 
 export class WebAppResponse extends JovoInboxPlatformResponse {
+
   version!: string;
   actions!: Action[];
   reprompts!: Action[];
@@ -33,6 +34,27 @@ export class WebAppResponse extends JovoInboxPlatformResponse {
     return undefined;
   }
 
+  getOutput(): Out[] {
+    const output: Out[] = [];
+
+
+    this.actions.forEach((action: Action) => {
+      if(action.type === 'TEXT') {
+        output.push({
+          text: action.text,
+          type: 'user',
+        });
+      } else if (action.type === 'SPEECH') {
+        output.push({
+          text: action.ssml,
+          type: 'user',
+        });
+      }
+    });
+
+    return output;
+  }
+
   getSpeech(): Out {
     if (this.actions?.length > 0) {
       return {
@@ -54,4 +76,6 @@ export class WebAppResponse extends JovoInboxPlatformResponse {
   hasSessionEnded(): boolean {
     return false;
   }
+
+
 }
