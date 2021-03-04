@@ -83,7 +83,7 @@ export class InboxLogUserService {
     ).findOne(cond);
 
     if (!user) {
-      throw new NotFoundException('User not found');
+      return {};
     }
     return user;
   }
@@ -97,7 +97,7 @@ export class InboxLogUserService {
     });
 
     if (!user) {
-      throw new NotFoundException('User not found');
+      return [];
     }
 
     const service = new InboxLogService();
