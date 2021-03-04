@@ -25,6 +25,9 @@ const dbImports = () => {
     TypeOrmModule.forRoot({
       entities: [InboxLogEntity, InboxLogUserEntity],
       synchronize: true,
+      ...{
+        timezone: '+0',
+      },
       ...(config.apps[0].connection as Partial<TypeOrmModuleOptions>),
     }),
   ];
@@ -34,6 +37,9 @@ const dbImports = () => {
         name: app.id,
         entities: [InboxLogEntity, InboxLogUserEntity],
         synchronize: true,
+        ...{
+          timezone: '+0',
+        },
         ...(app.connection as Partial<TypeOrmModuleOptions>),
       }),
     );
