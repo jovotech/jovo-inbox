@@ -71,7 +71,6 @@ export class DataModule extends VuexModule<DataState> {
 
   @MutationAction({ mutate: ['conversations'], rawError: true })
   async [DataAction.fetchConversations](getLastConversationsDto: GetLastConversationsDto) {
-    console.log(getLastConversationsDto);
     const result = await Api.getLastConversations(getLastConversationsDto);
     return { conversations: result };
   }
