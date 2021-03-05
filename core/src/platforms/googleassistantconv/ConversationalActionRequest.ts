@@ -43,6 +43,11 @@ export class ConversationalActionRequest extends JovoInboxPlatformRequest {
         type: "user",
         text: this.intent?.query
       }
+    } if (this.intent?.name === 'actions.intent.HEALTH_CHECK') {
+      return {
+        type: "platform",
+        text: 'HEALTH CHECK'
+      }
     } else if (this.scene?.name.endsWith('_Notifications')) {
       for (const [key, value] of Object.entries(this.scene.slots)) {
         if (key.startsWith('NotificationsSlot_')) {
