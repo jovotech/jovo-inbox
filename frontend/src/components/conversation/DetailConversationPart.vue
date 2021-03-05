@@ -102,6 +102,15 @@
                 >
                   <vue-json-pretty :data="json"> </vue-json-pretty>
                 </div>
+
+                <div v-if="hasApl" class="flex items-center justify-between mt-6">
+                  <h3>{{ deviceName }}</h3>
+                </div>
+                <div class="mt-5 qbg-gray-50 overflow-x-hidden" aria-hidden="true">
+                  <div class="w-full" ref="apl-parent">
+                    <div id="aplviewer" ref="apl-viewer"></div>
+                  </div>
+                </div>
               </div>
               <!-- /End replace -->
             </div>
@@ -113,17 +122,26 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch } from 'vue-property-decorator';
-import { InboxLog } from 'jovo-inbox-core';
+import { Component, Watch } from 'vue-property-decorator';
+import {
+  AlexaRequest,
+  AlexaResponse,
+  InboxLog,
+  InboxLogType,
+  JovoInboxPlatformResponse,
+} from 'jovo-inbox-core';
 import VueJsonPretty from 'vue-json-pretty';
 import 'vue-json-pretty/lib/styles.css';
-import { ArrowUpIcon, ArrowDownIcon, ChevronDownIcon, ChevronUpIcon } from 'vue-feather-icons';
-
+import { ArrowDownIcon, ArrowUpIcon, ChevronDownIcon, ChevronUpIcon } from 'vue-feather-icons';
+import * as AplRenderer from 'apl-viewhost-web';
+import { mixins } from 'vue-class-component';
+import { BaseMixin } from '@/mixins/BaseMixin';
+import _get from 'lodash.get';
 @Component({
   name: 'detail-conversation-part',
   components: { VueJsonPretty, ArrowUpIcon, ArrowDownIcon, ChevronDownIcon, ChevronUpIcon },
 })
-export default class DetailConversationPart extends Vue {
+export default class DetailConversationPart extends mixins(BaseMixin) {
   isContentHovered = false;
 
   expandedPayload = true;
@@ -135,6 +153,15 @@ export default class DetailConversationPart extends Vue {
   arrowDownActive = false;
 
   resizeActive = false;
+
+  // TODO: temp
+  hasApl = false;
+  deviceName = 'Screen';
+
+  // eslint-disable-next-line
+  renderer: any;
+
+  platformResponse: JovoInboxPlatformResponse | undefined;
 
   get selectedInboxLog(): InboxLog | null {
     return this.$store.state.DataModule.selectedInboxLog;
@@ -165,11 +192,109 @@ export default class DetailConversationPart extends Vue {
   private async onSelectedInboxLogChange() {
     this.activateButtons();
 
-    this.$nextTick(() => {
+    this.$nextTick(async () => {
       if (this.$refs['sidebarcontainer']) {
         (this.$refs['sidebarcontainer'] as HTMLElement).focus();
       }
+      this.resetAplViewer();
+
+      await this.renderApl();
     });
+  }
+
+  resetAplViewer() {
+    (this.$refs['apl-viewer'] as HTMLElement).innerHTML = '';
+
+    (this.$refs['apl-viewer'] as HTMLElement).style.width = '0';
+    (this.$refs['apl-viewer'] as HTMLElement).style.height = '0';
+    (this.$refs['apl-viewer'] as HTMLElement).style.background = 'none';
+  }
+
+  async renderApl() {
+    // TODO: Temporary
+    this.platformResponse = this.getPlatformResponse(this.selectedInboxLog);
+    if (this.platformResponse) {
+      if (this.platformResponse.constructor.name === 'AlexaResponse') {
+        const alexaResponse = this.platformResponse as AlexaResponse;
+        this.hasApl = alexaResponse.hasApl();
+        const previousAlexaRequest = this.getPlatformRequest(
+          this.getPreviousRequest(),
+        ) as AlexaRequest;
+        await this.handleRenderInit(alexaResponse, previousAlexaRequest);
+      }
+    } else {
+      this.hasApl = false;
+    }
+  }
+
+  getPreviousRequest(): InboxLog | undefined {
+    const index = this.selectedConversation.findIndex(
+      (item: InboxLog) => item.id === this.selectedInboxLog?.id,
+    );
+    for (let i = index - 1; i >= 0; i--) {
+      if (this.selectedConversation[i].type === InboxLogType.REQUEST) {
+        return this.selectedConversation[i];
+      }
+    }
+  }
+
+  async handleRenderInit(alexaResponse: AlexaResponse, previousAlexaRequest: AlexaRequest) {
+    document.getElementById('aplviewer').innerHTML = '';
+
+    const directive = alexaResponse.response.directives?.find(
+      (item: Directive) => item.type === 'Alexa.Presentation.APL.RenderDocument',
+    );
+
+    const requestDpi = _get(previousAlexaRequest, 'context.Viewport.dpi', 160);
+    const requestWidth = _get(previousAlexaRequest, 'context.Viewport.pixelWidth', 960);
+    const requestHeight = _get(previousAlexaRequest, 'context.Viewport.pixelHeight', 480);
+    const requestRatio = requestWidth / requestHeight;
+
+    this.deviceName = previousAlexaRequest.getDeviceName();
+
+    const doc = directive.document;
+    doc.version = '1.4';
+    const datasource = directive.datasources || {};
+    const content = AplRenderer.Content.create(JSON.stringify(doc));
+    if (content && datasource) {
+      content.addData('payload', JSON.stringify(datasource));
+    }
+
+    const width = (this.$refs['apl-parent'] as HTMLElement).offsetWidth;
+
+    const calcDpi = (width * requestDpi) / requestWidth;
+
+    const viewPortDpi = Math.round(calcDpi);
+    const viewportWidth = (viewPortDpi * requestWidth) / requestDpi;
+
+    const viewportHeight = viewportWidth / requestRatio;
+
+    this.renderer = AplRenderer.default.create({
+      content: content /* return value of the AplRenderer.Content.create call */,
+      view: document.getElementById(
+        'aplviewer',
+      ) /* element where the APL document should be rendered to */,
+      environment: {
+        agentName: 'APL Sandbox',
+        agentVersion: '1.0',
+        allowOpenUrl: true,
+        disallowVideo: false,
+      },
+      viewport: {
+        width: viewportWidth,
+        height: viewportHeight,
+        dpi: viewPortDpi,
+      },
+      theme: 'dark',
+      developerToolOptions: {
+        mappingKey: 'auth-id',
+        writeKeys: ['auth-banana', 'auth-id'],
+      },
+      utcTime: Date.now(),
+      localTimeAdjustment: -new Date().getTimezoneOffset() * 60 * 1000,
+    });
+
+    await this.renderer.init();
   }
 
   get selectedConversation(): InboxLog[] {
@@ -229,9 +354,11 @@ export default class DetailConversationPart extends Vue {
   resizeStart() {
     this.resizeActive = true;
   }
-  resizeEnd() {
+  async resizeEnd() {
     if (this.resizeActive) {
       this.resizeActive = false;
+
+      await this.renderApl();
     }
   }
   move(evt: MouseEvent) {
