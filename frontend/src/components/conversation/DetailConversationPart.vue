@@ -203,27 +203,35 @@ export default class DetailConversationPart extends mixins(BaseMixin) {
   }
 
   resetAplViewer() {
-    (this.$refs['apl-viewer'] as HTMLElement).innerHTML = '';
+    const aplViewerElement = this.$refs['apl-viewer'] as HTMLElement;
 
-    (this.$refs['apl-viewer'] as HTMLElement).style.width = '0';
-    (this.$refs['apl-viewer'] as HTMLElement).style.height = '0';
-    (this.$refs['apl-viewer'] as HTMLElement).style.background = 'none';
+    if (aplViewerElement) {
+      (this.$refs['apl-viewer'] as HTMLElement).innerHTML = '';
+
+      (this.$refs['apl-viewer'] as HTMLElement).style.width = '0';
+      (this.$refs['apl-viewer'] as HTMLElement).style.height = '0';
+      (this.$refs['apl-viewer'] as HTMLElement).style.background = 'none';
+    }
   }
 
   async renderApl() {
     // TODO: Temporary
-    this.platformResponse = this.getPlatformResponse(this.selectedInboxLog);
-    if (this.platformResponse) {
-      if (this.platformResponse.constructor.name === 'AlexaResponse') {
-        const alexaResponse = this.platformResponse as AlexaResponse;
-        this.hasApl = alexaResponse.hasApl();
-        const previousAlexaRequest = this.getPlatformRequest(
-          this.getPreviousRequest(),
-        ) as AlexaRequest;
-        await this.handleRenderInit(alexaResponse, previousAlexaRequest);
+    if (this.selectedInboxLog) {
+      this.platformResponse = this.getPlatformResponse(this.selectedInboxLog);
+      if (this.platformResponse) {
+        if (this.platformResponse.constructor.name === 'AlexaResponse') {
+          const alexaResponse = this.platformResponse as AlexaResponse;
+          this.hasApl = alexaResponse.hasApl();
+          if (this.hasApl) {
+            const previousAlexaRequest = this.getPlatformRequest(
+              this.getPreviousRequest(),
+            ) as AlexaRequest;
+            await this.handleRenderInit(alexaResponse, previousAlexaRequest);
+          }
+        }
+      } else {
+        this.hasApl = false;
       }
-    } else {
-      this.hasApl = false;
     }
   }
 
