@@ -86,7 +86,9 @@ export class Api {
     return await axios.request<string[]>(config);
   }
 
-  static async getInboxLogUserConversations(getInboxLogUserDto: Pick<GetInboxLogUserDto, 'id'>) {
+  static async getInboxLogUserConversations(
+    getInboxLogUserDto: Pick<GetInboxLogUserDto, 'id' | 'appId'>,
+  ) {
     const config: AxiosRequestConfig = {
       method: 'POST',
       url: `${BASE_URL}/inboxloguser/conversations`,
