@@ -63,18 +63,18 @@
       <div v-for="(part, index) in selectedConversation" :key="index">
         <div
           v-if="isSessionStart(index)"
-          class="text-center"
+          class="text-center mb-16"
           :title="sessionStart(index)"
           @click="expandSession(index)"
         >
           <div class="my-4 mt-12 mx-auto w-4/5 new-session">
             <span class="bg-gray-100 ">{{ newSessionDate(sessionStart(index)) }}</span>
           </div>
-          <div v-if="selectedTab === 'sessions'" class="text-center">
+          <div v-if="selectedTab === 'sessions'" class="text-center mb-4">
             <span
               class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-200 text-gray-800 mx-1"
             >
-              {{ getSessionTurns(index) }} turns
+              {{ getSessionInteractions(index) }} interactions
             </span>
             <span
               class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-200 text-gray-800 mx-1"
@@ -118,6 +118,7 @@
           :part="part"
           :selectedConversation="selectedConversation"
           :index="index"
+          class="mb-12"
         />
       </div>
     </div>
@@ -166,6 +167,10 @@ export default class MainPanel extends mixins(BaseMixin) {
     );
   }
 
+  mounted() {
+    this.countSessions();
+  }
+
   newSessionDate(date: string) {
     return FormatUtil.formatDate(date);
   }
@@ -174,6 +179,7 @@ export default class MainPanel extends mixins(BaseMixin) {
   onSelectedConversation() {
     this.$nextTick(() => {
       setTimeout(() => {
+        // TODO: how to handle scrollToBottom in LiveMode?
         this.scrollToBottom();
       }, 100);
     });
@@ -216,15 +222,11 @@ export default class MainPanel extends mixins(BaseMixin) {
   }
   expandSession(index: number) {
     const inboxLog = this.selectedConversation[index];
-    if (this.expandedSessions[inboxLog.sessionId]) {
-      this.expandedSessions[inboxLog.sessionId] = false;
-    } else {
-      this.expandedSessions[inboxLog.sessionId] = true;
-    }
+    this.expandedSessions[inboxLog.sessionId] = !this.expandedSessions[inboxLog.sessionId];
     this.$forceUpdate();
   }
 
-  getSessionTurns(index: number) {
+  getSessionInteractions(index: number) {
     const inboxLog = this.selectedConversation[index];
     let counter = 0;
 
@@ -272,4 +274,16 @@ export default class MainPanel extends mixins(BaseMixin) {
   }
 }
 </script>
-<style lang="scss"></style>
+<style lang="scss">
+div.new-session {
+  opacity: 0.3;
+  text-align: center;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+  line-height: 0.1em;
+  font-size: smaller;
+}
+
+div.new-session span {
+  padding: 0 10px;
+}
+</style>

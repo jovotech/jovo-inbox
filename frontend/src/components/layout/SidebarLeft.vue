@@ -29,33 +29,22 @@
             @scroll="handleScroll"
           >
             <ul class="divide-y divide-gray-200">
-              <li class="text-center justify-center" :class="[!isSearchLoading ? 'hidden' : '']">
-                <svg
-                  class="animate-spin h-5 w-5 text-jovo-blue mt-2 mb-2 m-auto"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    class="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    stroke-width="4"
-                  ></circle>
-                  <path
-                    class="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
-                </svg>
-              </li>
               <li
+                class="text-center justify-center items-center pt-2"
+                :class="[!isSearchLoading ? 'hidden' : '']"
+              >
+                <loading-spinner></loading-spinner>
+              </li>
+
+              <user-conversation-list-item
                 v-for="conversation in getConversations()"
                 v-bind:key="conversation.id"
-                @click="selectConversation(conversation)"
-              >
+                :part="conversation"
+                :loadingConversation="loadingConversation"
+                @select-conversation="selectConversation"
+              ></user-conversation-list-item>
+
+              <li v-if="false">
                 <a
                   href="#"
                   class="group block hover:bg-gray-100 focus:bg-gray-200"
@@ -100,27 +89,9 @@
                               {{ lastConversationItemDate(conversation) }}</span
                             >
                           </p>
-                          <svg
+                          <loading-spinner
                             v-if="loadingConversation === conversation.userId"
-                            class="animate-spin  h-5 w-5 text-jovo-blue self-center"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                          >
-                            <circle
-                              class="opacity-25"
-                              cx="12"
-                              cy="12"
-                              r="10"
-                              stroke="currentColor"
-                              stroke-width="4"
-                            ></circle>
-                            <path
-                              class="opacity-75"
-                              fill="currentColor"
-                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                            ></path>
-                          </svg>
+                          ></loading-spinner>
                         </div>
                       </div>
                       <div class="mt-1q sm:flex sm:justify-between">
@@ -138,29 +109,10 @@
                 </a>
               </li>
               <li
-                class="text-center justify-center"
+                class="text-center justify-center items-center pt-2"
                 :class="[lastConversationLoading ? 'visible' : 'invisible']"
               >
-                <svg
-                  class="animate-spin h-5 w-5 text-jovo-blue mt-2 m-auto"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    class="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    stroke-width="4"
-                  ></circle>
-                  <path
-                    class="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
-                </svg>
+                <loading-spinner></loading-spinner>
               </li>
             </ul>
           </div>
@@ -179,22 +131,43 @@ import { BaseMixin } from '@/mixins/BaseMixin';
 import { mixins } from 'vue-class-component';
 import SelectAppList from '@/components/SelectAppList.vue';
 import FilterSettings from '@/components/FilterSettings.vue';
-
+import dayjs from 'dayjs';
+import timezone from 'dayjs/plugin/timezone';
+import utc from 'dayjs/plugin/utc';
+import LoadingSpinner from '@/components/layout/partials/LoadingSpinner.vue';
+import { Api } from '@/Api';
+import UserConversationListItem from '@/components/layout/partials/UserConversationListItem.vue';
+dayjs.extend(utc);
+dayjs.extend(timezone);
 @Component({
   name: 'sidebar-left',
-  components: { FilterSettings, SelectAppList },
+  components: { LoadingSpinner, FilterSettings, SelectAppList, UserConversationListItem },
 })
 export default class SidebarLeft extends mixins(BaseMixin) {
-  loadingConversation: string | undefined = '';
   isContentHovered = false;
   lastConversationLoading = false;
   inSearchMode = false;
   isSearchLoading = false;
+  loadingConversation = '';
 
   async mounted() {
     await this.loadConversations({
       appId: this.app.id,
     });
+    try {
+      if (this.$route.params.id) {
+        const result = await Api.getInboxLogUserConversations({
+          id: this.$route.params.id,
+          appId: this.app.id,
+        });
+        if (result.data?.logs.length > 0) {
+          // TODO: selection of user doesn't work properly with many users
+          await this.selectConversation(result.data?.logs[0]);
+        }
+      }
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   updateSearchMode(val: boolean) {
@@ -225,26 +198,10 @@ export default class SidebarLeft extends mixins(BaseMixin) {
 
     await this.$store.dispatch('DataModule/fetchConversations', dto);
     this.isSearchLoading = false;
+  }
 
-    // try {
-    //   if (this.$route.params.id) {
-    //     const result = await Api.getInboxLogUserConversations({
-    //       id: this.$route.params.id,
-    //     });
-    //     if (result.data?.logs.length > 0) {
-    //       await this.$store.dispatch('DataModule/fetchUserConversations', {
-    //         userId: result.data?.logs[0].userId,
-    //         appId: result.data?.logs[0].appId,
-    //       } as SelectUserConversationsDto);
-    //     }
-    //   } else {
-    //     if (this.getConversations().length > 0) {
-    //       await this.selectConversation(this.getConversations()[0]);
-    //     }
-    //   }
-    // } catch (e) {
-    //   console.log(e);
-    // }
+  getConversations(): InboxLog[] {
+    return this.$store.state.DataModule.conversations;
   }
 
   async selectConversation(inboxLog?: InboxLog) {
@@ -263,69 +220,6 @@ export default class SidebarLeft extends mixins(BaseMixin) {
       }
     }
     this.loadingConversation = undefined;
-  }
-
-  lastConversationItemDate(inboxLog: InboxLog, simple = true) {
-    return FormatUtil.formatDate(inboxLog.createdAt, simple);
-  }
-
-  lastConversationItemRequestText(log: InboxLog) {
-    // const platformRequest = this.getPlatformRequest(log);
-    // if (platformRequest) {
-    //   return platformRequest.getText();
-    // }
-
-    const platformResponse = this.getPlatformResponse(log);
-    if (platformResponse) {
-      const str = FormatUtil.formatMessageSimple(platformResponse.getSpeech().text);
-
-      if (str.length > 30) {
-        return str.substring(0, 30) + '...';
-      }
-
-      return str;
-    }
-
-    return '...';
-  }
-
-  isUserActive(log: InboxLog): boolean {
-    if (!this.isLiveMode) {
-      return false;
-    }
-
-    const platformResponse = this.getPlatformResponse(log);
-    if (platformResponse) {
-      // const logCreatedAt = new Date(log.createdAt).getTime();
-      // const now = new Date().getTime();
-      // const lessThan5Minutes = logCreatedAt > now - 5 * 60 * 1000;
-      // TODO:
-      return !platformResponse.hasSessionEnded();
-    }
-
-    return false;
-  }
-
-  isSelected(inboxLog: InboxLog) {
-    const selectedConversations = this.$store.state.DataModule.selectedUserConversations;
-    if (!selectedConversations || selectedConversations.length === 0) {
-      return false;
-    }
-    return (
-      selectedConversations[0].appId === inboxLog.appId &&
-      selectedConversations[0].userId === inboxLog.userId
-    );
-  }
-
-  getConversations(): InboxLog[] {
-    return this.$store.state.DataModule.conversations;
-  }
-
-  getName(conversation: InboxLog) {
-    if (this.nameMap[conversation.userId] && this.nameMap[conversation.userId].name) {
-      return this.nameMap[conversation.userId].name;
-    }
-    return this.shortenUserId(conversation);
   }
 
   async handleScroll(event: any) {
