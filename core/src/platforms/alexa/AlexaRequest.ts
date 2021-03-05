@@ -141,6 +141,12 @@ export class AlexaRequest extends JovoInboxPlatformRequest {
       type: 'platform',
       text: `Unspecified`,
     };
+  }
 
+  getSupportedInterfaces() {
+    return _get(this, 'context.System.device.supportedInterfaces');
+  }
+  hasAPLInterface() {
+    return typeof _get(this.getSupportedInterfaces(), 'Alexa.Presentation.APL') !== 'undefined';
   }
 }

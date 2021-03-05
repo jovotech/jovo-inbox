@@ -23,7 +23,7 @@ export class AlexaResponse extends JovoInboxPlatformResponse {
   getOutput(): Out[] {
     const out: Out[] = [];
 
-    if (this.response?.outputSpeech?.ssml) {
+    if (this.response?.outputSpeech?.ssml && !isEmptySsml(this.response?.outputSpeech?.ssml)) {
       out.push({
         text: this.response?.outputSpeech?.ssml,
         type: 'user',
@@ -33,14 +33,10 @@ export class AlexaResponse extends JovoInboxPlatformResponse {
         const directive = this.response.directives[i];
 
         if (directive.type === 'Alexa.Presentation.APLA.RenderDocument') {
-          const result = apla(directive.document.mainTemplate, '');
-          out.push({
-            text: result,
-            type: 'user',
-          });
+          apla2(directive.document.mainTemplate, out);
         }
 
-
+        // TODO:
         // switch (directive.name) {
         //   case 'AskFor': {
         //     const scope = directive.payload.permissionScope.includes('reminders')
@@ -53,14 +49,10 @@ export class AlexaResponse extends JovoInboxPlatformResponse {
         //   }
         // }
     }
-
-
-
     return out;
   }
 
   getSpeech(): Out {
-    console.log(this.response?.directives?.length)
     if (false && this.response?.outputSpeech?.ssml) {
       return {
         text: this.response?.outputSpeech?.ssml,
@@ -72,7 +64,6 @@ export class AlexaResponse extends JovoInboxPlatformResponse {
       if (aplaDirectives) {
         const text = '';
         const result = apla(aplaDirectives[0].document.mainTemplate, text);
-        console.log(result)
       }
 
 
@@ -105,6 +96,11 @@ export class AlexaResponse extends JovoInboxPlatformResponse {
   hasSessionEnded(): boolean {
     return this.response?.shouldEndSession;
   }
+
+  hasApl(): boolean {
+    return !!this.response?.directives?.find((item: Directive) => item.type === 'Alexa.Presentation.APL.RenderDocument')
+  }
+
 }
 
 
@@ -119,8 +115,35 @@ function apla(data: any, result: string): string {
     if (data.type === 'Speech') {
       result += data.content;
     } else if (data.type === 'Audio') {
-      result += `<a src="${data.source}" />`;
+      result += `<audio src="${data.source}"/>`;
     }
   }
   return result;
+}
+
+function apla2(data: any, result: Out[]): Out[] {
+
+  if (data.items) {
+    for (let i = 0; i < data.items.length; i++) {
+      result = apla2(data.items[i], result)
+    }
+  } else {
+    if (data.type === 'Speech') {
+      result.push( {
+        text: data.content,
+        type: "user"
+      });
+    } else if (data.type === 'Audio') {
+      result.push( {
+        text: `<audio src="${data.source}"/>`,
+        type: "user"
+      });
+    }
+  }
+  return result;
+}
+
+function isEmptySsml(ssml: string) {
+  return  ssml.replace('<speak>', '').replace('</speak>', '').length === 0;
+
 }
