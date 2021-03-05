@@ -1,10 +1,13 @@
 import dayjs from 'dayjs';
 import isToday from 'dayjs/plugin/isToday';
 import isYesterday from 'dayjs/plugin/isYesterday';
+import timezone from 'dayjs/plugin/timezone';
 
+import utc from 'dayjs/plugin/utc';
+dayjs.extend(utc);
 dayjs.extend(isToday);
 dayjs.extend(isYesterday);
-
+dayjs.extend(timezone);
 export class FormatUtil {
   static formatDate(date: string | Date, simple = true) {
     const dateDayJs = dayjs(date);
@@ -43,8 +46,11 @@ export class FormatUtil {
     );
 
     const replacer = (x: any, a: string, b: any) => {
-      const filename = a.substring(a.lastIndexOf('/') + 1);
-      return `<span class="tag-audio pr-1 py-1 inline-block rounded-lg" title="${a}"><audio class="audio-player" src="${a}"></audio></span><span class="bg-gray-100 text-gray-400 text-sm p-1 rounded -ml-1 rounded-l-none">${filename}</span>`;
+      let filename = a.substring(a.lastIndexOf('/') + 1);
+      if (filename.length > 35) {
+        filename = `${filename.substr(0, 15)}...${filename.substr(-5)}`;
+      }
+      return `<span class="tag-audio pr-1 py-1 inline-block rounded-lg" title="${a}"><audio class="audio-player" src="${a}"></audio></span><span title="${a}" class="bg-gray-100 text-gray-400 text-sm p-1 rounded -ml-1 rounded-l-none">${filename}</span>`;
     };
     message = message.replace(/<audio src=(?:'|")(.+?)(?:'|")(?:(\/>)|(><\/audio>))/gi, replacer);
     return message;
