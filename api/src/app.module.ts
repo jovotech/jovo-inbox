@@ -52,13 +52,13 @@ const dbImports = () => {
     ConfigModule.forRoot(),
     ...dbImports(),
     ServeStaticModule.forRoot({
-      exclude: ['/api/(.*)'],
+      exclude: ['/api*'],
       rootPath: join(__dirname, '../..', 'public', 'client'),
       serveRoot: '/',
     }),
 
     ServeStaticModule.forRoot({
-      exclude: ['/api/(.*)'],
+      exclude: ['/api*'],
       rootPath: join(__dirname, '../..', 'public', 'images'),
       serveRoot: '/avatars/',
     }),
