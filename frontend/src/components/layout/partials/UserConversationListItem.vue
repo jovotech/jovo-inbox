@@ -65,7 +65,7 @@
 
 <script lang="ts">
 import Component, { mixins } from 'vue-class-component';
-import { Prop, Vue } from 'vue-property-decorator';
+import { Prop } from 'vue-property-decorator';
 import { InboxLog } from 'jovo-inbox-core';
 import { BaseMixin } from '@/mixins/BaseMixin';
 import { FormatUtil } from '@/utils/FormatUtil';
@@ -78,7 +78,7 @@ import LoadingSpinner from '@/components/layout/partials/LoadingSpinner.vue';
 })
 export default class UserConversationListItem extends mixins(BaseMixin) {
   @Prop({ type: Object })
-  part: InboxLog;
+  part!: InboxLog;
   @Prop({ type: String })
   loadingConversation!: string;
 

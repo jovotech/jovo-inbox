@@ -223,10 +223,12 @@ export default class DetailConversationPart extends mixins(BaseMixin) {
           const alexaResponse = this.platformResponse as AlexaResponse;
           this.hasApl = alexaResponse.hasApl();
           if (this.hasApl) {
-            const previousAlexaRequest = this.getPlatformRequest(
-              this.getPreviousRequest(),
-            ) as AlexaRequest;
-            await this.handleRenderInit(alexaResponse, previousAlexaRequest);
+            const previousRequest = this.getPreviousRequest();
+
+            if (previousRequest) {
+              const previousAlexaRequest = this.getPlatformRequest(previousRequest) as AlexaRequest;
+              await this.handleRenderInit(alexaResponse, previousAlexaRequest);
+            }
           }
         }
       } else {
@@ -247,10 +249,14 @@ export default class DetailConversationPart extends mixins(BaseMixin) {
   }
 
   async handleRenderInit(alexaResponse: AlexaResponse, previousAlexaRequest: AlexaRequest) {
-    document.getElementById('aplviewer').innerHTML = '';
+    const aplViewerDiv = document.getElementById('aplviewer');
+
+    if (aplViewerDiv) {
+      aplViewerDiv.innerHTML = '';
+    }
 
     const directive = alexaResponse.response.directives?.find(
-      (item: Directive) => item.type === 'Alexa.Presentation.APL.RenderDocument',
+      (item: { type: string }) => item.type === 'Alexa.Presentation.APL.RenderDocument',
     );
 
     const requestDpi = _get(previousAlexaRequest, 'context.Viewport.dpi', 160);

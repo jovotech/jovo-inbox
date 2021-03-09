@@ -126,7 +126,6 @@
 import { Component } from 'vue-property-decorator';
 import { GetLastConversationsDto, InboxLog } from 'jovo-inbox-core';
 
-import { FormatUtil } from '@/utils/FormatUtil';
 import { BaseMixin } from '@/mixins/BaseMixin';
 import { mixins } from 'vue-class-component';
 import SelectAppList from '@/components/SelectAppList.vue';
@@ -205,7 +204,7 @@ export default class SidebarLeft extends mixins(BaseMixin) {
   }
 
   async selectConversation(inboxLog?: InboxLog) {
-    this.loadingConversation = inboxLog?.userId;
+    this.loadingConversation = inboxLog?.userId || '';
     if (inboxLog) {
       await this.$store.dispatch('DataModule/fetchUserConversations', {
         userId: inboxLog.userId,
@@ -219,11 +218,16 @@ export default class SidebarLeft extends mixins(BaseMixin) {
         });
       }
     }
-    this.loadingConversation = undefined;
+    this.loadingConversation = '';
   }
 
-  async handleScroll(event: any) {
-    const target = event.target;
+  async handleScroll(event: Event) {
+    const target = event.target as HTMLElement;
+
+    if (!target) {
+      return;
+    }
+
     if (target.offsetHeight + target.scrollTop >= target.scrollHeight) {
       if (!this.lastConversationLoading && !this.inSearchMode) {
         await this.loadMore();

@@ -27,7 +27,7 @@
 <script lang="ts">
 import DetailConversationPart from '@/components/conversation/DetailConversationPart.vue';
 import ScreenConversationPart from '@/components/conversation/ScreenConversationPart.vue';
-import { InboxLog, InboxLogType, JovoInboxPlatformResponse } from 'jovo-inbox-core';
+import { InboxLog, JovoInboxPlatformResponse } from 'jovo-inbox-core';
 import { ChevronDownIcon, ChevronUpIcon, CodeIcon, MonitorIcon, UserIcon } from 'vue-feather-icons';
 import { Component, Prop, Watch } from 'vue-property-decorator';
 import Plyr from 'plyr';
@@ -52,7 +52,7 @@ export default class ResponsePart extends mixins(BaseMixin) {
   @Prop({ required: true, type: Object })
   part!: InboxLog;
 
-  platformResponse: JovoInboxPlatformResponse | null = null;
+  platformResponse?: JovoInboxPlatformResponse;
 
   mounted() {
     this.initPlyrPlayer();
