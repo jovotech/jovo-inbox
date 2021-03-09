@@ -15,15 +15,6 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { Api } from '@/Api';
-import { InboxLog } from 'jovo-inbox-core';
-import ConversationPart from '@/components/conversation/ConversationPart.vue';
-import DetailConversationPart from '@/components/conversation/DetailConversationPart.vue';
-
-import { InboxIcon } from 'vue-feather-icons';
-import { AlexaUtil } from '@/utils/AlexaUtil';
-import { FormatUtil } from '@/utils/FormatUtil';
-import { DisplayHelper } from '@/utils/DisplayHelper';
 
 @Component({
   name: 'inbox-header',

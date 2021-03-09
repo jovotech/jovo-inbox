@@ -4,16 +4,25 @@ import {
   JovoAppMetaData,
   SelectUserConversationsDto,
   InboxLogUser,
+  GetLastConversationsDto,
 } from 'jovo-inbox-core';
 import { Api } from '@/Api';
 export enum DataAction {
   fetchApps = 'fetchApps',
   fetchConversations = 'fetchConversations',
+  clearConversations = 'clearConversations',
+
+  searchConversations = 'searchConversations',
+
   fetchUserConversations = 'fetchUserConversations',
+
+  appendUserConversations = 'appendUserConversations',
+  appendLastConversations = 'appendLastConversations',
 
   buildAppUsersMap = 'buildAppUsersMap',
 
   selectApp = 'selectApp',
+  selectInboxLog = 'selectInboxLog',
 }
 
 export interface DataState {
@@ -21,6 +30,7 @@ export interface DataState {
   conversations: InboxLog[];
   selectedUserConversations: InboxLog[];
   selectedApp: JovoAppMetaData[];
+  selectedInboxLog: InboxLog;
   nameMap: Record<
     string,
     {
@@ -35,6 +45,9 @@ export class DataModule extends VuexModule<DataState> {
   apps: JovoAppMetaData[] = [];
   conversations: InboxLog[] = [];
   selectedUserConversations: InboxLog[] = [];
+
+  selectedInboxLog: InboxLog | null = null;
+
   selectedApp: JovoAppMetaData | null = null;
   nameMap: Record<
     string,
@@ -57,9 +70,14 @@ export class DataModule extends VuexModule<DataState> {
   }
 
   @MutationAction({ mutate: ['conversations'], rawError: true })
-  async [DataAction.fetchConversations]() {
-    const result = await Api.getLastConversations();
+  async [DataAction.fetchConversations](getLastConversationsDto: GetLastConversationsDto) {
+    const result = await Api.getLastConversations(getLastConversationsDto);
     return { conversations: result };
+  }
+
+  @MutationAction({ mutate: ['conversations'], rawError: true })
+  async [DataAction.clearConversations]() {
+    return { conversations: [] };
   }
 
   @MutationAction({ mutate: ['selectedUserConversations'], rawError: true })
@@ -68,6 +86,27 @@ export class DataModule extends VuexModule<DataState> {
   ) {
     const result = await Api.getUserConversations(selectUserConversationsDto);
     return { selectedUserConversations: result.logs };
+  }
+
+  @MutationAction({ mutate: ['selectedUserConversations'], rawError: true })
+  async [DataAction.appendUserConversations](
+    selectUserConversationsDto: SelectUserConversationsDto,
+  ) {
+    const result = await Api.getUserConversations(selectUserConversationsDto);
+    const selectedUserConversations = (this.state as DataState).selectedUserConversations;
+    return { selectedUserConversations: selectedUserConversations.concat(result.logs) };
+  }
+
+  @MutationAction({ mutate: ['conversations'], rawError: true })
+  async [DataAction.appendLastConversations](getLastConversationsDto: GetLastConversationsDto) {
+    const result = await Api.getLastConversations(getLastConversationsDto);
+    const conversations = (this.state as DataState).conversations;
+    return { conversations: conversations.concat(result) };
+  }
+
+  @MutationAction({ mutate: ['selectedInboxLog'], rawError: true })
+  async [DataAction.selectInboxLog](inboxLog: InboxLog) {
+    return { selectedInboxLog: inboxLog };
   }
 
   @MutationAction({ mutate: ['nameMap'], rawError: true })

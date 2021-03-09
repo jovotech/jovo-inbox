@@ -24,6 +24,7 @@ export class InboxLogUserEntity implements InboxLogUser {
   @Column()
   appId!: string;
 
+  @Index()
   @Column({ nullable: true })
   name!: string | null;
 

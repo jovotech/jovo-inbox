@@ -3,22 +3,21 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { MikroORM, QueryOrder } from '@mikro-orm/core';
 import { InboxLogEntity } from '../../entity/inbox-log.entity';
 import * as path from 'path';
 
-import { GetInboxLogUserDto, UpdateInboxLogUserDto } from 'jovo-inbox-core';
 import {
-  EntityManager,
-  FindOneOptions,
-  getRepository,
-  Repository,
-} from 'typeorm';
+  DeleteUserImageDto,
+  GetInboxLogUserDto,
+  UpdateInboxLogUserDto,
+} from 'jovo-inbox-core';
+import { FindOneOptions, getRepository, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { InboxLogUserEntity } from '../../entity/inbox-log-user.entity';
 import { UploadedFile } from 'jovo-inbox-core/dist/UploadedFile';
 import * as fs from 'fs';
 import { InboxLogService } from '../inbox-log/inbox-log.service';
+import { connectionName } from '../../util';
 
 @Injectable()
 export class InboxLogUserService {
@@ -43,7 +42,10 @@ export class InboxLogUserService {
       };
     }
 
-    let user = await getRepository(InboxLogUserEntity).findOne(cond);
+    let user = await getRepository(
+      InboxLogUserEntity,
+      connectionName(dto.appId),
+    ).findOne(cond);
 
     if (!user) {
       user = new InboxLogUserEntity();
@@ -53,7 +55,9 @@ export class InboxLogUserService {
     user.name = dto.name;
     user.notes = dto.notes;
 
-    await getRepository(InboxLogUserEntity).save(user);
+    await getRepository(InboxLogUserEntity, connectionName(dto.appId)).save(
+      user,
+    );
     return user;
   }
 
@@ -73,21 +77,27 @@ export class InboxLogUserService {
       };
     }
 
-    const user = await getRepository(InboxLogUserEntity).findOne(cond);
+    const user = await getRepository(
+      InboxLogUserEntity,
+      connectionName(dto.appId),
+    ).findOne(cond);
 
     if (!user) {
-      throw new NotFoundException('User not found');
+      return {};
     }
     return user;
   }
 
-  async getUserConversations(dto: Pick<GetInboxLogUserDto, 'id'>) {
-    const user = await getRepository(InboxLogUserEntity).findOne({
+  async getUserConversations(dto: Pick<GetInboxLogUserDto, 'id' | 'appId'>) {
+    const user = await getRepository(
+      InboxLogUserEntity,
+      connectionName(dto.appId),
+    ).findOne({
       id: dto.id,
     });
 
     if (!user) {
-      throw new NotFoundException('User not found');
+      return [];
     }
 
     const service = new InboxLogService();
@@ -99,7 +109,7 @@ export class InboxLogUserService {
   }
 
   async geAppUser(appId: string) {
-    return await getRepository(InboxLogUserEntity).find({
+    return await getRepository(InboxLogUserEntity, connectionName(appId)).find({
       where: {
         appId: appId,
       },
@@ -114,7 +124,10 @@ export class InboxLogUserService {
       throw new BadRequestException();
     }
 
-    let user = await getRepository(InboxLogUserEntity).findOne({
+    let user = await getRepository(
+      InboxLogUserEntity,
+      connectionName(updateInboxLogUserDto.appId),
+    ).findOne({
       where: {
         appId: updateInboxLogUserDto.appId,
         platformUserId: updateInboxLogUserDto.platformUserId,
@@ -129,22 +142,27 @@ export class InboxLogUserService {
     user.image =
       user.id + image.originalname.substr(image.originalname.indexOf('.'));
 
-    await getRepository(InboxLogUserEntity).save(user);
+    await getRepository(
+      InboxLogUserEntity,
+      connectionName(updateInboxLogUserDto.appId),
+    ).save(user);
 
-    // TODO: better error mgmt
-    const filePath = path.join(
-      __dirname,
-      './../../../../public/images',
-      user.image,
-    );
-    console.log(filePath);
-    fs.writeFileSync(filePath, image.buffer);
+    const filesDirectory = path.join(__dirname, './../../../../public/images');
+
+    if (!fs.existsSync(filesDirectory)) {
+      fs.mkdirSync(filesDirectory, { recursive: true });
+    }
+
+    fs.writeFileSync(path.join(filesDirectory, user.image), image.buffer);
   }
 
-  async deleteImage(jovoAppUserId: string) {
-    const user = await getRepository(InboxLogUserEntity).findOne({
+  async deleteImage(deleteUserImageDto: DeleteUserImageDto) {
+    const user = await getRepository(
+      InboxLogUserEntity,
+      connectionName(deleteUserImageDto.appId),
+    ).findOne({
       where: {
-        id: jovoAppUserId,
+        id: deleteUserImageDto.jovoAppUserId,
       },
     });
 
@@ -160,6 +178,9 @@ export class InboxLogUserService {
       fs.unlinkSync(filePath);
     }
     user.image = null;
-    await getRepository(InboxLogUserEntity).save(user);
+    await getRepository(
+      InboxLogUserEntity,
+      connectionName(deleteUserImageDto.appId),
+    ).save(user);
   }
 }

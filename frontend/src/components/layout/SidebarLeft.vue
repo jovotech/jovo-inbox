@@ -1,133 +1,97 @@
 <template>
-  <div class="hidden lg:flex lg:flex-shrink-0">
+  <div
+    class="hidden lg:flex lg:flex-shrink-0"
+    @mouseenter="isContentHovered = true"
+    @mouseleave="isContentHovered = false"
+  >
     <div class="flex flex-col w-80">
       <!-- Sidebar component, swap this element with another sidebar if you like -->
       <div class="flex flex-col h-0 flex-1 border-r border-gray-200 bg-gray-50">
-        <div class="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">
-          <div class="flex items-center flex-shrink-0 px-4">
-            <!--                select-->
-            <div class="w-full">
-              <button
-                type="button"
-                class="group w-full bg-gray-50 rounded-md px-3.5 pl-6 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-purple-500"
-                id="options-menu2"
-                aria-haspopup="true"
-                aria-expanded="true"
-              >
-                <span
-                  v-if="apps && apps.length > 0"
-                  class="flex w-full justify-between items-center"
-                >
-                  <span class="flex min-w-0 items-center justify-between space-x-3">
-                    <div
-                      v-if="false"
-                      class="rounded-full h-10 w-10 flex items-center justify-center bg-jovo-blue"
-                    ></div>
-                    <span class="flex-1 min-w-0">
-                      <span class="text-gray-900 text-sm font-medium truncate">{{
-                        apps[0].name
-                      }}</span
-                      ><br />
-                      <span class="text-gray-500 text-sm truncate"></span>
-                    </span>
-                  </span>
-                  <!-- Heroicon name: selector -->
-                  <svg
-                    class="flex-shrink-0 h-5 w-5 text-gray-400 group-hover:text-gray-500"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                    aria-hidden="true"
-                  >
-                    <path
-                      fill-rule="evenodd"
-                      d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
-                      clip-rule="evenodd"
-                    />
-                  </svg>
-                </span>
-              </button>
+        <div
+          class="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto"
+          :class="[isContentHovered ? 'scrollbar' : 'scrollbar-invisible']"
+        >
+          <div class="flex items-center flex-shrink-0 px-3">
+            <div class="w-full ">
+              <select-app-list @selectConversation="selectConversation"></select-app-list>
             </div>
           </div>
-          <div class="px-7 mt-5">
-            <label for="search" class="sr-only">Search</label>
-            <div class="mt-1 relative rounded-md shadow-sm">
-              <div
-                class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
-                aria-hidden="true"
-              >
-                <!-- Heroicon name: search -->
-                <svg
-                  class="mr-3 h-4 w-4 text-gray-400"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                  aria-hidden="true"
-                >
-                  <path
-                    fill-rule="evenodd"
-                    d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                    clip-rule="evenodd"
-                  />
-                </svg>
-              </div>
-              <input
-                type="text"
-                name="search"
-                id="search"
-                v-model="search"
-                class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-9 sm:text-sm border-gray-300 rounded-md"
-                placeholder="Search users"
-              />
-            </div>
+          <div class="px-3 my-3.5">
+            <filter-settings
+              @loadConversations="loadConversations"
+              @updateSearchMode="updateSearchMode"
+              @updateSearchLoading="updateSearchLoading"
+            ></filter-settings>
           </div>
-
-          <div class="bg-white  sm:rounded-md w-auto m-5">
+          <div
+            class="bg-white  w-auto ml-1 flex-1 flex flex-col overflow-y-auto"
+            :class="[isContentHovered ? 'scrollbar' : 'scrollbar-invisible']"
+            @scroll="handleScroll"
+          >
             <ul class="divide-y divide-gray-200">
               <li
+                class="text-center justify-center items-center pt-2"
+                :class="[!isSearchLoading ? 'hidden' : '']"
+              >
+                <loading-spinner></loading-spinner>
+              </li>
+
+              <user-conversation-list-item
                 v-for="conversation in getConversations()"
                 v-bind:key="conversation.id"
-                @click="selectConversation(conversation)"
-              >
+                :part="conversation"
+                :loadingConversation="loadingConversation"
+                @select-conversation="selectConversation"
+              ></user-conversation-list-item>
+
+              <li v-if="false">
                 <a
                   href="#"
                   class="group block hover:bg-gray-100 focus:bg-gray-200"
                   :class="[isSelected(conversation) ? 'bg-gray-200' : '']"
                 >
-                  <div class="px-2 py-2 sm:px-3 flex text-xs">
+                  <div class="px-2 py-2 sm:px-3 n flex text-xs">
                     <img
                       v-if="getImage(conversation)"
-                      class="h-10 w-10 rounded-full"
+                      class="h-10 w-10 rounded-full ml-0.5 mr-0.5"
                       :src="getImage(conversation)"
                       :title="conversation.userId"
                       alt=""
                     />
-                    <svg
-                      v-else
-                      class="h-auto w-14 text-gray-400"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path
-                        fill-rule="evenodd"
-                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z"
-                        clip-rule="evenodd"
-                      />
-                    </svg>
+                    <span v-else class="h-auto w-14">
+                      <svg class="text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path
+                          fill-rule="evenodd"
+                          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z"
+                          clip-rule="evenodd"
+                        />
+                      </svg>
+                    </span>
 
-                    <div class="w-full ml-2">
+                    <div class="w-full ml-2 mt-0.5">
                       <div class="flex items-center justify-between">
                         <p class="text-sm font-medium truncate" :title="conversation.userId">
                           {{ getName(conversation) }}
                         </p>
-                        <div class="ml-2 flex-shrink-0 flex">
+                        <div class="mr-2.5 flex-shrink-0 flex">
                           <p
+                            v-if="loadingConversation !== conversation.userId"
                             class=" inline-flex text-xs leading-5 text-gray-400 group-hover:text-gray-500 group-focus:text-gray-600"
                             :title="lastConversationItemDate(conversation, false)"
                             :class="[isSelected(conversation) ? 'text-gray-600' : '']"
                           >
-                            {{ lastConversationItemDate(conversation) }}
+                            <span>
+                              <span
+                                v-if="isUserActive(conversation)"
+                                class="inline-block h-2 w-2 mr-0.5 rounded-full  bg-green-400"
+                              ></span>
+
+                              {{ lastConversationItemDate(conversation) }}</span
+                            >
                           </p>
+                          <loading-spinner
+                            v-if="loadingConversation === conversation.userId"
+                          ></loading-spinner>
                         </div>
                       </div>
                       <div class="mt-1q sm:flex sm:justify-between">
@@ -136,13 +100,19 @@
                             class="flex items-center text-xs text-gray-400 group-hover:text-gray-500 group-focus:text-gray-600"
                             :class="[isSelected(conversation) ? 'text-gray-600' : '']"
                           >
-                            {{ lastConversationItemRequest(conversation).text }}
+                            {{ lastConversationItemRequestText(conversation) }}
                           </p>
                         </div>
                       </div>
                     </div>
                   </div>
                 </a>
+              </li>
+              <li
+                class="text-center justify-center items-center pt-2"
+                :class="[lastConversationLoading ? 'visible' : 'invisible']"
+              >
+                <loading-spinner></loading-spinner>
               </li>
             </ul>
           </div>
@@ -153,100 +123,116 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
-import { Api } from '@/Api';
-import { InboxLog, JovoAppMetaData, SelectUserConversationsDto } from 'jovo-inbox-core';
-import ConversationPart from '@/components/conversation/ConversationPart.vue';
-import DetailConversationPart from '@/components/conversation/DetailConversationPart.vue';
+import { Component } from 'vue-property-decorator';
+import { GetLastConversationsDto, InboxLog } from 'jovo-inbox-core';
 
-import { InboxIcon } from 'vue-feather-icons';
-import { AlexaUtil } from '@/utils/AlexaUtil';
-import { FormatUtil } from '@/utils/FormatUtil';
-import { DisplayHelper } from '@/utils/DisplayHelper';
 import { BaseMixin } from '@/mixins/BaseMixin';
 import { mixins } from 'vue-class-component';
-
+import SelectAppList from '@/components/SelectAppList.vue';
+import FilterSettings from '@/components/FilterSettings.vue';
+import dayjs from 'dayjs';
+import timezone from 'dayjs/plugin/timezone';
+import utc from 'dayjs/plugin/utc';
+import LoadingSpinner from '@/components/layout/partials/LoadingSpinner.vue';
+import { Api } from '@/Api';
+import UserConversationListItem from '@/components/layout/partials/UserConversationListItem.vue';
+dayjs.extend(utc);
+dayjs.extend(timezone);
 @Component({
   name: 'sidebar-left',
-  components: {},
+  components: { LoadingSpinner, FilterSettings, SelectAppList, UserConversationListItem },
 })
 export default class SidebarLeft extends mixins(BaseMixin) {
-  search = '';
+  isContentHovered = false;
+  lastConversationLoading = false;
+  inSearchMode = false;
+  isSearchLoading = false;
+  loadingConversation = '';
 
   async mounted() {
+    await this.loadConversations({
+      appId: this.app.id,
+    });
     try {
       if (this.$route.params.id) {
         const result = await Api.getInboxLogUserConversations({
           id: this.$route.params.id,
+          appId: this.app.id,
         });
         if (result.data?.logs.length > 0) {
-          await this.$store.dispatch('DataModule/fetchUserConversations', {
-            userId: result.data?.logs[0].userId,
-            appId: result.data?.logs[0].appId,
-          } as SelectUserConversationsDto);
-        }
-      } else {
-        if (this.getConversations().length > 0) {
-          await this.selectConversation(this.getConversations()[0]);
+          // TODO: selection of user doesn't work properly with many users
+          await this.selectConversation(result.data?.logs[0]);
         }
       }
     } catch (e) {
       console.log(e);
     }
-    await this.$store.dispatch('DataModule/fetchConversations');
   }
 
-  get apps(): JovoAppMetaData[] {
-    return this.$store.state.DataModule.apps;
+  updateSearchMode(val: boolean) {
+    this.inSearchMode = val;
   }
 
-  async selectConversation(inboxLog: InboxLog) {
-    try {
-      await this.$store.dispatch('DataModule/fetchUserConversations', {
-        userId: inboxLog.userId,
-        appId: inboxLog.appId,
-      } as SelectUserConversationsDto);
-    } catch (e) {
-      console.log(e);
+  updateSearchLoading(val: boolean) {
+    this.isSearchLoading = val;
+  }
+
+  async loadMore() {
+    this.lastConversationLoading = true;
+    const latestConversations = this.$store.state.DataModule.conversations as InboxLog[];
+    const last = latestConversations[latestConversations.length - 1].createdAt;
+
+    await this.$store.dispatch('DataModule/appendLastConversations', {
+      appId: this.app.id,
+      last,
+    });
+    this.lastConversationLoading = false;
+  }
+
+  async loadConversations(dto: GetLastConversationsDto) {
+    if (!this.isLiveMode) {
+      await this.$store.dispatch('DataModule/clearConversations');
+      this.isSearchLoading = true;
     }
-  }
 
-  lastConversationItemDate(inboxLog: InboxLog, simple = true) {
-    return FormatUtil.formatDate(inboxLog.createdAt, simple);
-  }
-
-  lastConversationItemRequest(inboxLog: InboxLog) {
-    return AlexaUtil.getFriendlyRequestName(inboxLog.payload);
-  }
-
-  isSelected(inboxLog: InboxLog) {
-    const selectedConversations = this.$store.state.DataModule.selectedUserConversations;
-    if (!selectedConversations || selectedConversations.length === 0) {
-      return false;
-    }
-    return (
-      selectedConversations[0].appId === inboxLog.appId &&
-      selectedConversations[0].userId === inboxLog.userId
-    );
+    await this.$store.dispatch('DataModule/fetchConversations', dto);
+    this.isSearchLoading = false;
   }
 
   getConversations(): InboxLog[] {
-    if (this.search.length >= 2) {
-      return this.$store.state.DataModule.conversations.filter((log: InboxLog) => {
-        return (
-          log.userId.indexOf(this.search) > -1 ||
-          (this.nameMap[log.userId] && this.nameMap[log.userId].name.indexOf(this.search) > -1)
-        );
-      });
-    }
     return this.$store.state.DataModule.conversations;
   }
 
-  getName(conversation: InboxLog) {
-    if (this.nameMap[conversation.userId] && this.nameMap[conversation.userId].name) {
-      return this.nameMap[conversation.userId].name;
+  async selectConversation(inboxLog?: InboxLog) {
+    this.loadingConversation = inboxLog?.userId || '';
+    if (inboxLog) {
+      await this.$store.dispatch('DataModule/fetchUserConversations', {
+        userId: inboxLog.userId,
+        appId: inboxLog.appId,
+      });
+    } else {
+      if (this.getConversations().length > 0) {
+        await this.$store.dispatch('DataModule/fetchUserConversations', {
+          userId: this.getConversations()[0].userId,
+          appId: this.getConversations()[0].appId,
+        });
+      }
     }
-    return this.shortenUserId(conversation);
+    this.loadingConversation = '';
+  }
+
+  async handleScroll(event: Event) {
+    const target = event.target as HTMLElement;
+
+    if (!target) {
+      return;
+    }
+
+    if (target.offsetHeight + target.scrollTop >= target.scrollHeight) {
+      if (!this.lastConversationLoading && !this.inSearchMode) {
+        await this.loadMore();
+      }
+    }
   }
 }
 </script>

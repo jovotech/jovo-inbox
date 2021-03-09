@@ -2,7 +2,9 @@ import axios, { AxiosRequestConfig } from 'axios';
 import { BASE_URL } from '@/main';
 import { InboxLog } from '../../core/src';
 import {
+  DeleteUserImageDto,
   GetInboxLogUserDto,
+  GetLastConversationsDto,
   JovoAppList,
   SelectUserConversationsDto,
   UpdateInboxLogUserDto,
@@ -11,14 +13,15 @@ import { UserConversationsResponse } from 'jovo-inbox-core/dist/UserConversation
 import { InboxLogUser } from 'jovo-inbox-core/dist/InboxLogUser';
 
 export class Api {
-  static async getLastConversations() {
+  static async getLastConversations(getLastConversationsDto: GetLastConversationsDto) {
     const config: AxiosRequestConfig = {
-      method: 'GET',
+      method: 'POST',
       url: `${BASE_URL}/inboxlog`,
+      data: getLastConversationsDto,
     };
 
     const result = await axios.request<InboxLog[]>(config);
-    if (result.status === 200 && result.data) {
+    if (result.status === 201 && result.data) {
       return result.data;
     }
     throw new Error('Could not load last conversations.');
@@ -74,18 +77,29 @@ export class Api {
     };
     return await axios.request<InboxLogUser[]>(config);
   }
-  static async getInboxLogUserConversations(getInboxLogUserDto: Pick<GetInboxLogUserDto, 'id'>) {
+
+  static async getAppPlatforms(appId: string) {
+    const config: AxiosRequestConfig = {
+      method: 'GET',
+      url: `${BASE_URL}/inboxlog/platform/${appId}`,
+    };
+    return await axios.request<string[]>(config);
+  }
+
+  static async getInboxLogUserConversations(
+    getInboxLogUserDto: Pick<GetInboxLogUserDto, 'id' | 'appId'>,
+  ) {
     const config: AxiosRequestConfig = {
       method: 'POST',
       url: `${BASE_URL}/inboxloguser/conversations`,
       data: getInboxLogUserDto,
     };
-    return await axios.request<InboxLogUser[]>(config);
+    return await axios.request<{ logs: InboxLog[] }>(config);
   }
   static async uploadUserImage(
     updateInboxLogUserDto: Pick<UpdateInboxLogUserDto, 'appId' | 'platformUserId'>,
     data: FormData,
-  ): Promise<any> {
+  ): Promise<void> {
     data.append('appId', updateInboxLogUserDto.appId);
     data.append('platformUserId', updateInboxLogUserDto.platformUserId);
 
@@ -95,14 +109,15 @@ export class Api {
       data,
     };
 
-    return await axios.request<any>(config);
+    await axios.request<void>(config);
   }
 
-  static async deleteUserImage(jovoAppUserId: string): Promise<any> {
+  static async deleteUserImage(deleteUserImageDto: DeleteUserImageDto): Promise<void> {
     const config: AxiosRequestConfig = {
       method: 'DELETE',
-      url: `${BASE_URL}/inboxloguser/${jovoAppUserId}/delete-image`,
+      url: `${BASE_URL}/inboxloguser/delete-image`,
+      data: deleteUserImageDto,
     };
-    return await axios.request<any>(config);
+    await axios.request<void>(config);
   }
 }

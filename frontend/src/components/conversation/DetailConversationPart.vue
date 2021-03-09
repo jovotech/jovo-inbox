@@ -1,374 +1,288 @@
 <template>
-  <div v-if="visible" class="fixed z-30 inset-0 overflow-y-auto text-gray-800 ">
-    <div
-      class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0"
-    >
-      <!--
-        Background overlay, show/hide based on modal state.
-
-        Entering: "ease-out duration-300"
-          From: "opacity-0"
-          To: "opacity-100"
-        Leaving: "ease-in duration-200"
-          From: "opacity-100"
-          To: "opacity-0"
-      -->
-      <div class="fixed inset-0 transition-opacity ease-out duration-300" aria-hidden="true">
-        <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
-      </div>
-
-      <!-- This element is to trick the browser into centering the modal contents. -->
-      <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true"
-        >&#8203;</span
+  <div
+    v-if="visible"
+    class="fixed inset-0 overflow-hidden z-40 bg-opacityblack"
+    @keydown.esc="hide"
+    @keydown.up="previous"
+    @keydown.down="next"
+    tabindex="0"
+    ref="sidebarcontainer"
+    @mousemove="move"
+    @mouseup="resizeEnd"
+    @click="close"
+  >
+    <div class="flex flex-row bg-gray-50">
+      <section
+        ref="sidebar"
+        class="absolute inset-y-0 right-0 shadow-xl flex "
+        style="width: 450px"
+        aria-labelledby="slide-over-heading"
       >
-      <!--
-        Modal panel, show/hide based on modal state.
+        <div
+          class="w-6 cursor-col-resize flex sm:items-center bg-gray-50 hover:bg-gray-100"
+          @mousedown="resizeStart"
+        >
+          <svg
+            class="h-4 w-4 text-gray-600 pointer-events-none"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path d="M8 5h2v14H8zM14 5h2v14h-2z"></path>
+          </svg>
+        </div>
+        <div class="w-screen ">
+          <div class="h-full flex flex-col py-6 bg-white  overflow-y-scroll">
+            <div class="px-4 sm:px-6">
+              <div class="flex items-start justify-between">
+                <h2 id="slide-over-heading" class="text-lg font-medium text-gray-900">
+                  Detail View
+                </h2>
+                <div class="ml-3 h-7 flex items-center">
+                  <button
+                    class="bg-white shadow rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 border-2 p-1.5 text-sm mr-1"
+                    @click="previous"
+                    :class="[
+                      arrowUpActive
+                        ? 'outline-none ring-2 ring-offset-2 ring-indigo-500 border-2 mt-0.5 shadow-none'
+                        : '',
+                      isArrowUpEnabled ? '' : 'opacity-40',
+                    ]"
+                    :disabled="!isArrowUpEnabled"
+                  >
+                    <arrow-up-icon size="16"></arrow-up-icon>
+                  </button>
+                  <button
+                    class="bg-white shadow rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 border-2 p-1.5 text-sm mr-1"
+                    :class="[
+                      arrowDownActive
+                        ? 'outline-none ring-2 ring-offset-2 ring-indigo-500 border-2 mt-0.5 shadow-none'
+                        : '',
+                      isArrowDownEnabled ? '' : 'opacity-40',
+                    ]"
+                    :disabled="!isArrowDownEnabled"
+                    @click="next"
+                  >
+                    <arrow-down-icon size="16"></arrow-down-icon>
+                  </button>
 
-        Entering: "ease-out duration-300"
-          From: "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-          To: "opacity-100 translate-y-0 sm:scale-100"
-        Leaving: "ease-in duration-200"
-          From: "opacity-100 translate-y-0 sm:scale-100"
-          To: "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-      -->
-      <div
-        class="inline-block align-bottom  bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:w-full xl:w-3/5"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="modal-headline"
-      >
-        <div class="bg-red px-2 pt-5 pb-4 sm:p-6 sm:pb-4 ">
-          <div class="sm:flex">
-            <div
-              class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left flex-grow"
-              :class="[isContentHovered ? 'scrollbar' : 'scrollbar-invisible']"
-              @mouseenter="isContentHovered = true"
-              @mouseleave="isContentHovered = false"
-            >
-              <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-headline">
-                Details
-              </h3>
-              <div class="mt-2">
-                <div class="h-172 w-full text-sm max-h-144 overflow-y-auto  bg-gray-50 p-3">
-                  <div id="aplviewer"></div>
-                  <vue-json-pretty :data="json"> </vue-json-pretty>
+                  <button
+                    class="bg-white shadow rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 border-2 p-1 text-sm"
+                    @click="hide"
+                  >
+                    ESC
+                  </button>
                 </div>
               </div>
             </div>
+            <div class="mt-6 relative flex-1 px-4 sm:px-6">
+              <!-- Replace with your content -->
+              <div class="absolute inset-0 px-4 sm:px-6">
+                <div class="flex items-center justify-between">
+                  <h3>Payload</h3>
+                  <chevron-down-icon
+                    v-if="expandedPayload"
+                    size="16"
+                    class="flex-shrink-1 mr-1 cursor-pointer"
+                    @click="expandedPayload = !expandedPayload"
+                  ></chevron-down-icon>
+                  <chevron-up-icon
+                    v-else-if="!expandedPayload"
+                    size="16"
+                    class="flex-shrink-1 mr-1 cursor-pointer"
+                    @click="expandedPayload = !expandedPayload"
+                  ></chevron-up-icon>
+                </div>
+                <div
+                  v-if="expandedPayload"
+                  class="h-96 mt-2 bg-gray-50 overflow-x-hidden p-3 rounded-lg"
+                  aria-hidden="true"
+                  :class="[isContentHovered ? 'scrollbar' : 'scrollbar-invisible']"
+                  @mouseenter="isContentHovered = true"
+                  @mouseleave="isContentHovered = false"
+                >
+                  <vue-json-pretty :data="json"> </vue-json-pretty>
+                </div>
+
+                <div v-if="hasApl" class="flex items-center justify-between mt-6">
+                  <h3>{{ deviceName }}</h3>
+                </div>
+                <div class="mt-5 qbg-gray-50 overflow-x-hidden" aria-hidden="true">
+                  <div class="w-full" ref="apl-parent">
+                    <div id="aplviewer" ref="apl-viewer"></div>
+                  </div>
+                </div>
+              </div>
+              <!-- /End replace -->
+            </div>
           </div>
         </div>
-        <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-          <button
-            type="button"
-            @click="hide"
-            class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-          >
-            Close
-          </button>
-        </div>
-      </div>
+      </section>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
-import { InboxLog, InboxLogType } from 'jovo-inbox-core';
+import { Component, Watch } from 'vue-property-decorator';
+import {
+  AlexaRequest,
+  AlexaResponse,
+  InboxLog,
+  InboxLogType,
+  JovoInboxPlatformResponse,
+} from 'jovo-inbox-core';
 import VueJsonPretty from 'vue-json-pretty';
 import 'vue-json-pretty/lib/styles.css';
+import { ArrowDownIcon, ArrowUpIcon, ChevronDownIcon, ChevronUpIcon } from 'vue-feather-icons';
 import * as AplRenderer from 'apl-viewhost-web';
-
+import { mixins } from 'vue-class-component';
+import { BaseMixin } from '@/mixins/BaseMixin';
+import _get from 'lodash.get';
 @Component({
   name: 'detail-conversation-part',
-  components: { VueJsonPretty },
+  components: { VueJsonPretty, ArrowUpIcon, ArrowDownIcon, ChevronDownIcon, ChevronUpIcon },
 })
-export default class DetailConversationPart extends Vue {
-  @Prop({ required: true, type: Object })
-  part!: InboxLog;
-
-  @Prop({ required: false, type: Array })
-  sessionLogs!: InboxLog[];
-
-  @Prop()
-  visible = false;
-
+export default class DetailConversationPart extends mixins(BaseMixin) {
   isContentHovered = false;
 
+  expandedPayload = true;
+
+  isArrowUpEnabled = true;
+  arrowUpActive = false;
+
+  isArrowDownEnabled = true;
+  arrowDownActive = false;
+
+  resizeActive = false;
+
+  // TODO: temp
+  hasApl = false;
+  deviceName = 'Screen';
+
+  // eslint-disable-next-line
   renderer: any;
 
-  async mounted() {
-    //
+  platformResponse: JovoInboxPlatformResponse | undefined;
+
+  get selectedInboxLog(): InboxLog | null {
+    return this.$store.state.DataModule.selectedInboxLog;
+  }
+  get visible() {
+    return !!this.selectedInboxLog;
   }
 
-  @Watch('visible', { deep: true })
-  private async onVisibilityChange() {
-    if (this.visible) {
-      // await this.handleRenderInit();
+  activateButtons() {
+    const index = this.selectedConversation.findIndex(
+      (item: InboxLog) => item.id === this.selectedInboxLog?.id,
+    );
+
+    if (index + 1 === this.selectedConversation.length) {
+      this.isArrowDownEnabled = false;
+    } else {
+      this.isArrowDownEnabled = true;
+    }
+
+    if (index - 1 < 0) {
+      this.isArrowUpEnabled = false;
+    } else {
+      this.isArrowUpEnabled = true;
     }
   }
 
-  async handleRenderInit() {
-    console.log('handleRenderInit');
-    // await AplRenderer.initEngine();
+  @Watch('selectedInboxLog', { deep: true })
+  private async onSelectedInboxLogChange() {
+    this.activateButtons();
 
-    const doc = this.part.payload.response.directives[0].document;
+    this.$nextTick(async () => {
+      if (this.$refs['sidebarcontainer']) {
+        (this.$refs['sidebarcontainer'] as HTMLElement).focus();
+      }
+      this.resetAplViewer();
+
+      await this.renderApl();
+    });
+  }
+
+  resetAplViewer() {
+    const aplViewerElement = this.$refs['apl-viewer'] as HTMLElement;
+
+    if (aplViewerElement) {
+      (this.$refs['apl-viewer'] as HTMLElement).innerHTML = '';
+
+      (this.$refs['apl-viewer'] as HTMLElement).style.width = '0';
+      (this.$refs['apl-viewer'] as HTMLElement).style.height = '0';
+      (this.$refs['apl-viewer'] as HTMLElement).style.background = 'none';
+    }
+  }
+
+  async renderApl() {
+    // TODO: Temporary
+    if (this.selectedInboxLog) {
+      this.platformResponse = this.getPlatformResponse(this.selectedInboxLog);
+      if (this.platformResponse) {
+        if (this.platformResponse.constructor.name === 'AlexaResponse') {
+          const alexaResponse = this.platformResponse as AlexaResponse;
+          this.hasApl = alexaResponse.hasApl();
+          if (this.hasApl) {
+            const previousRequest = this.getPreviousRequest();
+
+            if (previousRequest) {
+              const previousAlexaRequest = this.getPlatformRequest(previousRequest) as AlexaRequest;
+              await this.handleRenderInit(alexaResponse, previousAlexaRequest);
+            }
+          }
+        }
+      } else {
+        this.hasApl = false;
+      }
+    }
+  }
+
+  getPreviousRequest(): InboxLog | undefined {
+    const index = this.selectedConversation.findIndex(
+      (item: InboxLog) => item.id === this.selectedInboxLog?.id,
+    );
+    for (let i = index - 1; i >= 0; i--) {
+      if (this.selectedConversation[i].type === InboxLogType.REQUEST) {
+        return this.selectedConversation[i];
+      }
+    }
+  }
+
+  async handleRenderInit(alexaResponse: AlexaResponse, previousAlexaRequest: AlexaRequest) {
+    const aplViewerDiv = document.getElementById('aplviewer');
+
+    if (aplViewerDiv) {
+      aplViewerDiv.innerHTML = '';
+    }
+
+    const directive = alexaResponse.response.directives?.find(
+      (item: { type: string }) => item.type === 'Alexa.Presentation.APL.RenderDocument',
+    );
+
+    const requestDpi = _get(previousAlexaRequest, 'context.Viewport.dpi', 160);
+    const requestWidth = _get(previousAlexaRequest, 'context.Viewport.pixelWidth', 960);
+    const requestHeight = _get(previousAlexaRequest, 'context.Viewport.pixelHeight', 480);
+    const requestRatio = requestWidth / requestHeight;
+
+    this.deviceName = previousAlexaRequest.getDeviceName();
+
+    const doc = directive.document;
     doc.version = '1.4';
-    console.log(doc);
-    const apl = {
-      type: 'APL',
-      version: '1.4',
-      settings: {},
-      theme: 'dark',
-      import: [
-        {
-          name: 'alexa-layouts',
-          version: '1.0.0',
-        },
-      ],
-
-      onMount: [],
-      graphics: {},
-      commands: {},
-      styles: {
-        PlaceStyle: {
-          values: [
-            {
-              when: '${viewport.width === 1920}',
-              fontSize: '15dp',
-              fontWeight: 500,
-            },
-            {
-              when: '${viewport.width < 1920}',
-              fontSize: '20dp',
-              fontWeight: 700,
-            },
-          ],
-        },
-        TimerStyle: {
-          values: [
-            {
-              when: '${viewport.width === 1920}',
-              fontSize: '30dp',
-            },
-            {
-              when: '${viewport.width < 1920}',
-              fontSize: '40dp',
-              fontWeight: 700,
-            },
-          ],
-        },
-        ScoreStyle: {
-          values: [
-            {
-              textAlign: 'left',
-              fontWeight: '700',
-              fontSize: '60dp',
-            },
-          ],
-        },
-      },
-      layouts: {
-        Timer: {
-          parameters: ['time', 'quarter'],
-          items: [
-            {
-              alignItems: 'center',
-              width: '100%',
-              position: 'absolute',
-              type: 'Container',
-              items: [
-                {
-                  style: 'TimerStyle',
-                  position: 'absolute',
-                  bind: [
-                    {
-                      name: 'TimerMinutes',
-                      value: '${time.minutes}',
-                    },
-                    {
-                      name: 'TimerSeconds',
-                      value: '${time.seconds}',
-                    },
-                  ],
-                  text:
-                    '${TimerMinutes < 10 ? "0" + TimerMinutes : TimerMinutes}:${TimerSeconds < 10 ? "0" + TimerSeconds : TimerSeconds}',
-                  handleTick: {
-                    when: '${TimerMinutes > 0 || TimerSeconds > 0}',
-                    commands: [
-                      {
-                        type: 'Sequential',
-                        commands: [
-                          {
-                            property: 'TimerSeconds',
-                            type: 'SetValue',
-                            when: '${TimerSeconds == 0 && TimerMinutes > 0}',
-                            value: 60,
-                          },
-                          {
-                            property: 'TimerMinutes',
-                            type: 'SetValue',
-                            when: '${TimerSeconds == 60 && TimerMinutes > 0}',
-                            value: '${TimerMinutes - 1}',
-                          },
-                          {
-                            property: 'TimerSeconds',
-                            type: 'SetValue',
-                            when: '${TimerSeconds > 0 && TimerMinutes >= 0}',
-                            value: '${TimerSeconds - 1}',
-                          },
-                        ],
-                      },
-                    ],
-                  },
-                  type: 'Text',
-                },
-                {
-                  style: 'PlaceStyle',
-                  text: '${quarter}',
-                  position: 'absolute',
-                  type: 'Text',
-                  bottom: 0,
-                },
-              ],
-              justifyContent: 'center',
-              height: '50%',
-              direction: 'column',
-            },
-          ],
-        },
-        Team: {
-          parameters: ['teamData', 'direction'],
-          items: [
-            {
-              width: '33%',
-              type: 'Container',
-              items: [
-                {
-                  width: '50%',
-                  type: 'Container',
-                  alignItems: 'center',
-                  items: [
-                    {
-                      type: 'Image',
-                      source: '${teamData.logo}',
-                    },
-                  ],
-                  justifyContent: 'center',
-                  height: '100%',
-                },
-                {
-                  width: '50%',
-                  type: 'Container',
-                  alignItems: 'center',
-                  items: [
-                    {
-                      type: 'Text',
-                      style: 'ScoreStyle',
-                      text: '${teamData.score}',
-                    },
-                  ],
-                  justifyContent: 'center',
-                  height: '100%',
-                },
-              ],
-              height: '100%',
-              direction: '${direction}',
-            },
-          ],
-        },
-      },
-      mainTemplate: {
-        items: [
-          {
-            width: '100vw',
-            type: 'Container',
-            items: [
-              // {
-              //   "width": "100vw",
-              //   "scale": "best-fill",
-              //   "position": "absolute",
-              //   "source": "https://nba-ui.s3.amazonaws.com/NBA_visuals/00_Welcome/3.png",
-              //   "type": "Image",
-              //   "when": "${viewport.width == 1280}",
-              //   "height": "100vh"
-              // },
-              {
-                type: 'Text',
-                style: 'ScoreStyle',
-                text: '${viewport.width}',
-              },
-            ],
-            height: '100vh',
-          },
-        ],
-      },
-    };
-    const datasource = {
-      data: {
-        games: [
-          {
-            teams: [
-              {
-                score: 112,
-                logo: 'https://nba-ui.s3.amazonaws.com/NBA_visuals/TeamLogo_Global/Heat_Global.png',
-              },
-              {
-                score: 124,
-                logo:
-                  'https://nba-ui.s3.amazonaws.com/NBA_visuals/TeamLogo_Global/Lakers_Global.png',
-              },
-            ],
-            time: {
-              minutes: 0,
-              seconds: 0,
-            },
-            quarter: '4',
-          },
-          {
-            teams: [
-              {
-                score: 108,
-                logo:
-                  'https://nba-ui.s3.amazonaws.com/NBA_visuals/TeamLogo_Global/Warriors_Global.png',
-              },
-              {
-                score: 100,
-                logo:
-                  'https://nba-ui.s3.amazonaws.com/NBA_visuals/TeamLogo_Global/Thunder_Global.png',
-              },
-            ],
-            time: {
-              minutes: 14,
-              seconds: 39,
-            },
-            quarter: '3',
-          },
-          {
-            teams: [
-              {
-                score: 45,
-                logo: 'https://nba-ui.s3.amazonaws.com/NBA_visuals/TeamLogo_Global/Heat_Global.png',
-              },
-              {
-                score: 32,
-                logo:
-                  'https://nba-ui.s3.amazonaws.com/NBA_visuals/TeamLogo_Global/Lakers_Global.png',
-              },
-            ],
-            time: {
-              minutes: 12,
-              seconds: 19,
-            },
-            quarter: '3',
-          },
-        ],
-      },
-    };
+    const datasource = directive.datasources || {};
     const content = AplRenderer.Content.create(JSON.stringify(doc));
-    if (content) {
-      // content.addData('payload', JSON.stringify(datasource))
+    if (content && datasource) {
+      content.addData('payload', JSON.stringify(datasource));
     }
-    console.log('a');
+
+    const width = (this.$refs['apl-parent'] as HTMLElement).offsetWidth;
+
+    const calcDpi = (width * requestDpi) / requestWidth;
+
+    const viewPortDpi = Math.round(calcDpi);
+    const viewportWidth = (viewPortDpi * requestWidth) / requestDpi;
+
+    const viewportHeight = viewportWidth / requestRatio;
+
     this.renderer = AplRenderer.default.create({
       content: content /* return value of the AplRenderer.Content.create call */,
       view: document.getElementById(
@@ -381,9 +295,9 @@ export default class DetailConversationPart extends Vue {
         disallowVideo: false,
       },
       viewport: {
-        width: 1280,
-        height: 600,
-        dpi: 160,
+        width: viewportWidth,
+        height: viewportHeight,
+        dpi: viewPortDpi,
       },
       theme: 'dark',
       developerToolOptions: {
@@ -397,12 +311,86 @@ export default class DetailConversationPart extends Vue {
     await this.renderer.init();
   }
 
-  get json() {
-    return this.part.payload;
+  get selectedConversation(): InboxLog[] {
+    return this.$store.state.DataModule.selectedUserConversations;
   }
 
-  hide(val: boolean) {
+  get json() {
+    return this.selectedInboxLog?.payload;
+  }
+
+  get sessionjson() {
+    return this.selectedInboxLog?.payload;
+  }
+
+  async hide() {
+    await this.$store.dispatch('DataModule/selectInboxLog', null);
     this.$emit('hide');
+  }
+
+  next() {
+    this.arrowDownActive = true;
+    setTimeout(async () => {
+      this.arrowDownActive = false;
+
+      const index = this.selectedConversation.findIndex(
+        (item: InboxLog) => item.id === this.selectedInboxLog?.id,
+      );
+
+      if (index + 1 < this.selectedConversation.length) {
+        await this.$store.dispatch(
+          'DataModule/selectInboxLog',
+          this.selectedConversation[index + 1],
+        );
+      }
+      this.activateButtons();
+    }, 100);
+  }
+  previous() {
+    this.arrowUpActive = true;
+    setTimeout(async () => {
+      this.arrowUpActive = false;
+
+      const index = this.selectedConversation.findIndex(
+        (item: InboxLog) => item.id === this.selectedInboxLog?.id,
+      );
+
+      if (index - 1 >= 0) {
+        await this.$store.dispatch(
+          'DataModule/selectInboxLog',
+          this.selectedConversation[index - 1],
+        );
+      }
+
+      this.activateButtons();
+    }, 100);
+  }
+  resizeStart() {
+    this.resizeActive = true;
+  }
+  async resizeEnd() {
+    if (this.resizeActive) {
+      this.resizeActive = false;
+
+      await this.renderApl();
+    }
+  }
+  move(evt: MouseEvent) {
+    if (!this.resizeActive) {
+      return;
+    }
+    const screenWidth =
+      window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+
+    const sidebarWidth = screenWidth - evt.x;
+    const sidebarElement = this.$refs['sidebar'] as HTMLElement;
+    sidebarElement.style.width = sidebarWidth + 'px';
+  }
+
+  close(event: MouseEvent) {
+    if (!(this.$refs.sidebar as HTMLElement).contains(event.target as HTMLElement)) {
+      this.hide();
+    }
   }
 }
 </script>

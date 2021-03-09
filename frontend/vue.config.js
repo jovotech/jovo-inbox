@@ -1,5 +1,8 @@
+const webpack = require('webpack');
+const path = require('path');
 module.exports = {
   parallel: false,
+  outputDir: './../api/public/client',
   chainWebpack: (config) => {
     config.resolve.symlinks(false);
 
@@ -18,9 +21,10 @@ module.exports = {
     //   .loader('ts-loader')
     //   .tap((options) => {
     //     options.transpileOnly = false;
-    //     return options;
+    //     return opti2ons;
     //   });
   },
+  configureWebpack: {},
   css: {
     loaderOptions: {
       postcss: {

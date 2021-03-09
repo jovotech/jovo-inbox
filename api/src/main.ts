@@ -11,8 +11,7 @@ async function bootstrap() {
     origin: '*',
     methods: 'GET,POST,OPTIONS,PUT,DELETE',
   });
-  // app.useStaticAssets(path.join(__dirname, '..', 'public'));
-  // app.use('/public', express.static(path.join(__dirname, '..', 'public')));
+  app.setGlobalPrefix('api');
   await app.listen(4000);
 }
 bootstrap();

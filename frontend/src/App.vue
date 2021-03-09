@@ -14,9 +14,8 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
 
-import Inbox from '@/components/Inbox.vue';
 import InboxHeader from '@/components/layout/InboxHeader.vue';
 import SidebarLeft from '@/components/layout/SidebarLeft.vue';
 import SidebarRight from '@/components/layout/SidebarRight.vue';
@@ -25,17 +24,26 @@ import { BaseMixin } from '@/mixins/BaseMixin';
 import { mixins } from 'vue-class-component';
 
 @Component({
-  components: { MainPanel, SidebarRight, SidebarLeft, InboxHeader, Inbox },
+  components: { MainPanel, SidebarRight, SidebarLeft, InboxHeader },
 })
 export default class App extends mixins(BaseMixin) {
   async mounted() {
     try {
       await this.$store.dispatch('DataModule/fetchApps');
-      await this.$store.dispatch('DataModule/selectApp', this.$store.state.DataModule.apps[0]);
+      if (!this.app) {
+        await this.$store.dispatch('DataModule/selectApp', this.$store.state.DataModule.apps[0]);
+      } else {
+        await this.$store.dispatch('DataModule/selectApp', this.app);
+      }
       await this.$store.dispatch('DataModule/buildAppUsersMap', this.app.id);
     } catch (e) {
       console.log(e);
     }
+  }
+
+  @Watch('app')
+  async onAppChanged() {
+    await this.$store.dispatch('DataModule/buildAppUsersMap', this.app.id);
   }
 }
 </script>

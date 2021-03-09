@@ -1,21 +1,26 @@
 <template>
   <aside class="hidden relative xl:flex xl:flex-col flex-shrink-0 w-4/12 border-l  border-gray-200">
     <!-- Start secondary column (hidden on smaller screens) -->
-    <div v-if="!!conversation" class="text-right px-5 py-5">
-      <button
-        v-if="!isCopied"
-        type="button"
-        @click="handleShareConversation"
-        class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-jovo-blue bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-      >
-        <!-- Heroicon name: mail -->
-        <share2-icon size="16" class="mr-2"></share2-icon>
-        Share
-      </button>
-      <span v-else class="inline-flex text-sm items-center px-3 py-2 "
-        >Link copied to clipboard!</span
-      >
+
+    <div class="flex justify-between">
+      <div class="flex items-center"></div>
+      <div v-if="!!conversation" class="text-right px-5 py-5">
+        <button
+          v-if="!isCopied"
+          type="button"
+          @click="handleShareConversation"
+          class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-jovo-blue bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+        >
+          <!-- Heroicon name: mail -->
+          <share2-icon size="16" class="mr-2"></share2-icon>
+          Share
+        </button>
+        <span v-else class="inline-flex text-sm items-center px-3 py-2 "
+          >Link copied to clipboard!</span
+        >
+      </div>
     </div>
+
     <div v-if="!!conversation" class="text-center">
       <div class="flex items-center">
         <div class="hidden relative rounded-full overflow-hidden lg:block m-auto">
@@ -91,6 +96,7 @@
           type="text"
           name="first_name"
           v-model="user.name"
+          @keydown.enter="handleSaveUserName"
           ref="name"
           id="name"
           placeholder="Name"
@@ -135,21 +141,11 @@
 
         <span
           v-for="device in devices"
-          v-bind:key="device"
-          class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-50 text-indigo-800 mr-1"
+          v-bind:key="device.platform + '-' + device.name"
+          class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-50 text-gray-700 mr-1 mb-1"
         >
-          <svg
-            class="h-4 w-4 fill-current text-alexa-blue mr-1"
-            height="24"
-            width="24"
-            viewBox="0 0 24 24"
-          >
-            <path
-              d="M0,10.0000489 C0,15.0707816 3.77428289,19.2594477 8.66667972,19.9113334 L8.66667972,17.8962718 C8.66667972,17.3281595 8.30829606,16.8174945 7.76974193,16.636736 C4.94690794,15.688512 2.927648,12.9904434 3.00202582,9.8313279 C3.09245359,5.9853886 6.22532565,2.96152397 10.0722248,3.00037678 C13.9049334,3.03913173 16.9999315,6.15812215 16.9999315,10.0000489 C16.9999315,10.087639 16.9977785,10.1747398 16.9945489,10.2614491 C16.9887748,10.4004189 16.9838815,10.4807669 16.9775203,10.5606256 C16.975563,10.5860707 16.9731163,10.611418 16.9707676,10.6367653 C16.9658743,10.692549 16.9601002,10.7479411 16.9538368,10.8032355 C16.9466926,10.8660654 16.9385698,10.928504 16.9298598,10.9906489 C16.9258473,11.01903 16.9220305,11.0475091 16.9177244,11.0756945 C16.0607158,16.7212922 8.70778325,19.8942068 8.66756051,19.9115291 C9.10355154,19.9694658 9.54815475,20 9.99990213,20 C15.5228467,20 20,15.5229227 20,10.0000489 C20,4.47717519 15.5228467,0 9.99990213,0 C4.47715329,0 0,4.47717519 0,10.0000489 Z"
-              transform="translate(2 2)"
-            ></path>
-          </svg>
-          {{ device }}
+          <img class="h-3 w-3 mr-1" :src="device.image" />
+          {{ device.name }}
         </span>
       </div>
 
@@ -171,22 +167,25 @@
 
 <script lang="ts">
 import { Component, Watch } from 'vue-property-decorator';
-import { Share2Icon, CheckIcon } from 'vue-feather-icons';
+import { CheckIcon, Share2Icon } from 'vue-feather-icons';
 import { BaseMixin } from '@/mixins/BaseMixin';
 import { mixins } from 'vue-class-component';
 import { InboxLog, InboxLogType } from 'jovo-inbox-core';
 import { InboxLogUser } from 'jovo-inbox-core/dist/InboxLogUser';
 import { Api } from '@/Api';
-import { AlexaUtil } from '@/utils/AlexaUtil';
-import { BASE_URL } from '@/main';
 
+interface Device {
+  name: string;
+  platform: string;
+  image: string;
+}
 @Component({
   name: 'sidebar-right',
   components: { Share2Icon, CheckIcon },
 })
 export default class SidebarRight extends mixins(BaseMixin) {
   isNameEdit = false;
-  devices: string[] = ['Echo', 'Echo Show'];
+  devices: Device[] = [];
 
   user: Partial<InboxLogUser> = {};
   isCopied = false;
@@ -215,7 +214,7 @@ export default class SidebarRight extends mixins(BaseMixin) {
   }
 
   async handleFileUpload() {
-    const file = (this.$refs.file as any).files[0];
+    const file = (this.$refs.file as HTMLFormElement).files[0];
     const formData = new FormData();
 
     if (!this.conversation) {
@@ -231,7 +230,7 @@ export default class SidebarRight extends mixins(BaseMixin) {
         },
         formData,
       );
-      (this.$refs.file as any).value = '';
+      (this.$refs.file as HTMLFormElement).value = '';
       await this.getInboxLogUserData();
       await this.$store.dispatch('DataModule/buildAppUsersMap', this.app.id);
     } catch (e) {
@@ -248,7 +247,9 @@ export default class SidebarRight extends mixins(BaseMixin) {
 
   editName() {
     this.isNameEdit = true;
-    this.oldNameValue = this.user.name;
+    if (this.user?.name) {
+      this.oldNameValue = this.user.name;
+    }
     // TODO: focus doesn't work
     // (this.$refs['name'] as HTMLElement).focus();
   }
@@ -260,11 +261,14 @@ export default class SidebarRight extends mixins(BaseMixin) {
 
   @Watch('conversation')
   async onConversationChange() {
-    this.user = {
-      name: this.shortenUserId(this.conversation!),
-    };
-    this.isCopied = false;
-    await this.getInboxLogUserData();
+    if (this.conversation) {
+      this.user = {
+        name: this.shortenUserId(this.conversation),
+      };
+      this.isCopied = false;
+      this.getDevices();
+      await this.getInboxLogUserData();
+    }
   }
 
   async handleShareConversation() {
@@ -287,14 +291,18 @@ export default class SidebarRight extends mixins(BaseMixin) {
     this.isCopied = true;
     this.$clipboard(`${window.location.origin}/user/${this.user.id}`);
   }
+
   async handleDeleteImage() {
     try {
-      const result = await Api.deleteUserImage(this.user.id as string);
-      this.user = {
-        ...result.data,
-      };
-      await this.getInboxLogUserData();
-      await this.$store.dispatch('DataModule/buildAppUsersMap', this.app.id);
+      if (this.user?.id) {
+        await Api.deleteUserImage({
+          appId: this.app.id,
+          jovoAppUserId: this.user.id,
+        });
+        this.user.image = undefined;
+        await this.getInboxLogUserData();
+        await this.$store.dispatch('DataModule/buildAppUsersMap', this.app.id);
+      }
     } catch (e) {
       console.log(e);
     }
@@ -309,7 +317,7 @@ export default class SidebarRight extends mixins(BaseMixin) {
         platformUserId: this.conversation.userId,
         appId: this.conversation.appId,
       });
-      this.getDevices();
+
       this.user = {
         ...result.data,
       };
@@ -319,14 +327,31 @@ export default class SidebarRight extends mixins(BaseMixin) {
   }
 
   getDevices() {
-    const devicesMap: Record<string, string> = {};
-    this.selectedConversations.forEach((inboxLog: InboxLog) => {
-      if (inboxLog.type === InboxLogType.REQUEST) {
-        devicesMap[AlexaUtil.getFriendlyDeviceName(inboxLog.payload)] = true;
+    this.devices = [];
+
+    const detectedDevices: Device[] = [];
+    this.selectedConversations.forEach((log: InboxLog) => {
+      if (log.type === InboxLogType.REQUEST) {
+        const platform = this.getPlatform(log);
+
+        if (platform) {
+          const requestConstructor = platform?.requestClass;
+
+          const request = Object.assign(new requestConstructor(), log.payload);
+          detectedDevices.push({
+            name: request.getDeviceName(),
+            platform: platform.name,
+            image: platform?.image64x64,
+          });
+        }
       }
     });
 
-    this.devices = Object.keys(devicesMap);
+    // remove duplicates
+    this.devices = detectedDevices.filter(
+      (v: Device, i: number, a: Device[]) =>
+        a.findIndex((t: Device) => JSON.stringify(t) === JSON.stringify(v)) === i,
+    );
   }
 }
 </script>

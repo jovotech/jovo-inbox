@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import VueRouter, { Route, RouteConfig } from 'vue-router';
+import VueRouter, { RouteConfig } from 'vue-router';
 
 Vue.use(VueRouter);
 
@@ -27,7 +27,6 @@ const router = new VueRouter({
   routes,
 });
 router.beforeEach((to, from, next) => {
-  // document.title = to.meta.title;
   next();
 });
 export default router;
