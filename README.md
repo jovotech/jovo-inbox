@@ -59,7 +59,10 @@ Install the Jovo Inbox plugin as explained here: https://github.com/jovotech/jov
 
 
 
-### Deploy on server
+### Deploy on server 
+
+#### Requirements
+* Server with at least 2gb of RAM
 
 This is not the best way, but sufficient for the beginning. Better approaches will follow.
 
