@@ -93,7 +93,7 @@
           </div>
         </div>
 
-        <div class="py-1">
+        <div v-if="filterPlatforms.length > 1" class="py-1">
           <div
             v-for="platform in filterPlatforms"
             v-bind:key="platform"
@@ -175,8 +175,17 @@ export default class FilterSettings extends mixins(BaseMixin) {
   interval?: number;
 
   async mounted() {
+    await this.updateAppPlatforms();
+  }
+
+  async updateAppPlatforms() {
     const response = await Api.getAppPlatforms(this.app.id);
     this.filterPlatforms = response.data;
+  }
+
+  @Watch('app')
+  async onAppChange() {
+    await this.updateAppPlatforms();
   }
 
   open() {
