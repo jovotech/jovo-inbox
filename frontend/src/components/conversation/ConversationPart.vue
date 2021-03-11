@@ -6,7 +6,7 @@
       isSelectedInboxLog ? 'border-jovo-blue border-l-4 inset-0' : 'border-transparent border-l-4 ',
       isRequest ? 'mt-8' : '',
     ]"
-    v-on:click="openDetailView"
+    v-on:dblclick="openDetailView"
     tabindex="0"
   >
     <request-part v-if="isRequest" :part="part"></request-part>
@@ -50,9 +50,7 @@ export default class ConversationPart extends mixins(BaseMixin) {
     return this.part.type === InboxLogType.REQUEST;
   }
   async openDetailView() {
-    if (window.getSelection()?.isCollapsed) {
-      await this.$store.dispatch('DataModule/selectInboxLog', this.part);
-    }
+    await this.$store.dispatch('DataModule/selectInboxLog', this.part);
   }
 
   get isResponse(): boolean {
