@@ -58,6 +58,7 @@ export class FormatUtil {
 
   static formatMessageSimple(message: string) {
     message = message.replace('<speak>', '').replace('</speak>', '');
+    message = message.replace(/<p>/gi, '').replace(/<\/p>/gi, '');
 
     message = message.replace(/<iframe/gi, '').replace(/<\/iframe/gi, '');
     message = message.replace(/<script>/gi, '').replace(/<\/script>/gi, '');

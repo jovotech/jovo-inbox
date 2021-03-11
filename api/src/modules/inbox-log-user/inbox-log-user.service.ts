@@ -147,7 +147,7 @@ export class InboxLogUserService {
       connectionName(updateInboxLogUserDto.appId),
     ).save(user);
 
-    const filesDirectory = path.join(__dirname, './../../../../public/images');
+    const filesDirectory = path.join(process.cwd(), 'public', 'images');
 
     if (!fs.existsSync(filesDirectory)) {
       fs.mkdirSync(filesDirectory, { recursive: true });
@@ -169,11 +169,7 @@ export class InboxLogUserService {
     if (!user) {
       throw new NotFoundException();
     }
-    const filePath = path.join(
-      __dirname,
-      './../../../../public/images',
-      user.image,
-    );
+    const filePath = path.join(process.cwd(), 'public', 'images', user.image);
     if (fs.existsSync(filePath)) {
       fs.unlinkSync(filePath);
     }
