@@ -188,6 +188,14 @@ export default class FilterSettings extends mixins(BaseMixin) {
     await this.updateAppPlatforms();
   }
 
+  getFilter() {
+    return {
+      appId: this.app.id,
+      withErrors: this.filterSelectedWithErrors,
+      platform: this.filterSelectedPlatform,
+    };
+  }
+
   open() {
     if (this.opened) {
       this.close();

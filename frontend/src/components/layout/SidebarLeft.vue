@@ -21,6 +21,7 @@
               @loadConversations="loadConversations"
               @updateSearchMode="updateSearchMode"
               @updateSearchLoading="updateSearchLoading"
+              ref="filtersettings"
             ></filter-settings>
           </div>
           <div
@@ -43,7 +44,6 @@
                 :loadingConversation="loadingConversation"
                 @select-conversation="selectConversation"
               ></user-conversation-list-item>
-
 
               <li
                 class="text-center justify-center items-center pt-2"
@@ -119,8 +119,10 @@ export default class SidebarLeft extends mixins(BaseMixin) {
     const latestConversations = this.$store.state.DataModule.conversations as InboxLog[];
     const last = latestConversations[latestConversations.length - 1].createdAt;
 
+    const filter = (this.$refs['filtersettings'] as FilterSettings).getFilter();
+
     await this.$store.dispatch('DataModule/appendLastConversations', {
-      appId: this.app.id,
+      ...filter,
       last,
     });
     this.lastConversationLoading = false;
