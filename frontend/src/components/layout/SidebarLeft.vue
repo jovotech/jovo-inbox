@@ -44,70 +44,7 @@
                 @select-conversation="selectConversation"
               ></user-conversation-list-item>
 
-              <li v-if="false">
-                <a
-                  href="#"
-                  class="group block hover:bg-gray-100 focus:bg-gray-200"
-                  :class="[isSelected(conversation) ? 'bg-gray-200' : '']"
-                >
-                  <div class="px-2 py-2 sm:px-3 n flex text-xs">
-                    <img
-                      v-if="getImage(conversation)"
-                      class="h-10 w-10 rounded-full ml-0.5 mr-0.5"
-                      :src="getImage(conversation)"
-                      :title="conversation.userId"
-                      alt=""
-                    />
-                    <span v-else class="h-auto w-14">
-                      <svg class="text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                        <path
-                          fill-rule="evenodd"
-                          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z"
-                          clip-rule="evenodd"
-                        />
-                      </svg>
-                    </span>
 
-                    <div class="w-full ml-2 mt-0.5">
-                      <div class="flex items-center justify-between">
-                        <p class="text-sm font-medium truncate" :title="conversation.userId">
-                          {{ getName(conversation) }}
-                        </p>
-                        <div class="mr-2.5 flex-shrink-0 flex">
-                          <p
-                            v-if="loadingConversation !== conversation.userId"
-                            class=" inline-flex text-xs leading-5 text-gray-400 group-hover:text-gray-500 group-focus:text-gray-600"
-                            :title="lastConversationItemDate(conversation, false)"
-                            :class="[isSelected(conversation) ? 'text-gray-600' : '']"
-                          >
-                            <span>
-                              <span
-                                v-if="isUserActive(conversation)"
-                                class="inline-block h-2 w-2 mr-0.5 rounded-full  bg-green-400"
-                              ></span>
-
-                              {{ lastConversationItemDate(conversation) }}</span
-                            >
-                          </p>
-                          <loading-spinner
-                            v-if="loadingConversation === conversation.userId"
-                          ></loading-spinner>
-                        </div>
-                      </div>
-                      <div class="mt-1q sm:flex sm:justify-between">
-                        <div class="sm:flex">
-                          <p
-                            class="flex items-center text-xs text-gray-400 group-hover:text-gray-500 group-focus:text-gray-600"
-                            :class="[isSelected(conversation) ? 'text-gray-600' : '']"
-                          >
-                            {{ lastConversationItemRequestText(conversation) }}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </a>
-              </li>
               <li
                 class="text-center justify-center items-center pt-2"
                 :class="[lastConversationLoading ? 'visible' : 'invisible']"
