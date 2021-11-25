@@ -22,7 +22,7 @@ export class ConversationalActionRequest extends JovoInboxPlatformRequest {
   }
 
   getPlainText(): string {
-    return '';
+    return this.getText().text;
   }
 
   hasAudioInterface(): boolean {
@@ -67,5 +67,9 @@ export class ConversationalActionRequest extends JovoInboxPlatformRequest {
       text: `Unspecified`,
     };
 
+  }
+
+  getNluPlain(): string | undefined {
+    return this.intent?.name
   }
 }

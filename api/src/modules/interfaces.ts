@@ -9,3 +9,11 @@ export interface AppConfig {
   id: string;
   connection: Partial<ConnectionOptions>;
 }
+
+export interface ExportInboxLog {
+  userId: string;
+  userSaid: string;
+  botSaid: string;
+  intent: string;
+  timestamp: string;
+}

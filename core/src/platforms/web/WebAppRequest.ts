@@ -18,7 +18,7 @@ export class WebAppRequest extends JovoInboxPlatformRequest {
   }
 
   getPlainText(): string {
-    return '';
+    return this.getText().text;
   }
 
   hasAudioInterface(): boolean {
@@ -50,6 +50,9 @@ export class WebAppRequest extends JovoInboxPlatformRequest {
       type: 'platform',
       text: `Unspecified`,
     };
+  }
 
+  getNluPlain(): string | undefined {
+    return;
   }
 }

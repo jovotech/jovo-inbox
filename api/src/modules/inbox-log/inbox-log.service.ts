@@ -2,15 +2,28 @@ import { Injectable } from '@nestjs/common';
 import { InboxLogEntity } from '../../entity/inbox-log.entity';
 import {
   GetLastConversationsDto,
+  InboxAlexa,
+  InboxConversationalActions,
+  InboxGoogleAssistant,
   InboxLog,
   InboxLogType,
+  InboxPlatform,
+  InboxWeb,
   SelectUserConversationsDto,
+  UserConversationsResponse,
 } from 'jovo-inbox-core';
-import { FindManyOptions, getRepository, MoreThan } from 'typeorm';
-import { UserConversationsResponse } from 'jovo-inbox-core/dist/UserConversationsResponse';
+import {
+  FindManyOptions,
+  getRepository,
+  LessThan,
+  MoreThan,
+  MoreThanOrEqual,
+} from 'typeorm';
 import { LOGS_PER_REQUEST } from '../../constants';
 import { connectionName } from '../../util';
 import { InboxLogUserEntity } from '../../entity/inbox-log-user.entity';
+import { ExportToCsv } from 'export-to-csv';
+import { ExportInboxLog } from '../interfaces';
 
 @Injectable()
 export class InboxLogService {
@@ -187,5 +200,97 @@ export class InboxLogService {
     const rawResult = await qb.getRawMany();
 
     return rawResult.map((item: { platform: string }) => item.platform);
+  }
+
+  async exportLogs(appId: string, from?: Date, to?: Date) {
+    const options: FindManyOptions<InboxLog> = {
+      where: {
+        appId,
+      },
+      order: {
+        userId: 'DESC',
+        id: 'ASC',
+      },
+    };
+
+    if (from) {
+      options.where['createdAt'] = MoreThanOrEqual(from);
+    }
+    if (to) {
+      options.where['createdAt'] = LessThan(to);
+    }
+    const logs = await getRepository(
+      InboxLogEntity,
+      connectionName(appId),
+    ).find(options);
+    return logs;
+  }
+
+  async exportLogsToCsv(appId: string, from?: Date, to?: Date) {
+    const logs = await this.exportLogs(appId, from, to);
+
+    const platforms: InboxPlatform[] = [
+      new InboxAlexa(),
+      new InboxConversationalActions(),
+      new InboxGoogleAssistant(),
+      new InboxWeb(),
+    ];
+
+    const options = {
+      fieldSeparator: ',',
+      quoteStrings: '"',
+      decimalSeparator: '.',
+      showLabels: true,
+      showTitle: true,
+      title: `Exported data: ${appId}`,
+      useTextFile: false,
+      useBom: true,
+      useKeysAsHeaders: true,
+    };
+
+    const csvExporter = new ExportToCsv(options);
+
+    const data: Partial<ExportInboxLog>[] = [];
+
+    let lastUser = '';
+    for (let i = 0; i < logs.length; i++) {
+      const log = logs[i];
+      const row: Partial<ExportInboxLog> = {};
+
+      // user id
+      if (lastUser !== log.userId) {
+        row.userId = log.userId;
+        lastUser = log.userId;
+      } else {
+        row.userId = '';
+      }
+
+      const platformRequest = InboxPlatform.getPlatformRequest(log, platforms);
+
+      // user said
+      row.userSaid = platformRequest ? platformRequest.getPlainText() : '';
+
+      const platformResponse = InboxPlatform.getPlatformResponse(
+        log,
+        platforms,
+      );
+
+      // bot said
+      row.botSaid = platformResponse
+        ? platformResponse
+            .getSpeechPlain()
+            .replace(/<[^>]*>?/gm, '')
+            .replace(/&nbsp;/g, ' ')
+        : '';
+      // intent
+      row.intent = platformResponse?.getNluPlain()
+        ? platformResponse?.getNluPlain()
+        : '';
+
+      row.timestamp = log.createdAt.toISOString();
+      data.push(row);
+    }
+
+    return csvExporter.generateCsv(data, true);
   }
 }

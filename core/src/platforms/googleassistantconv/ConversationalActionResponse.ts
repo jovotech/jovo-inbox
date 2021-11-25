@@ -52,10 +52,14 @@ export class ConversationalActionResponse extends JovoInboxPlatformResponse {
   }
 
   getSpeechPlain(): string | undefined {
-    return undefined;
+    return this.getSpeech().text;
   }
 
   hasSessionEnded(): boolean {
     return this.scene?.next?.name === 'actions.scene.END_CONVERSATION';
+  }
+
+  getNluPlain(): string | undefined {
+    return;
   }
 }

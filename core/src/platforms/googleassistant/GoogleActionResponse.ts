@@ -54,10 +54,13 @@ export class GoogleActionResponse extends JovoInboxPlatformResponse {
   }
 
   getSpeechPlain(): string | undefined {
-    return undefined;
+    return this.getSpeech().text;
   }
 
   hasSessionEnded(): boolean {
     return false; //TODO:
+  }
+  getNluPlain(): string | undefined {
+    return;
   }
 }

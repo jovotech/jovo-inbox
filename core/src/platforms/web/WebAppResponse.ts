@@ -70,12 +70,20 @@ export class WebAppResponse extends JovoInboxPlatformResponse {
   }
 
   getSpeechPlain(): string | undefined {
-    return undefined;
+    let text = '';
+
+    this.getOutput().forEach((out) =>  {
+      text += out.text + '\n\n';
+    })
+
+    return text.trim();
   }
 
   hasSessionEnded(): boolean {
     return false;
   }
 
-
+  getNluPlain(): string | undefined {
+    return this.context?.request?.nlu?.intent?.name;
+  }
 }

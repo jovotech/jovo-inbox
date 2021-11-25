@@ -90,7 +90,7 @@ export class AlexaResponse extends JovoInboxPlatformResponse {
   }
 
   getSpeechPlain(): string | undefined {
-    return undefined;
+    return this.getSpeech().text;
   }
 
   hasSessionEnded(): boolean {
@@ -100,7 +100,9 @@ export class AlexaResponse extends JovoInboxPlatformResponse {
   hasApl(): boolean {
     return !!this.response?.directives?.find((item: Directive) => item.type === 'Alexa.Presentation.APL.RenderDocument')
   }
-
+  getNluPlain(): string | undefined {
+    return;
+  }
 }
 
 
