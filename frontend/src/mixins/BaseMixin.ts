@@ -77,29 +77,14 @@ export class BaseMixin extends Vue {
   }
 
   getPlatformRequest(inboxLog: InboxLog): JovoInboxPlatformRequest | undefined {
-    for (let i = 0; i < this.platforms.length; i++) {
-      const platform = this.platforms[i];
-      const requestConstructor = platform.requestClass;
-      const request = new requestConstructor();
-      if (request && request.isPlatformRequest(inboxLog.payload)) {
-        return Object.assign(request, inboxLog.payload) as JovoInboxPlatformRequest;
-      }
-    }
+    return InboxPlatform.getPlatformRequest(inboxLog, this.platforms);
   }
   getPlatformImage(inboxLog: InboxLog) {
     return this.getPlatform(inboxLog)?.image64x64;
   }
 
   getPlatformResponse(inboxLog: InboxLog): JovoInboxPlatformResponse | undefined {
-    for (let i = 0; i < this.platforms.length; i++) {
-      const platform = this.platforms[i];
-      const responseConstructor = platform.responseClass;
-
-      const response = new responseConstructor();
-      if (response && response.isPlatformResponse(inboxLog.payload)) {
-        return Object.assign(response, inboxLog.payload) as JovoInboxPlatformResponse;
-      }
-    }
+    return InboxPlatform.getPlatformResponse(inboxLog, this.platforms);
   }
 
   get isLiveMode(): boolean {
