@@ -96,6 +96,19 @@ basic authentication
 
 
 
+### CSV Export
+
+Logs can be exported in csv format calling this api url: 
+
+`http://localhost:4000/api/inboxlog/export?appId=saas-fitness-topfit&from=2021-11-23&to2021-11-24`
+
+Available query params:
+* appId: App ID defined in `inbox.config.ts`
+* from: Timestamp `YYYY-MM-DD`
+* to: Timestamp `YYYY-MM-DD`
+
+Structure of the exported columns:
+`userId`, `userSaid`, `botSaid`, `intent`, `timestamp`
 
 
 
