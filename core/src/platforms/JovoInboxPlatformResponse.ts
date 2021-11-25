@@ -8,4 +8,5 @@ export abstract class JovoInboxPlatformResponse {
   abstract getRepromptPlain(): string | undefined;
   abstract hasSessionEnded(): boolean;
   abstract getOutput(): Out[];
+  abstract getNluPlain(): string | undefined;
 }

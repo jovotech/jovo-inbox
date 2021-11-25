@@ -13,4 +13,5 @@ export abstract class JovoInboxPlatformRequest {
   abstract hasVideoInterface(): boolean;
   abstract getPlainText(): string;
   abstract getText(): Out;
+  abstract getNluPlain(): string | undefined;
 }

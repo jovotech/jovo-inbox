@@ -15,7 +15,7 @@ export * from './platforms/JovoInboxPlatformRequest';
 
 export * from './platforms/googleassistantconv/InboxConversationalActions';
 export * from './platforms/googleassistantconv/ConversationalActionResponse';
-export * from './platforms/googleassistantconv/ConversationalActionResponse';
+export * from './platforms/googleassistantconv/ConversationalActionRequest';
 
 export * from './platforms/alexa/InboxAlexa';
 export * from './platforms/alexa/AlexaRequest';
@@ -28,3 +28,5 @@ export * from './platforms/googleassistant/GoogleActionResponse';
 export * from './platforms/web/InboxWeb';
 export * from './platforms/web/WebAppRequest';
 export * from './platforms/web/WebAppResponse';
+
+export * from './UserConversationsResponse';

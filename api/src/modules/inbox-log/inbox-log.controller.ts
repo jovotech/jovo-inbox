@@ -1,10 +1,18 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Header,
+  Param,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { InboxLogService } from './inbox-log.service';
 import {
   GetLastConversationsDto,
   SelectUserConversationsDto,
+  UserConversationsResponse,
 } from 'jovo-inbox-core';
-import { UserConversationsResponse } from 'jovo-inbox-core/dist/UserConversationsResponse';
 
 @Controller('inboxlog')
 export class InboxLogController {
@@ -29,5 +37,19 @@ export class InboxLogController {
   @Get('platform/:appId')
   getPlatforms(@Param('appId') appId: string): Promise<any> {
     return this.inboxLogService.getPlatforms(appId);
+  }
+
+  @Get('export')
+  @Header('Content-type', 'text/csv; charset=utf-8')
+  async exportLog(
+    @Query('appId') appId: string,
+    @Query('from') from: string,
+    @Query('to') to: string,
+  ) {
+    return this.inboxLogService.exportLogsToCsv(
+      appId,
+      from ? new Date(from) : undefined,
+      to ? new Date(to) : undefined,
+    );
   }
 }

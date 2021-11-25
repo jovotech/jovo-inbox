@@ -79,7 +79,7 @@ export class AlexaRequest extends JovoInboxPlatformRequest {
   }
 
   getPlainText(): string {
-    return '';
+    return this.getText().text;
   }
 
   hasAudioInterface(): boolean {
@@ -148,5 +148,15 @@ export class AlexaRequest extends JovoInboxPlatformRequest {
   }
   hasAPLInterface() {
     return typeof _get(this.getSupportedInterfaces(), 'Alexa.Presentation.APL') !== 'undefined';
+  }
+
+  getNluPlain(): string {
+    let text = this.request?.type || '';
+
+    if (this.request?.type === 'IntentRequest') {
+      text += ' ' + this.request.intent?.name;
+    }
+
+    return text;
   }
 }
