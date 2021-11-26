@@ -13,6 +13,7 @@ import {
   UserConversationsResponse,
 } from 'jovo-inbox-core';
 import {
+  Between,
   FindManyOptions,
   getRepository,
   LessThan,
@@ -203,27 +204,26 @@ export class InboxLogService {
   }
 
   async exportLogs(appId: string, from?: Date, to?: Date) {
+    if (!to) {
+      to = new Date();
+    }
+
     const options: FindManyOptions<InboxLog> = {
-      where: {
-        appId,
-      },
+      where: [
+        {
+          appId,
+          createdAt: Between(from, to),
+        },
+      ],
       order: {
         userId: 'DESC',
         id: 'ASC',
       },
     };
 
-    if (from) {
-      options.where['createdAt'] = MoreThanOrEqual(from);
-    }
-    if (to) {
-      options.where['createdAt'] = LessThan(to);
-    }
-    const logs = await getRepository(
-      InboxLogEntity,
-      connectionName(appId),
-    ).find(options);
-    return logs;
+    return await getRepository(InboxLogEntity, connectionName(appId)).find(
+      options,
+    );
   }
 
   async exportLogsToCsv(appId: string, from?: Date, to?: Date) {
