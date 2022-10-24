@@ -100,7 +100,7 @@ basic authentication
 
 Logs can be exported in csv format calling this api url: 
 
-`http://localhost:4000/api/inboxlog/export?appId=<APP_ID>&from=2021-11-23&to2021-11-24`
+`http://localhost:4000/api/inboxlog/export?appId=<APP_ID>&from=2021-11-23&to=2021-11-24`
 
 Available query params:
 * appId: App ID defined in `inbox.config.ts`
