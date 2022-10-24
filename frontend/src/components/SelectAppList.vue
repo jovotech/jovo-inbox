@@ -1,5 +1,5 @@
 <template>
-  <div class=" relative inline-block text-left w-full">
+  <div class="relative inline-block text-left w-full">
     <div>
       <button
         @click="open"

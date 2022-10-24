@@ -8,7 +8,7 @@ import {
   InboxLog,
   InboxLogType,
   InboxPlatform,
-  InboxWeb,
+  InboxWeb, InboxWebV4,
   SelectUserConversationsDto,
   UserConversationsResponse,
 } from 'jovo-inbox-core';
@@ -143,6 +143,7 @@ export class InboxLogService {
 
     foundLogs = foundLogs.concat(await qb.getMany());
 
+
     return foundLogs;
   }
   async getUserConversations(
@@ -234,6 +235,7 @@ export class InboxLogService {
       new InboxConversationalActions(),
       new InboxGoogleAssistant(),
       new InboxWeb(),
+      new InboxWebV4()
     ];
 
     const options = {
