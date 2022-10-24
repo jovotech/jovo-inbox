@@ -7,7 +7,7 @@ import {
   InboxLog,
   InboxLogType,
   InboxPlatform,
-  InboxWeb,
+  InboxWeb, InboxWebV4,
   JovoAppMetaData,
   JovoInboxPlatformRequest,
   JovoInboxPlatformResponse,
@@ -23,6 +23,7 @@ export class BaseMixin extends Vue {
     new InboxConversationalActions(),
     new InboxGoogleAssistant(),
     new InboxWeb(),
+      new InboxWebV4()
   ];
 
   createIcon(id: string, size = 20) {

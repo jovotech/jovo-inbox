@@ -29,4 +29,8 @@ export * from './platforms/web/InboxWeb';
 export * from './platforms/web/WebAppRequest';
 export * from './platforms/web/WebAppResponse';
 
+export * from './platforms/webV4/InboxWebV4';
+export * from './platforms/webV4/WebV4AppRequest';
+export * from './platforms/webV4/WebV4AppResponse';
+
 export * from './UserConversationsResponse';
