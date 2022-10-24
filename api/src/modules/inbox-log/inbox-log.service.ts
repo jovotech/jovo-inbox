@@ -143,7 +143,6 @@ export class InboxLogService {
 
     foundLogs = foundLogs.concat(await qb.getMany());
 
-    console.log(foundLogs)
 
     return foundLogs;
   }
