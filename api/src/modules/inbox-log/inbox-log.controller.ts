@@ -9,20 +9,34 @@ import {
 } from '@nestjs/common';
 import { InboxLogService } from './inbox-log.service';
 import {
+  AddInboxLogDto,
   GetLastConversationsDto,
   SelectUserConversationsDto,
   UserConversationsResponse,
 } from 'jovo-inbox-core';
+import { InboxLogEntity } from '../../entity/inbox-log.entity';
+import { getConnection } from 'typeorm';
 
-@Controller('inboxlog')
+@Controller('logs')
 export class InboxLogController {
   constructor(private readonly inboxLogService: InboxLogService) {}
 
   @Post()
-  getLastConversations(
-    @Body() getLastConversationsDto: GetLastConversationsDto,
-  ): Promise<any> {
-    return this.inboxLogService.getConversations(getLastConversationsDto);
+  async addInboxLog(
+    @Body() inboxLog: AddInboxLogDto | AddInboxLogDto[],
+  ): Promise<void> {
+    const logs = Array.isArray(inboxLog) ? inboxLog : [inboxLog];
+    await getConnection()
+      .createQueryBuilder()
+      .insert()
+      .into(InboxLogEntity)
+      .values(logs.map((log) => ({ ...log, createdAt: new Date() })))
+      .execute();
+  }
+
+  @Post('conversations')
+  getLastConversations(@Body() dto: GetLastConversationsDto): Promise<any> {
+    return this.inboxLogService.getConversations(dto);
   }
 
   @Post('user/conversation')
@@ -46,10 +60,11 @@ export class InboxLogController {
     @Query('from') from: string,
     @Query('to') to: string,
   ) {
-    return this.inboxLogService.exportLogsToCsv(
-      appId,
-      from ? new Date(from) : undefined,
-      to ? new Date(to) : undefined,
-    );
+    // TODO: temporary not useable
+    // return this.inboxLogService.exportLogsToCsv(
+    //   appId,
+    //   from ? new Date(from) : undefined,
+    //   to ? new Date(to) : undefined,
+    // );
   }
 }

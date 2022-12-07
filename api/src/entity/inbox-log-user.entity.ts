@@ -1,6 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column, Index } from 'typeorm';
-import { InboxLog, InboxLogType } from 'jovo-inbox-core';
-import { InboxLogUser } from 'jovo-inbox-core/dist/InboxLogUser';
+import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
+import { InboxLogUser } from 'jovo-inbox-core';
 
 @Entity({
   name: 'inboxlogusers',

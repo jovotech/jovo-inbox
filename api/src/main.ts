@@ -1,9 +1,9 @@
 import { NestFactory } from '@nestjs/core';
-require('dotenv').config();
 import { AppModule } from './app.module';
-import * as express from 'express';
-import * as path from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
+
+require('dotenv').config();
+
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   // important to define cors before basic-auth

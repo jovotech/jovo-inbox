@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import { JovoAppList } from 'jovo-inbox-core';
 import { JovoAppService } from './jovo-app.service';
 

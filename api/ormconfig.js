@@ -5,13 +5,14 @@ module.exports = {
   logging: false,
   logger: 'simple-console',
   // eslint-disable-next-line no-undef
-  host: process.env.INBOX_MYSQL_HOST,
+  host: process.env.MYSQL_HOST,
   port: 3306,
   // eslint-disable-next-line no-undef
-  username: process.env.INBOX_MYSQL_USER,
+  username: process.env.MYSQL_USER,
   // eslint-disable-next-line no-undef
-  password: process.env.INBOX_MYSQL_PASSWORD,
+  password: process.env.MYSQL_PASSWORD,
   // eslint-disable-next-line no-undef
-  database: process.env.INBOX_MYSQL_DATABASE,
-  entities: ['src/entity/**/*.ts'],
+  database: process.env.MYSQL_DATABASE,
+  entities: ['dist/**/*.entity{.ts,.js}'],
+  charset: 'utf8mb4_unicode_ci',
 };

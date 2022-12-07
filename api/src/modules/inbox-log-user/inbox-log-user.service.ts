@@ -17,7 +17,6 @@ import { InboxLogUserEntity } from '../../entity/inbox-log-user.entity';
 import { UploadedFile } from 'jovo-inbox-core/dist/UploadedFile';
 import * as fs from 'fs';
 import { InboxLogService } from '../inbox-log/inbox-log.service';
-import { connectionName } from '../../util';
 
 @Injectable()
 export class InboxLogUserService {
@@ -42,10 +41,7 @@ export class InboxLogUserService {
       };
     }
 
-    let user = await getRepository(
-      InboxLogUserEntity,
-      connectionName(dto.appId),
-    ).findOne(cond);
+    let user = await getRepository(InboxLogUserEntity).findOne(cond);
 
     if (!user) {
       user = new InboxLogUserEntity();
@@ -55,9 +51,7 @@ export class InboxLogUserService {
     user.name = dto.name;
     user.notes = dto.notes;
 
-    await getRepository(InboxLogUserEntity, connectionName(dto.appId)).save(
-      user,
-    );
+    await getRepository(InboxLogUserEntity).save(user);
     return user;
   }
 
@@ -77,10 +71,7 @@ export class InboxLogUserService {
       };
     }
 
-    const user = await getRepository(
-      InboxLogUserEntity,
-      connectionName(dto.appId),
-    ).findOne(cond);
+    const user = await getRepository(InboxLogUserEntity).findOne(cond);
 
     if (!user) {
       return {};
@@ -89,10 +80,7 @@ export class InboxLogUserService {
   }
 
   async getUserConversations(dto: Pick<GetInboxLogUserDto, 'id' | 'appId'>) {
-    const user = await getRepository(
-      InboxLogUserEntity,
-      connectionName(dto.appId),
-    ).findOne({
+    const user = await getRepository(InboxLogUserEntity).findOne({
       id: dto.id,
     });
 
@@ -109,7 +97,7 @@ export class InboxLogUserService {
   }
 
   async geAppUser(appId: string) {
-    return await getRepository(InboxLogUserEntity, connectionName(appId)).find({
+    return await getRepository(InboxLogUserEntity).find({
       where: {
         appId: appId,
       },
@@ -124,10 +112,7 @@ export class InboxLogUserService {
       throw new BadRequestException();
     }
 
-    let user = await getRepository(
-      InboxLogUserEntity,
-      connectionName(updateInboxLogUserDto.appId),
-    ).findOne({
+    let user = await getRepository(InboxLogUserEntity).findOne({
       where: {
         appId: updateInboxLogUserDto.appId,
         platformUserId: updateInboxLogUserDto.platformUserId,
@@ -142,10 +127,7 @@ export class InboxLogUserService {
     user.image =
       user.id + image.originalname.substr(image.originalname.indexOf('.'));
 
-    await getRepository(
-      InboxLogUserEntity,
-      connectionName(updateInboxLogUserDto.appId),
-    ).save(user);
+    await getRepository(InboxLogUserEntity).save(user);
 
     const filesDirectory = path.join(process.cwd(), 'public', 'images');
 
@@ -157,10 +139,7 @@ export class InboxLogUserService {
   }
 
   async deleteImage(deleteUserImageDto: DeleteUserImageDto) {
-    const user = await getRepository(
-      InboxLogUserEntity,
-      connectionName(deleteUserImageDto.appId),
-    ).findOne({
+    const user = await getRepository(InboxLogUserEntity).findOne({
       where: {
         id: deleteUserImageDto.jovoAppUserId,
       },
@@ -174,9 +153,6 @@ export class InboxLogUserService {
       fs.unlinkSync(filePath);
     }
     user.image = null;
-    await getRepository(
-      InboxLogUserEntity,
-      connectionName(deleteUserImageDto.appId),
-    ).save(user);
+    await getRepository(InboxLogUserEntity).save(user);
   }
 }

@@ -2,29 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { InboxLogEntity } from '../../entity/inbox-log.entity';
 import {
   GetLastConversationsDto,
-  InboxAlexa,
-  InboxConversationalActions,
-  InboxGoogleAssistant,
   InboxLog,
   InboxLogType,
-  InboxPlatform,
-  InboxWeb, InboxWebV4,
   SelectUserConversationsDto,
   UserConversationsResponse,
 } from 'jovo-inbox-core';
-import {
-  Between,
-  FindManyOptions,
-  getRepository,
-  LessThan,
-  MoreThan,
-  MoreThanOrEqual,
-} from 'typeorm';
+import { Between, FindManyOptions, getRepository, MoreThan } from 'typeorm';
 import { LOGS_PER_REQUEST } from '../../constants';
-import { connectionName } from '../../util';
 import { InboxLogUserEntity } from '../../entity/inbox-log-user.entity';
-import { ExportToCsv } from 'export-to-csv';
-import { ExportInboxLog } from '../interfaces';
 
 @Injectable()
 export class InboxLogService {
@@ -40,10 +25,9 @@ export class InboxLogService {
     let foundLogs = [];
 
     if (getLastConversationsDto.search) {
-      const qb1 = await getRepository(
-        InboxLogEntity,
-        connectionName(getLastConversationsDto.appId),
-      ).createQueryBuilder('inboxlog');
+      const qb1 = await getRepository(InboxLogEntity).createQueryBuilder(
+        'inboxlog',
+      );
 
       const mappingSubQuery = qb1
         .subQuery()
@@ -67,7 +51,7 @@ export class InboxLogService {
         .where('inboxlog.id IN ' + subQuery1.getQuery())
         .andWhere('appId = :appId')
 
-        .setParameter('type', InboxLogType.RESPONSE)
+        .setParameter('type', InboxLogType.Response)
         .setParameter('last', last)
         .setParameter('appId', getLastConversationsDto.appId)
         .orderBy('inboxlog.id', 'DESC');
@@ -82,10 +66,9 @@ export class InboxLogService {
 
     // search in logs
 
-    const qb = await getRepository(
-      InboxLogEntity,
-      connectionName(getLastConversationsDto.appId),
-    ).createQueryBuilder('inboxlog');
+    const qb = await getRepository(InboxLogEntity).createQueryBuilder(
+      'inboxlog',
+    );
     const subQuery = qb
       .subQuery()
       .select('MAX(id)')
@@ -94,7 +77,8 @@ export class InboxLogService {
       .andWhere('log.createdAt < :last')
 
       .andWhere('log.id NOT IN (:...foundMappingIds)', { foundMappingIds })
-      .groupBy('log.userId');
+      .groupBy('log.appId')
+      .addGroupBy('log.userId');
 
     if (getLastConversationsDto.search) {
       subQuery.andWhere('log.userId LIKE :userId', {
@@ -107,7 +91,7 @@ export class InboxLogService {
         .subQuery()
         .select('userId')
         .from(InboxLogEntity, 'log')
-        .where('log.type = :errortype', { errortype: InboxLogType.ERROR })
+        .where('log.type = :errortype', { errortype: InboxLogType.Error })
         .groupBy('log.userId');
 
       subQuery.andWhere('log.userId IN ' + errorsSubQuery.getQuery());
@@ -129,7 +113,7 @@ export class InboxLogService {
     qb.where('inboxlog.id IN ' + subQuery.getQuery())
       .andWhere('appId = :appId')
       .andWhere('inboxlog.createdAt < :last')
-      .setParameter('type', InboxLogType.RESPONSE)
+      .setParameter('type', InboxLogType.Response)
       .setParameter('last', last)
       .setParameter('appId', getLastConversationsDto.appId)
       .orderBy('inboxlog.id', 'DESC')
@@ -142,7 +126,6 @@ export class InboxLogService {
     }
 
     foundLogs = foundLogs.concat(await qb.getMany());
-
 
     return foundLogs;
   }
@@ -170,10 +153,7 @@ export class InboxLogService {
       conditions.where.id = MoreThan(selectUserConversationsDto.lastId);
     }
 
-    const result = await getRepository(
-      InboxLogEntity,
-      connectionName(selectUserConversationsDto.appId),
-    ).findAndCount(conditions);
+    const result = await getRepository(InboxLogEntity).findAndCount(conditions);
 
     // time of last item in pagination
     const last =
@@ -188,10 +168,7 @@ export class InboxLogService {
   }
 
   async getPlatforms(appId: string) {
-    const qb = getRepository(
-      InboxLogEntity,
-      connectionName(appId),
-    ).createQueryBuilder('inboxlog');
+    const qb = getRepository(InboxLogEntity).createQueryBuilder('inboxlog');
 
     qb.select('platform')
       .where('appId = :appId')
@@ -222,77 +199,70 @@ export class InboxLogService {
       },
     };
 
-    return await getRepository(InboxLogEntity, connectionName(appId)).find(
-      options,
-    );
+    return await getRepository(InboxLogEntity).find(options);
   }
 
-  async exportLogsToCsv(appId: string, from?: Date, to?: Date) {
-    const logs = await this.exportLogs(appId, from, to);
-
-    const platforms: InboxPlatform[] = [
-      new InboxAlexa(),
-      new InboxConversationalActions(),
-      new InboxGoogleAssistant(),
-      new InboxWeb(),
-      new InboxWebV4()
-    ];
-
-    const options = {
-      fieldSeparator: ',',
-      quoteStrings: '"',
-      decimalSeparator: '.',
-      showLabels: true,
-      showTitle: true,
-      title: `Exported data: ${appId}`,
-      useTextFile: false,
-      useBom: true,
-      useKeysAsHeaders: true,
-    };
-
-    const csvExporter = new ExportToCsv(options);
-
-    const data: Partial<ExportInboxLog>[] = [];
-
-    let lastUser = '';
-    for (let i = 0; i < logs.length; i++) {
-      const log = logs[i];
-      const row: Partial<ExportInboxLog> = {};
-
-      // user id
-      if (lastUser !== log.userId) {
-        row.userId = log.userId;
-        lastUser = log.userId;
-      } else {
-        row.userId = '';
-      }
-
-      const platformRequest = InboxPlatform.getPlatformRequest(log, platforms);
-
-      // user said
-      row.userSaid = platformRequest ? platformRequest.getPlainText() : '';
-
-      const platformResponse = InboxPlatform.getPlatformResponse(
-        log,
-        platforms,
-      );
-
-      // bot said
-      row.botSaid = platformResponse
-        ? platformResponse
-            .getSpeechPlain()
-            .replace(/<[^>]*>?/gm, '')
-            .replace(/&nbsp;/g, ' ')
-        : '';
-      // intent
-      row.intent = platformResponse?.getNluPlain()
-        ? platformResponse?.getNluPlain()
-        : '';
-
-      row.timestamp = log.createdAt.toISOString();
-      data.push(row);
-    }
-
-    return csvExporter.generateCsv(data, true);
-  }
+  // async exportLogsToCsv(appId: string, from?: Date, to?: Date) {
+  //   const logs = await this.exportLogs(appId, from, to);
+  //
+  //   const platforms: InboxPlatform[] = [
+  //   ];
+  //
+  //   const options = {
+  //     fieldSeparator: ',',
+  //     quoteStrings: '"',
+  //     decimalSeparator: '.',
+  //     showLabels: true,
+  //     showTitle: true,
+  //     title: `Exported data: ${appId}`,
+  //     useTextFile: false,
+  //     useBom: true,
+  //     useKeysAsHeaders: true,
+  //   };
+  //
+  //   const csvExporter = new ExportToCsv(options);
+  //
+  //   const data: Partial<ExportInboxLog>[] = [];
+  //
+  //   let lastUser = '';
+  //   for (let i = 0; i < logs.length; i++) {
+  //     const log = logs[i];
+  //     const row: Partial<ExportInboxLog> = {};
+  //
+  //     // user id
+  //     if (lastUser !== log.userId) {
+  //       row.userId = log.userId;
+  //       lastUser = log.userId;
+  //     } else {
+  //       row.userId = '';
+  //     }
+  //
+  //     const platformRequest = InboxPlatform.getPlatformRequest(log, platforms);
+  //
+  //     // user said
+  //     row.userSaid = platformRequest ? platformRequest.getPlainText() : '';
+  //
+  //     const platformResponse = InboxPlatform.getPlatformResponse(
+  //       log,
+  //       platforms,
+  //     );
+  //
+  //     // bot said
+  //     row.botSaid = platformResponse
+  //       ? platformResponse
+  //           .getSpeechPlain()
+  //           .replace(/<[^>]*>?/gm, '')
+  //           .replace(/&nbsp;/g, ' ')
+  //       : '';
+  //     // intent
+  //     row.intent = platformResponse?.getNluPlain()
+  //       ? platformResponse?.getNluPlain()
+  //       : '';
+  //
+  //     row.timestamp = log.createdAt.toISOString();
+  //     data.push(row);
+  //   }
+  //
+  //   return csvExporter.generateCsv(data, true);
+  // }
 }
