@@ -1,31 +1,12 @@
 import { Component, Vue } from 'vue-property-decorator';
 import { DisplayHelper } from '@/utils/DisplayHelper';
-import {
-  InboxAlexa,
-  InboxConversationalActions,
-  InboxGoogleAssistant,
-  InboxLog,
-  InboxLogType,
-  InboxPlatform,
-  InboxWeb, InboxWebV4,
-  JovoAppMetaData,
-  JovoInboxPlatformRequest,
-  JovoInboxPlatformResponse,
-} from 'jovo-inbox-core';
+import { InboxLog, Interaction, JovoAppMetaData, Session } from 'jovo-inbox-core';
 import { FormatUtil } from '@/utils/FormatUtil';
-import { API_BASE_URL } from '@/constants';
+import { API_BASE_URL, PLATFORMS } from '@/constants';
+import { OutputTemplate, OutputTemplateConverter } from '@jovotech/framework';
 
 @Component
 export class BaseMixin extends Vue {
-  // TODO:
-  platforms: InboxPlatform[] = [
-    new InboxAlexa(),
-    new InboxConversationalActions(),
-    new InboxGoogleAssistant(),
-    new InboxWeb(),
-      new InboxWebV4()
-  ];
-
   createIcon(id: string, size = 20) {
     return DisplayHelper.toDisplayIcon(id, {
       size,
@@ -49,6 +30,64 @@ export class BaseMixin extends Vue {
     return this.$store.state.DataModule.selectedUserConversations;
   }
 
+  get selectedInteraction(): Interaction | null {
+    return this.$store.state.DataModule.selectedInteraction;
+  }
+
+  get interactions() {
+    const interactions: Record<string, Interaction> = {};
+
+    const isSessionStart = (index: number) => {
+      return (
+        index === 0 ||
+        this.selectedConversation[index - 1].sessionId !==
+          this.selectedConversation[index].sessionId
+      );
+    };
+
+    for (let i = 0; i < this.selectedConversation.length; i++) {
+      const conversation = this.selectedConversation[i];
+
+      if (!interactions[conversation.requestId]) {
+        interactions[conversation.requestId] = {
+          requestId: conversation.requestId,
+          logs: [],
+          start: new Date(conversation.createdAt),
+          hasSessionStarted: isSessionStart(i),
+        };
+      }
+      interactions[conversation.requestId].logs.push(conversation);
+    }
+
+    // sort turns by turnStart
+    return Object.values(interactions).sort((a, b) => {
+      return a.start.getTime() - b.start.getTime();
+    });
+  }
+
+  get sessions() {
+    const sessions: Record<string, Session> = {};
+
+    for (let i = 0; i < this.interactions.length; i++) {
+      const turn = this.interactions[i];
+      const firstSessionLog = turn.logs[0];
+
+      if (!sessions[firstSessionLog.sessionId]) {
+        sessions[firstSessionLog.sessionId] = {
+          sessionId: firstSessionLog.sessionId,
+          sessionStart: new Date(turn.logs[0].createdAt),
+          interactions: [],
+        };
+      }
+      sessions[firstSessionLog.sessionId].interactions.push(turn);
+    }
+
+    // sort turns by turnStart
+    return Object.values(sessions).sort((a, b) => {
+      return a.sessionStart.getTime() - b.sessionStart.getTime();
+    });
+  }
+
   get app(): JovoAppMetaData {
     return this.$store.state.DataModule.selectedApp;
   }
@@ -57,35 +96,103 @@ export class BaseMixin extends Vue {
     return this.$store.state.DataModule.apps;
   }
 
-  getPlatform(inboxLog: InboxLog): InboxPlatform | undefined {
-    for (let i = 0; i < this.platforms.length; i++) {
-      const platform = this.platforms[i];
-      const requestConstructor = platform.requestClass;
-      const request = new requestConstructor();
+  // getPlatform(inboxLog: InboxLog): InboxPlatform | undefined {
+  //   for (let i = 0; i < this.platforms.length; i++) {
+  //     const platform = this.platforms[i];
+  //     const requestConstructor = platform.requestClass;
+  //     const request = new requestConstructor();
+  //
+  //     const responseConstructor = platform.responseClass;
+  //     const response = new responseConstructor();
+  //
+  //     if (inboxLog.type === InboxLogType.Request && request.isPlatformRequest(inboxLog.payload)) {
+  //       return platform;
+  //     } else if (
+  //       inboxLog.type === InboxLogType.Response &&
+  //       response.isPlatformResponse(inboxLog.payload)
+  //     ) {
+  //       return platform;
+  //     }
+  //   }
+  // }
 
-      const responseConstructor = platform.responseClass;
-      const response = new responseConstructor();
+  getResponsePlatform(inboxLog: InboxLog) {
+    return PLATFORMS.find((platform) =>
+      Array.isArray(inboxLog.payload)
+        ? inboxLog.payload.every((res) => platform.isResponseRelated(res))
+        : platform.isResponseRelated(inboxLog.payload),
+    );
+  }
 
-      if (inboxLog.type === InboxLogType.REQUEST && request.isPlatformRequest(inboxLog.payload)) {
-        return platform;
-      } else if (
-        inboxLog.type === InboxLogType.RESPONSE &&
-        response.isPlatformResponse(inboxLog.payload)
-      ) {
-        return platform;
+  getRequestPlatform(inboxLog: InboxLog) {
+    return PLATFORMS.find((platform) =>
+      Array.isArray(inboxLog.payload)
+        ? inboxLog.payload.every((req) => platform.isRequestRelated(req))
+        : platform.isRequestRelated(inboxLog.payload),
+    );
+  }
+
+  async getPlatformResponseOutputTemplate(inboxLog: InboxLog): Promise<OutputTemplate[]> {
+    const platform = this.getResponsePlatform(inboxLog);
+    if (platform) {
+      const outputTemplateConverter = new OutputTemplateConverter(
+        platform.outputTemplateConverterStrategy,
+      );
+      const output = await outputTemplateConverter.fromResponse(inboxLog.payload);
+
+      if (Array.isArray(output)) {
+        return output;
       }
+      return [output];
+    }
+
+    return [];
+  }
+
+  getOutputText(output: OutputTemplate): string {
+    if (typeof output.message === 'string') {
+      return output.message;
+    }
+
+    if (Array.isArray(output.message)) {
+      return output.message.join(' ');
+    }
+
+    return output.message?.text || this.removeSSML(output.message!.speech || '');
+  }
+
+  removeSSML(ssml: string): string {
+    return ssml.replace(/<[^>]*>/g, '');
+  }
+
+  formatMessage(str: string) {
+    return FormatUtil.formatMessage(str);
+  }
+
+  getPlatformRequest(inboxLog: InboxLog) {
+    const platform = this.getRequestPlatform(inboxLog);
+
+    if (platform) {
+      const platformRequest = platform.createRequestInstance(inboxLog.payload);
+
+      const requestIntent = platformRequest.getIntent();
+      const requestIntentName =
+        typeof requestIntent === 'string' ? requestIntent : requestIntent?.name;
+      const text =
+        platformRequest.getInputText() ||
+        requestIntentName ||
+        (platformRequest.getInputType() as string | undefined) ||
+        '<Unknown>';
+
+      return {
+        type: 'user',
+        text: text,
+      };
     }
   }
 
-  getPlatformRequest(inboxLog: InboxLog): JovoInboxPlatformRequest | undefined {
-    return InboxPlatform.getPlatformRequest(inboxLog, this.platforms);
-  }
-  getPlatformImage(inboxLog: InboxLog) {
-    return this.getPlatform(inboxLog)?.image64x64;
-  }
-
-  getPlatformResponse(inboxLog: InboxLog): JovoInboxPlatformResponse | undefined {
-    return InboxPlatform.getPlatformResponse(inboxLog, this.platforms);
+  get selectedConversation(): InboxLog[] {
+    return this.$store.state.DataModule.selectedUserConversations;
   }
 
   get isLiveMode(): boolean {

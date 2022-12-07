@@ -1,30 +1,48 @@
 const webpack = require('webpack');
 const path = require('path');
+
+const ignoreJovoCliPlugin = new webpack.IgnorePlugin({
+  resourceRegExp: /.\/cli$/,
+  contextRegExp: /@jovotech[/\\]platform-\w+[/\\]dist[/\\]\w+$/,
+});
+
+const externals = {
+  '@jest/globals': 'var {}',
+  // 'axios': 'var {}',
+  'google-auth-library': 'var { JWT: function JWT() {} }',
+  'i18next': 'var {}',
+  'json-colorizer': 'var () => {}',
+  'lodash.clonedeep': 'var () => {}',
+  'lodash.unset': 'var () => {}',
+  './GoogleAssistantRepromptComponent': 'var {}',
+  './JovoLogger': 'var { JovoLogger: function JovoLogger() {} }',
+};
+
 module.exports = {
   parallel: false,
   outputDir: './../api/public/client',
   chainWebpack: (config) => {
     config.resolve.symlinks(false);
-
-    // config.module
-    //   .rule('ts')
-    //   .use('ts-loader')
-    //   .loader('ts-loader')
-    //   .tap((options) => {
-    //     options.transpileOnly = false;
-    //     return options;
-    //   });
-    //
-    // config.module
-    //   .rule('tsx')
-    //   .use('ts-loader')
-    //   .loader('ts-loader')
-    //   .tap((options) => {
-    //     options.transpileOnly = false;
-    //     return opti2ons;
-    //   });
   },
-  configureWebpack: {},
+  configureWebpack:
+    process.env.NODE_ENV === 'production'
+      ? {
+          plugins: [
+            ignoreJovoCliPlugin,
+            new webpack.IgnorePlugin({
+              resourceRegExp: /.*(JovoProxy|BaseOutput|BaseComponent)$/,
+            }),
+          ],
+          externals: {
+            ...externals,
+            './GoogleAssistantRepromptComponent': 'var {}',
+          },
+        }
+      : {
+          devtool: 'inline-source-map',
+          plugins: [ignoreJovoCliPlugin],
+          externals: externals,
+        },
   css: {
     loaderOptions: {
       postcss: {

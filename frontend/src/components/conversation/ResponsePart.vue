@@ -1,22 +1,30 @@
 <template>
   <div ref="response" class="inline-flex flex-col max-w-3/4">
-    <div class="flex items-center justify-center flex-shrink-0">
+    <div class="flex items-start justify-center flex-shrink-0">
       <div class="flex flex-col">
         <div
-          v-for="response in responses"
-          v-bind:key="response.text"
-          class=" py-2 px-4 inline text-sm bg-white self-end text-gray-800 rounded-xl mb-2"
+          v-for="(out, index) in output"
+          v-bind:key="index"
+          class="py-2 px-4 inline self-end text-gray-800 rounded-xl mb-2 inline-flex px-4 py-2 rounded-xl text-sm bg-white shadow-sm"
         >
           <p
-            :class="[response.type === 'Action' ? 'italic' : '']"
             class="font-sans leading-6 whitespace-pre-wrap"
-            v-html="$sanitize(formatMessage(response.text))"
+            v-html="formatMessage(getOutputText(out))"
           ></p>
+        </div>
+        <div class="pl-2">
+          <span
+            v-for="quickreply in quickReplies"
+            v-bind:key="quickreply"
+            class="quick-reply-display inline-flex items-center border shadow-sm ml-auto rounded-full border-transparent text-gray-700 bg-gray-200 px-4 py-2 text-sm rounded-md mr-2"
+          >
+            {{ quickreply }}
+          </span>
         </div>
       </div>
 
       <div
-        class="rounded-full h-10 w-12  flex ml-1.5 text-center items-center justify-center flex-shrink-0"
+        class="rounded-full h-10 w-12 flex ml-1.5 text-center items-center justify-center flex-shrink-0"
       >
         <img class="h-8 w-8 flex-shrink-0" :src="platformImage" />
       </div>
@@ -27,14 +35,15 @@
 <script lang="ts">
 import DetailConversationPart from '@/components/conversation/DetailConversationPart.vue';
 import ScreenConversationPart from '@/components/conversation/ScreenConversationPart.vue';
-import { InboxLog, JovoInboxPlatformResponse } from 'jovo-inbox-core';
+import { InboxLog } from 'jovo-inbox-core';
 import { ChevronDownIcon, ChevronUpIcon, CodeIcon, MonitorIcon, UserIcon } from 'vue-feather-icons';
 import { Component, Prop, Watch } from 'vue-property-decorator';
 import Plyr from 'plyr';
 import 'plyr/src/sass/plyr.scss';
-import { FormatUtil } from '@/utils/FormatUtil';
 import { BaseMixin } from '@/mixins/BaseMixin';
 import { mixins } from 'vue-class-component';
+import { OutputTemplate } from '@jovotech/framework';
+import { getPlatformLogo } from '@/util';
 
 @Component({
   name: 'response-part',
@@ -52,33 +61,35 @@ export default class ResponsePart extends mixins(BaseMixin) {
   @Prop({ required: true, type: Object })
   part!: InboxLog;
 
-  platformResponse?: JovoInboxPlatformResponse;
+  output: OutputTemplate[] = [];
 
-  mounted() {
+  async mounted() {
     this.initPlyrPlayer();
+
+    this.output = await this.getPlatformResponseOutputTemplate(this.part);
   }
 
   @Watch('part')
-  watchPart() {
-    this.$nextTick(() => {
-      this.initPlyrPlayer();
+  async watchPart() {
+    this.$nextTick(async () => {
+      // this.initPlyrPlayer();
     });
   }
 
-  get responses() {
-    this.platformResponse = this.getPlatformResponse(this.part);
-    if (this.platformResponse) {
-      return this.platformResponse.getOutput();
-    }
-    return [];
-  }
-
   get platformImage() {
-    return this.getPlatform(this.part)?.image64x64;
+    return getPlatformLogo(this.part.platform);
   }
 
-  formatMessage(str: string) {
-    return FormatUtil.formatMessage(str);
+  get quickReplies() {
+    const quickReplies = [];
+
+    for (const output of this.output) {
+      if (output.quickReplies) {
+        quickReplies.push(...output.quickReplies);
+      }
+    }
+
+    return quickReplies;
   }
 
   initPlyrPlayer() {

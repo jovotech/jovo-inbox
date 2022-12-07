@@ -1,7 +1,10 @@
 <template>
-  <li @click="$emit('select-conversation', part)">
-    <a
-      href="#"
+  <li>
+    <router-link
+      :to="{
+        name: 'conversation',
+        params: { appId: app.id, userId: part.userId },
+      }"
       class="group block hover:bg-gray-100 focus:bg-gray-200"
       :class="[isSelected(part) ? 'bg-gray-200' : '']"
     >
@@ -31,14 +34,14 @@
             <div class="mr-2.5 flex-shrink-0 flex">
               <p
                 v-if="loadingConversation !== part.userId"
-                class=" inline-flex text-xs leading-5 text-gray-400 group-hover:text-gray-500 group-focus:text-gray-600"
+                class="inline-flex text-xs leading-5 text-gray-400 group-hover:text-gray-500 group-focus:text-gray-600"
                 :title="lastConversationItemDate(part, false)"
                 :class="[isSelected(part) ? 'text-gray-600' : '']"
               >
                 <span>
                   <span
                     v-if="isUserActive(part)"
-                    class="inline-block h-2 w-2 mr-0.5 rounded-full  bg-green-400"
+                    class="inline-block h-2 w-2 mr-0.5 rounded-full bg-green-400"
                   ></span>
 
                   {{ lastConversationItemDate(part) }}</span
@@ -53,13 +56,13 @@
                 class="flex items-center text-xs text-gray-400 group-hover:text-gray-500 group-focus:text-gray-600"
                 :class="[isSelected(part) ? 'text-gray-600' : '']"
               >
-                {{ lastConversationItemRequestText(part) }}
+                {{ lastConversationItemRequestText }}
               </p>
             </div>
           </div>
         </div>
       </div>
-    </a>
+    </router-link>
   </li>
 </template>
 
@@ -69,7 +72,6 @@ import { Prop } from 'vue-property-decorator';
 import { InboxLog } from 'jovo-inbox-core';
 import { BaseMixin } from '@/mixins/BaseMixin';
 import { FormatUtil } from '@/utils/FormatUtil';
-import dayjs from 'dayjs';
 import LoadingSpinner from '@/components/layout/partials/LoadingSpinner.vue';
 
 @Component({
@@ -82,6 +84,13 @@ export default class UserConversationListItem extends mixins(BaseMixin) {
   @Prop({ type: String })
   loadingConversation!: string;
 
+  lastConversationItemRequestText = '';
+
+  async mounted() {
+    this.lastConversationItemRequestText = await this.retrieveLastConversationItemRequestText(
+      this.part,
+    );
+  }
   isSelected(inboxLog: InboxLog) {
     const selectedConversations = this.$store.state.DataModule.selectedUserConversations;
     if (!selectedConversations || selectedConversations.length === 0) {
@@ -104,15 +113,16 @@ export default class UserConversationListItem extends mixins(BaseMixin) {
     return FormatUtil.formatDate(inboxLog.createdAt, simple);
   }
 
-  lastConversationItemRequestText(log: InboxLog) {
-    const platformResponse = this.getPlatformResponse(log);
-    if (platformResponse) {
-      const out = platformResponse.getOutput();
-      const str = FormatUtil.formatMessageSimple(out[out.length - 1].text);
+  async retrieveLastConversationItemRequestText(log: InboxLog) {
+    const outputTemplate = await this.getPlatformResponseOutputTemplate(log);
+    if (outputTemplate && outputTemplate.length > 0) {
+      const lastOutput = outputTemplate[outputTemplate.length - 1];
 
+      const str = this.getOutputText(lastOutput);
       if (str.length > 30) {
         return str.substring(0, 30) + '...';
       }
+
       return str;
     }
 
@@ -123,12 +133,12 @@ export default class UserConversationListItem extends mixins(BaseMixin) {
     if (!this.isLiveMode) {
       return false;
     }
-    const platformResponse = this.getPlatformResponse(log);
-    if (platformResponse) {
-      const logCreatedAt = dayjs(log.createdAt);
-      const nowMinus5Minutes = dayjs().subtract(5, 'minute');
-      return !platformResponse.hasSessionEnded() && logCreatedAt.isAfter(nowMinus5Minutes);
-    }
+    // const platformResponse = this.getRequestPlatform(log);
+    // if (platformResponse) {
+    //   const logCreatedAt = dayjs(log.createdAt);
+    //   const nowMinus5Minutes = dayjs().subtract(5, 'minute');
+    //   return !platformResponse.hasSessionEnded() && logCreatedAt.isAfter(nowMinus5Minutes);
+    // }
 
     return false;
   }

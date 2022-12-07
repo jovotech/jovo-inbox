@@ -7,8 +7,8 @@
     @mouseleave="isContentHovered = false"
   >
     <!-- Start main area-->
-    <div class="inset-0 mt-2 px-0  bg-gray-100" v-if="selectedConversation.length > 0">
-      <div class="h-full  rounded-lg">
+    <div class="inset-0 mt-2 px-0 bg-gray-100" v-if="selectedConversation.length > 0">
+      <div class="h-full rounded-lg">
         <div class="text-center">
           <div class="sm:hidden">
             <label for="tabs" class="sr-only">Select a tab</label>
@@ -17,36 +17,40 @@
               name="tabs"
               class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
             >
-              <option :selected="selectedTab === 'all_interactions'">All Interactions</option>
-              <option :selected="selectedTab === 'sessions'">Sessions</option>
+              <option :selected="$route.name === 'conversation'">All Interactions</option>
+              <option :selected="$route.name === 'sessions'">Sessions</option>
             </select>
           </div>
           <div class="hidden sm:block">
             <div class="border-b border-gray-200">
               <nav class="-mb-px flex space-x-8 justify-center" aria-label="Tabs">
-                <a
-                  href="#"
-                  @click="selectedTab = 'all_interactions'"
+                <router-link
+                  :to="{
+                    name: 'conversation',
+                    params: { appId: app.id, userId: selectedConversation[0].userId },
+                  }"
                   aria-current="page"
                   class="text-jovo-blue hover:text-jovo-blue hover:border-jovo-blue whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
                   :class="[
-                    selectedTab === 'all_interactions' ? 'border-jovo-blue' : 'border-transparent',
+                    $route.name === 'conversation' ? 'border-jovo-blue' : 'border-transparent',
                   ]"
                 >
                   All interactions
-                </a>
-                <a
-                  href="#"
-                  @click="selectedTab = 'sessions'"
+                </router-link>
+                <router-link
+                  :to="{
+                    name: 'sessions',
+                    params: { appId: app.id, userId: selectedConversation[0].userId },
+                  }"
                   class="text-gray-500 hover:text-jovo-blue hover:border-jovo-blue whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
-                  :class="[selectedTab === 'sessions' ? 'border-jovo-blue' : 'border-transparent']"
+                  :class="[$route.name === 'sessions' ? 'border-jovo-blue' : 'border-transparent']"
                 >
                   Sessions
                   <span
                     class="inline-flex items-center justify-center px-1 py-0.5 mr-2 text-xs font-bold leading-none text-gray-500 bg-gray-200 rounded"
-                    >{{ sessionsCount }}</span
+                    >{{ sessions.length }}</span
                   >
-                </a>
+                </router-link>
                 <!-- Current: "border-indigo-500 text-indigo-600", Default: "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300" -->
               </nav>
             </div>
@@ -56,73 +60,46 @@
     </div>
     <div
       v-if="!loading"
-      class="ml-auto overflow-y-auto h-screen font-medium  space-y-4 overflow-y-scroll px-32 pt-10 pb-36"
+      class="ml-auto overflow-y-auto h-screen font-medium space-y-4 overflow-y-scroll px-32 pt-10 pb-36"
       ref="partContainer"
       :class="[isContentHovered ? 'scrollbar' : 'scrollbar-invisible']"
     >
-      <div v-for="(part, index) in selectedConversation" :key="index">
-        <div
-          v-if="isSessionStart(index)"
-          class="text-center mb-16"
-          :title="sessionStart(index)"
-          @click="expandSession(index)"
-        >
+      <div v-for="session in sessions" v-bind:key="session.sessionId">
+        <div>
           <div class="my-4 mt-12 mx-auto w-4/5 new-session">
-            <span class="bg-gray-100 ">{{ newSessionDate(sessionStart(index)) }}</span>
+            <span class="bg-gray-100">{{ newSessionDate(session.sessionStart) }}</span>
           </div>
-          <div v-if="selectedTab === 'sessions'" class="text-center mb-4">
+          <div
+            class="text-center"
+            v-if="$route.name === 'sessions'"
+            @click="expandSession(session.sessionId)"
+          >
             <span
               class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-200 text-gray-800 mx-1"
             >
-              {{ getSessionInteractions(index) }} interactions
+              {{ session.interactions.length }} interactions
             </span>
-            <span
-              class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-200 text-gray-800 mx-1"
-            >
-              <img class="h-2 w-2 mr-1" :src="getSessionDevice(index).image" />
-              {{ getSessionDevice(index).name }}
-            </span>
-
-            <span
-              v-if="getSessionErrors(index) > 0"
-              class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800 mx-1"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                aria-hidden="true"
-                class="h-2 w-2 mr-1 text-red-400"
-              >
-                <path
-                  fill-rule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                  clip-rule="evenodd"
-                ></path>
-              </svg>
-              has errors
-            </span>
-
             <span class="text-center">
               <chevron-down-icon
+                v-if="!expandedSessions[session.sessionId]"
                 size="14"
-                v-if="!expandedSessions[part.sessionId]"
                 class="inline cursor-pointer"
               ></chevron-down-icon>
               <chevron-up-icon size="14" v-else class="inline cursor-pointer"></chevron-up-icon>
             </span>
           </div>
         </div>
-        <conversation-part
-          v-if="selectedTab === 'all_interactions' || expandedSessions[part.sessionId]"
-          :part="part"
-          :selectedConversation="selectedConversation"
-          :index="index"
-          class="mb-12"
-        />
+
+        <div v-if="$route.name === 'conversation' || expandedSessions[session.sessionId]">
+          <interaction-item
+            v-for="interaction in session.interactions"
+            v-bind:key="interaction.requestId"
+            :interaction="interaction"
+          />
+        </div>
       </div>
     </div>
-    <detail-conversation-part></detail-conversation-part>
+    <!--    <detail-conversation-part></detail-conversation-part>-->
     <!-- End main area -->
   </main>
 </template>
@@ -130,77 +107,57 @@
 <script lang="ts">
 import { Component, Watch } from 'vue-property-decorator';
 import ConversationPart from '@/components/conversation/ConversationPart.vue';
-import { InboxLog, InboxLogType, SelectUserConversationsDto } from 'jovo-inbox-core';
+import { SelectUserConversationsDto } from 'jovo-inbox-core';
 import DetailConversationPart from '@/components/conversation/DetailConversationPart.vue';
 import { mixins } from 'vue-class-component';
 import { BaseMixin } from '@/mixins/BaseMixin';
 import { FormatUtil } from '@/utils/FormatUtil';
 import { ChevronDownIcon, ChevronUpIcon } from 'vue-feather-icons';
-
-enum Tabs {
-  ALL_INTERACTIONS = 'all_interactions',
-  SESSIONS = 'sessions',
-}
+import UserSessions from '@/components/conversation/UserSessions.vue';
+import RequestPart from '@/components/conversation/RequestPart.vue';
+import ResponsePart from '@/components/conversation/ResponsePart.vue';
+import InteractionItem from '@/components/conversation/InteractionItem.vue';
 
 @Component({
   name: 'main-panel',
-  components: { ConversationPart, DetailConversationPart, ChevronDownIcon, ChevronUpIcon },
+  components: {
+    InteractionItem,
+    ResponsePart,
+    RequestPart,
+    UserSessions,
+    ConversationPart,
+    DetailConversationPart,
+    ChevronDownIcon,
+    ChevronUpIcon,
+  },
 })
 export default class MainPanel extends mixins(BaseMixin) {
   loading = false;
   isContentHovered = false;
-  sessionsCount = 0;
-
-  selectedTab = Tabs.ALL_INTERACTIONS;
 
   interval?: number;
   expandedSessions: Record<string, boolean> = {};
 
-  get selectedConversation(): InboxLog[] {
-    return this.$store.state.DataModule.selectedUserConversations;
-  }
-
-  isSessionStart(index: number) {
-    return (
-      index === 0 ||
-      this.selectedConversation[index - 1].sessionId !== this.selectedConversation[index].sessionId
-    );
-  }
-
   mounted() {
-    this.countSessions();
+    this.onSelectedConversation();
   }
 
-  newSessionDate(date: string) {
+  newSessionDate(date: string | Date) {
     return FormatUtil.formatDate(date);
   }
 
   @Watch('selectedConversation')
   onSelectedConversation() {
     this.$nextTick(() => {
-      setTimeout(() => {
-        // TODO: how to handle scrollToBottom in LiveMode?
+      setTimeout(async () => {
         this.scrollToBottom();
+        await this.$store.dispatch('DataModule/selectInteraction', null);
       }, 100);
     });
-    this.countSessions();
   }
   scrollToBottom() {
     const partContainer = this.$refs.partContainer as HTMLDivElement;
     partContainer.scrollTop = partContainer.scrollHeight;
-  }
-
-  sessionStart(index: number) {
-    return this.selectedConversation[index].createdAt;
-  }
-
-  countSessions() {
-    const sessionsMap: Record<string, boolean> = {};
-    this.selectedConversation.forEach((inboxLog: InboxLog) => {
-      sessionsMap[inboxLog.sessionId] = true;
-    });
-
-    this.sessionsCount = Object.keys(sessionsMap).length;
   }
 
   @Watch('isLiveMode')
@@ -220,57 +177,14 @@ export default class MainPanel extends mixins(BaseMixin) {
       }
     }
   }
-  expandSession(index: number) {
-    const inboxLog = this.selectedConversation[index];
-    this.expandedSessions[inboxLog.sessionId] = !this.expandedSessions[inboxLog.sessionId];
+  expandSession(sessionId: string) {
+    const value =
+      typeof this.expandedSessions[sessionId] === 'undefined'
+        ? false
+        : this.expandedSessions[sessionId];
+
+    this.expandedSessions[sessionId] = !value;
     this.$forceUpdate();
-  }
-
-  getSessionInteractions(index: number) {
-    const inboxLog = this.selectedConversation[index];
-    let counter = 0;
-
-    while (
-      index + 1 <= this.selectedConversation.length &&
-      this.selectedConversation[index++].sessionId === inboxLog.sessionId
-    ) {
-      counter++;
-    }
-    return counter / 2;
-  }
-
-  getSessionErrors(index: number) {
-    const firstInboxLog = this.selectedConversation[index];
-    let errors = 0;
-
-    for (let i = index + 1; i < this.selectedConversation.length; i++) {
-      if (this.selectedConversation[i].type === InboxLogType.ERROR) {
-        errors++;
-      }
-
-      if (this.selectedConversation[i].sessionId !== firstInboxLog.sessionId) {
-        return errors;
-      }
-    }
-
-    return errors;
-  }
-
-  getSessionDevice(index: number) {
-    const inboxLog = this.selectedConversation[index];
-
-    const platform = this.getPlatform(inboxLog);
-
-    if (platform) {
-      const requestConstructor = platform?.requestClass;
-
-      const request = Object.assign(new requestConstructor(), inboxLog.payload);
-      return {
-        name: request.getDeviceName(),
-        platform: platform.name,
-        image: platform?.image64x64,
-      };
-    }
   }
 }
 </script>

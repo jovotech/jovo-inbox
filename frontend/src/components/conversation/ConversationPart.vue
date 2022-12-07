@@ -1,7 +1,7 @@
 <template>
   <div
     ref="conversation-part"
-    class="group w-full flex-grow flex flex-col rounded-l border-transparent focus:outline-none"
+    class="group w-full flex-grow inline-flex flex-col rounded-l border-transparent focus:outline-none"
     :class="[
       isSelectedInboxLog ? 'border-jovo-blue border-l-4 inset-0' : 'border-transparent border-l-4 ',
       isRequest ? 'mt-8' : '',
@@ -12,6 +12,7 @@
     <request-part v-if="isRequest" :part="part"></request-part>
     <response-part v-if="isResponse" :part="part" class="ml-auto justify-end"></response-part>
     <error-part v-if="isError" :part="part" class="m-auto"></error-part>
+    <span v-if="part.type === 'nlu'" class="bg-gray-300 inline">nlu</span>
   </div>
 </template>
 
@@ -47,18 +48,18 @@ export default class ConversationPart extends mixins(BaseMixin) {
   part!: InboxLog;
 
   get isRequest(): boolean {
-    return this.part.type === InboxLogType.REQUEST;
+    return this.part.type === InboxLogType.Request;
   }
   async openDetailView() {
     await this.$store.dispatch('DataModule/selectInboxLog', this.part);
   }
 
   get isResponse(): boolean {
-    return this.part.type === InboxLogType.RESPONSE;
+    return this.part.type === InboxLogType.Response;
   }
 
   get isError(): boolean {
-    return this.part.type === InboxLogType.ERROR;
+    return this.part.type === InboxLogType.Error;
   }
 
   get isSelectedInboxLog() {

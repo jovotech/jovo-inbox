@@ -33,7 +33,7 @@
       />
 
       <div
-        class="absolute inset-y-0 right-0 pl-3 flex items-center  text-gray-400 hover:text-gray-600 cursor-pointer"
+        class="absolute inset-y-0 right-0 pl-3 flex items-center text-gray-400 hover:text-gray-600 cursor-pointer"
         aria-hidden="true"
         @click="open"
         ref="button"
@@ -97,9 +97,8 @@
           <div
             v-for="platform in filterPlatforms"
             v-bind:key="platform"
-            @click="handleFilterSelectedPlatform(platform)"
-            href="#"
-            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 flex justify-between items-center"
+            @click="handleFilterSelectedPlatform(pla2tform)"
+            class="block px-4 py-2 text-sm cursor-pointer text-gray-700 hover:bg-gray-100 hover:text-gray-900 flex justify-between items-center"
             role="menuitem"
           >
             <span>{{ platform }}</span>
@@ -179,8 +178,11 @@ export default class FilterSettings extends mixins(BaseMixin) {
   }
 
   async updateAppPlatforms() {
-    const response = await Api.getAppPlatforms(this.app.id);
-    this.filterPlatforms = response.data;
+    if (this.app.id) {
+      const response = await Api.getAppPlatforms(this.app.id);
+
+      this.filterPlatforms = response.data;
+    }
   }
 
   @Watch('app')

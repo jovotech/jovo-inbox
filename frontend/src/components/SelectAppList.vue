@@ -11,16 +11,12 @@
       >
         <span class="flex w-full justify-between items-center">
           <span class="flex min-w-0 items-center justify-between space-x-3">
-            <div
-              v-if="false"
-              class="rounded-full h-10 w-10 flex items-center justify-center bg-jovo-blue"
-            ></div>
             <span class="flex-1 min-w-0">
               <span class="text-gray-900 text-sm font-medium truncate">{{ app.name }}</span>
             </span>
           </span>
           <svg
-            class="flex-shrink-0 h-5 w-5 text-gray-400 group-hover:text-gray-500 "
+            class="flex-shrink-0 h-5 w-5 text-gray-400 group-hover:text-gray-500"
             x-description="Heroicon name: solid/selector"
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 20 20"
@@ -47,11 +43,10 @@
       <div
         class="max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto scrollbar focus:outline-none sm:text-sm"
       >
-        <a
+        <span
           v-for="a in apps"
           v-bind:key="a.id"
           @click="selectApp(a)"
-          href="#"
           class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 group text-gray-900 cursor-default select-none relative pl-3 pr-9 hover:bg-primary-600 hover:text-white"
           role="menuitem"
           >{{ a.name }}
@@ -75,7 +70,7 @@
               />
             </svg>
           </span>
-        </a>
+        </span>
       </div>
     </div>
   </div>
@@ -123,7 +118,10 @@ export default class SelectAppList extends mixins(BaseMixin) {
     });
 
     this.close();
-    this.$emit('selectConversation');
+    this.$emit('select-conversation');
+    this.$router.push({ name: 'app', params: { appId: app.id } }).catch(() => {
+      // ignore
+    });
   }
 }
 </script>

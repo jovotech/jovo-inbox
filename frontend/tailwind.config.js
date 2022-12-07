@@ -9,11 +9,10 @@ module.exports = {
   },
   purge: ['./src/**/*.html', './src/**/*.vue', './src/**/*.tsx', './src/**/*.ts'],
   theme: {
-    fontFamily: {
-      sans: ['Roboto', 'sans-serif'],
-    },
-
     extend: {
+      fontFamily: {
+        sans: ['Roboto', 'sans-serif'],
+      },
       inset: {
         0.5: '0.5rem',
         1: '1rem',

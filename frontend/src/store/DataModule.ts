@@ -5,6 +5,7 @@ import {
   SelectUserConversationsDto,
   InboxLogUser,
   GetLastConversationsDto,
+  Interaction,
 } from 'jovo-inbox-core';
 import { Api } from '@/Api';
 export enum DataAction {
@@ -23,6 +24,7 @@ export enum DataAction {
 
   selectApp = 'selectApp',
   selectInboxLog = 'selectInboxLog',
+  selectInteraction = 'selectInteraction',
 }
 
 export interface DataState {
@@ -47,6 +49,7 @@ export class DataModule extends VuexModule<DataState> {
   selectedUserConversations: InboxLog[] = [];
 
   selectedInboxLog: InboxLog | null = null;
+  selectedInteraction: Interaction | null = null;
 
   selectedApp: JovoAppMetaData | null = null;
   nameMap: Record<
@@ -107,6 +110,11 @@ export class DataModule extends VuexModule<DataState> {
   @MutationAction({ mutate: ['selectedInboxLog'], rawError: true })
   async [DataAction.selectInboxLog](inboxLog: InboxLog) {
     return { selectedInboxLog: inboxLog };
+  }
+
+  @MutationAction({ mutate: ['selectedInteraction'], rawError: true })
+  async [DataAction.selectInteraction](interaction: Interaction) {
+    return { selectedInteraction: interaction };
   }
 
   @MutationAction({ mutate: ['nameMap'], rawError: true })

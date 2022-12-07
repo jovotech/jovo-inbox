@@ -12,8 +12,8 @@
           :class="[isContentHovered ? 'scrollbar' : 'scrollbar-invisible']"
         >
           <div class="flex items-center flex-shrink-0 px-3">
-            <div class="w-full ">
-              <select-app-list @selectConversation="selectConversation"></select-app-list>
+            <div class="w-full">
+              <select-app-list @select-conversation="selectConversation"></select-app-list>
             </div>
           </div>
           <div class="px-3 my-3.5">
@@ -25,7 +25,7 @@
             ></filter-settings>
           </div>
           <div
-            class="bg-white  w-auto ml-1 flex-1 flex flex-col overflow-y-auto"
+            class="bg-white w-auto ml-1 flex-1 flex flex-col overflow-y-auto"
             :class="[isContentHovered ? 'scrollbar' : 'scrollbar-invisible']"
             @scroll="handleScroll"
           >
@@ -42,7 +42,6 @@
                 v-bind:key="conversation.id"
                 :part="conversation"
                 :loadingConversation="loadingConversation"
-                @select-conversation="selectConversation"
               ></user-conversation-list-item>
 
               <li
@@ -60,7 +59,7 @@
 </template>
 
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
 import { GetLastConversationsDto, InboxLog } from 'jovo-inbox-core';
 
 import { BaseMixin } from '@/mixins/BaseMixin';
@@ -98,7 +97,7 @@ export default class SidebarLeft extends mixins(BaseMixin) {
         });
         if (result.data?.logs.length > 0) {
           // TODO: selection of user doesn't work properly with many users
-          await this.selectConversation(result.data?.logs[0]);
+          // await this.selectConversation(result.data?.logs[0]);
         }
       }
     } catch (e) {
@@ -142,23 +141,49 @@ export default class SidebarLeft extends mixins(BaseMixin) {
     return this.$store.state.DataModule.conversations;
   }
 
-  async selectConversation(inboxLog?: InboxLog) {
-    this.loadingConversation = inboxLog?.userId || '';
-    if (inboxLog) {
-      await this.$store.dispatch('DataModule/fetchUserConversations', {
-        userId: inboxLog.userId,
-        appId: inboxLog.appId,
-      });
-    } else {
-      if (this.getConversations().length > 0) {
-        await this.$store.dispatch('DataModule/fetchUserConversations', {
-          userId: this.getConversations()[0].userId,
-          appId: this.getConversations()[0].appId,
-        });
-      }
+  @Watch('$route')
+  async onRouteChange() {
+    if (this.$route.name === 'conversation') {
+      await this.selectConversation();
     }
-    this.loadingConversation = '';
   }
+
+  async selectConversation() {
+    await this.$store.dispatch('DataModule/fetchUserConversations', {
+      userId: this.$route.params.userId,
+      appId: this.$route.params.appId,
+    });
+  }
+
+  // TODO do we need this?
+  // async selectConversation(inboxLog?: InboxLog) {
+  //   this.loadingConversation = inboxLog?.userId || '';
+  //   if (inboxLog) {
+  //     await this.$store.dispatch('DataModule/fetchUserConversations', {
+  //       userId: inboxLog.userId,
+  //       appId: inboxLog.appId,
+  //     });
+  //   } else {
+  //     if (this.getConversations().length > 0) {
+  //       await this.$store.dispatch('DataModule/fetchUserConversations', {
+  //         userId: this.getConversations()[0].userId,
+  //         appId: this.getConversations()[0].appId,
+  //       });
+  //     }
+  //   }
+  //   this.$router
+  //     .push({
+  //       name: 'conversation',
+  //       params: {
+  //         userId: inboxLog?.userId || '',
+  //         appId: this.app.id,
+  //       },
+  //     })
+  //     .catch(() => {
+  //       //
+  //     });
+  //   this.loadingConversation = '';
+  // }
 
   async handleScroll(event: Event) {
     const target = event.target as HTMLElement;

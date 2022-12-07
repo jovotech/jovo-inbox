@@ -1,6 +1,5 @@
 import axios, { AxiosRequestConfig } from 'axios';
 import { BASE_URL } from '@/main';
-import { InboxLog } from '../../core/src';
 import {
   DeleteUserImageDto,
   GetInboxLogUserDto,
@@ -8,15 +7,16 @@ import {
   JovoAppList,
   SelectUserConversationsDto,
   UpdateInboxLogUserDto,
+  UserConversationsResponse,
+  InboxLogUser,
+  InboxLog,
 } from 'jovo-inbox-core';
-import { UserConversationsResponse } from 'jovo-inbox-core/dist/UserConversationsResponse';
-import { InboxLogUser } from 'jovo-inbox-core/dist/InboxLogUser';
 
 export class Api {
   static async getLastConversations(getLastConversationsDto: GetLastConversationsDto) {
     const config: AxiosRequestConfig = {
       method: 'POST',
-      url: `${BASE_URL}/inboxlog`,
+      url: `${BASE_URL}/logs/conversations`,
       data: getLastConversationsDto,
     };
 
@@ -29,7 +29,7 @@ export class Api {
   static async getUserConversations(selectUserConversationsDto: SelectUserConversationsDto) {
     const config: AxiosRequestConfig = {
       method: 'POST',
-      url: `${BASE_URL}/inboxlog/user/conversation`,
+      url: `${BASE_URL}/logs/user/conversation`,
       data: selectUserConversationsDto,
     };
     const result = await axios.request<UserConversationsResponse>(config);
@@ -81,7 +81,7 @@ export class Api {
   static async getAppPlatforms(appId: string) {
     const config: AxiosRequestConfig = {
       method: 'GET',
-      url: `${BASE_URL}/inboxlog/platform/${appId}`,
+      url: `${BASE_URL}/logs/platform/${appId}`,
     };
     return await axios.request<string[]>(config);
   }

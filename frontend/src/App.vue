@@ -1,15 +1,7 @@
 <template>
   <div id="app" class="h-screen max-h-screen bg-gray-100 flex flex-col">
     <inbox-header></inbox-header>
-    <div class=" flex overflow-hidden bg-white">
-      <sidebar-left></sidebar-left>
-      <div class="flex flex-col min-w-0 flex-1 overflow-hidden">
-        <div class="flex-1 relative z-0 flex overflow-hidden">
-          <main-panel></main-panel>
-          <sidebar-right></sidebar-right>
-        </div>
-      </div>
-    </div>
+    <router-view class="flex overflow-hidden bg-white w-full h-full" />
   </div>
 </template>
 
@@ -35,15 +27,24 @@ export default class App extends mixins(BaseMixin) {
       } else {
         await this.$store.dispatch('DataModule/selectApp', this.app);
       }
+
+      if (this.$route.name == 'index') {
+        this.$router
+          .push({
+            name: 'app',
+            params: {
+              appId: this.app.id,
+            },
+          })
+          .catch(() => {
+            //
+          });
+      }
+
       await this.$store.dispatch('DataModule/buildAppUsersMap', this.app.id);
     } catch (e) {
       console.log(e);
     }
-  }
-
-  @Watch('app')
-  async onAppChanged() {
-    await this.$store.dispatch('DataModule/buildAppUsersMap', this.app.id);
   }
 }
 </script>
