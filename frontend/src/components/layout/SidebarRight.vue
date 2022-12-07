@@ -62,7 +62,7 @@ import { CheckIcon, Share2Icon, UserIcon } from 'vue-feather-icons';
 import { BaseMixin } from '@/mixins/BaseMixin';
 import { mixins } from 'vue-class-component';
 import { InboxLog } from 'jovo-inbox-core';
-import { InboxLogUser } from 'jovo-inbox-core/dist/InboxLogUser';
+import { InboxLogUser } from 'jovo-inbox-core';
 import { Api } from '@/Api';
 import InboxLogTypeDetail from '@/components/conversation/InboxLogTypeDetail.vue';
 import UserSettingsModal from '@/components/conversation/UserSettingsModal.vue';

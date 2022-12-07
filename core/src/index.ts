@@ -10,3 +10,4 @@ export * from './dtos/delete-user-image.dto';
 export * from './dtos/add-inbox-log.dto';
 
 export * from './UserConversationsResponse';
+export * from './UploadedFile';

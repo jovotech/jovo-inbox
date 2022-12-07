@@ -14,7 +14,7 @@ import {
 import { FindOneOptions, getRepository, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { InboxLogUserEntity } from '../../entity/inbox-log-user.entity';
-import { UploadedFile } from 'jovo-inbox-core/dist/UploadedFile';
+import { UploadedFile } from 'jovo-inbox-core';
 import * as fs from 'fs';
 import { InboxLogService } from '../inbox-log/inbox-log.service';
 

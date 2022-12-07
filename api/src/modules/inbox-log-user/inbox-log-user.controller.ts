@@ -16,7 +16,7 @@ import {
   UpdateInboxLogUserDto,
 } from 'jovo-inbox-core';
 import { FilesInterceptor } from '@nestjs/platform-express';
-import { UploadedFile } from 'jovo-inbox-core/dist/UploadedFile';
+import { UploadedFile } from 'jovo-inbox-core';
 
 @Controller('inboxloguser')
 export class InboxLogUserController {
