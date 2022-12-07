@@ -8,12 +8,12 @@
   "scripts": {
     "build": "tsc",
     "tsc": "tsc",
-    "watch": "tsc -w",
-    "postinstall": "npm run build"
+    "watch": "tsc -w"
   },
   "author": "jovotech",
   "license": "Apache-2.0",
   "dependencies": {
+    "class-validator": "^0.13.2",
     "lodash.get": "^4.4.2",
     "lodash.merge": "^4.6.2",
     "lodash.set": "^4.3.2"
@@ -30,6 +30,7 @@
     "jovo-platform-googleassistant": "^3.4.1",
     "jovo-platform-googleassistantconv": "^3.4.1",
     "jovo-platform-web": "^3.4.1",
+    "@jovotech/common": "^4.4.2",
     "prettier": "^2.0.5",
     "tslint": "^5.20.0",
     "typescript": "^4.4.4"
