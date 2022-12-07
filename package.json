@@ -3,11 +3,14 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "postinstall": "npm run setup",
     "setup": "npm run setup:core && npm run setup:api && npm run setup:frontend",
     "setup:api": "cd api && npm i && cd ..",
     "setup:core": "cd core && npm i && cd ..",
-    "setup:frontend": "cd frontend && npm i && cd .."
+    "setup:frontend": "cd frontend && npm i && cd ..",
+    "start:dev:api": "cd api && npm run start:dev",
+    "start:dev:frontend": "cd frontend && npm run serve",
+    "start:dev:core": "cd core && npm run watch",
+    "bla": "npm run start:dev:core && npm run start:dev:api"
   },
   "author": "jovotech",
   "license": "Apache-2.0"
