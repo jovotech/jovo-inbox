@@ -9,8 +9,7 @@
     "setup:frontend": "cd frontend && npm i && cd ..",
     "start:dev:api": "cd api && npm run start:dev",
     "start:dev:frontend": "cd frontend && npm run serve",
-    "start:dev:core": "cd core && npm run watch",
-    "bla": "npm run start:dev:core && npm run start:dev:api"
+    "start:dev:core": "cd core && npm run watch"
   },
   "author": "jovotech",
   "license": "Apache-2.0"
