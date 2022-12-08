@@ -30,7 +30,7 @@
       <div
         v-if="getLogByType(interaction, 'error')"
         ref="conversation-part"
-        class="group w-full flex-grow inline-flex flex-col rounded-l border-transparent focus:outline-none my-4"
+        class="group w-full flex-grow inline-flex flex-col rounded-l border-transparent focus:outline-none my-8"
         tabindex="0"
       >
         <error-part :part="getLogByType(interaction, 'error')" class="mx-auto" />
