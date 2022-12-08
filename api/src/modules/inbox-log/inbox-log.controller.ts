@@ -30,7 +30,7 @@ export class InboxLogController {
       .createQueryBuilder()
       .insert()
       .into(InboxLogEntity)
-      .values(logs.map((log) => ({ ...log, createdAt: new Date() })))
+      .values(logs.map((log) => ({ ...log })))
       .execute();
   }
 

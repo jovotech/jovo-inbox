@@ -8,7 +8,7 @@ export class InboxLogEntity implements InboxLog {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column()
+  @Column({ type: 'datetime', precision: 3 })
   createdAt: Date = new Date();
 
   @Column()
