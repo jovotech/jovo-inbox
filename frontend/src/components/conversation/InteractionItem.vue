@@ -27,9 +27,16 @@
       >
         <request-part :part="getLogByType(interaction, 'request')" />
       </div>
-
       <div
-        v-if="getLogByType(interaction, 'response')"
+        v-if="getLogByType(interaction, 'error')"
+        ref="conversation-part"
+        class="group w-full flex-grow inline-flex flex-col rounded-l border-transparent focus:outline-none my-4"
+        tabindex="0"
+      >
+        <error-part :part="getLogByType(interaction, 'error')" class="mx-auto" />
+      </div>
+      <div
+        v-if="getLogByType(interaction, 'response') && !getLogByType(interaction, 'error')"
         ref="conversation-part"
         class="group w-full flex-grow inline-flex flex-col rounded-l border-transparent focus:outline-none"
         tabindex="0"
@@ -51,10 +58,12 @@ import { ChevronDownIcon, ChevronUpIcon } from 'vue-feather-icons';
 import UserSessions from '@/components/conversation/UserSessions.vue';
 import RequestPart from '@/components/conversation/RequestPart.vue';
 import ResponsePart from '@/components/conversation/ResponsePart.vue';
+import ErrorPart from '@/components/conversation/ErrorPart.vue';
 
 @Component({
   name: 'interaction-item',
   components: {
+    ErrorPart,
     ResponsePart,
     RequestPart,
     UserSessions,
