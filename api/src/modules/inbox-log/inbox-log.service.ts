@@ -4,6 +4,7 @@ import {
   GetLastConversationsDto,
   InboxLog,
   InboxLogType,
+  Interaction,
   SelectUserConversationsDto,
   UserConversationsResponse,
 } from 'jovo-inbox-core';
@@ -127,7 +128,34 @@ export class InboxLogService {
 
     foundLogs = foundLogs.concat(await qb.getMany());
 
-    return foundLogs;
+    // create array with extracted requestId from foundlogs
+    const requestIds = foundLogs.map((log: InboxLog) => log.requestId);
+
+    const q = getRepository(InboxLogEntity)
+      .createQueryBuilder('inboxlog')
+      .where('requestId IN (:...requestIds)', { requestIds });
+
+    const interactionLogs = await q.getMany();
+
+    const interactions: Record<string, Interaction> = {};
+
+    for (let i = 0; i < interactionLogs.length; i++) {
+      const conversation = interactionLogs[i];
+
+      if (!interactions[conversation.requestId]) {
+        interactions[conversation.requestId] = {
+          requestId: conversation.requestId,
+          logs: [],
+          start: new Date(conversation.createdAt),
+          hasSessionStarted: false,
+        };
+      }
+      interactions[conversation.requestId].logs.push(conversation);
+    }
+
+    return Object.values(interactions).sort((a, b) => {
+      return b.start.getTime() - a.start.getTime();
+    });
   }
   async getUserConversations(
     selectUserConversationsDto: SelectUserConversationsDto,
