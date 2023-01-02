@@ -1,5 +1,5 @@
 <template>
-  <div class="rounded-md bg-red-50 p-4 m-auto w-5/6 text-sm mb-6 border-2 border-red-500">
+  <div class="rounded-md bg-red-50 p-4 m-auto w-5/6 text-sm mb-6 border-2 border-red-800">
     <div class="flex">
       <div class="flex-shrink-0">
         <!-- Heroicon name: solid/x-circle -->

@@ -10,6 +10,7 @@ import {
   UserConversationsResponse,
   InboxLogUser,
   InboxLog,
+  Interaction,
 } from 'jovo-inbox-core';
 
 export class Api {
@@ -20,7 +21,7 @@ export class Api {
       data: getLastConversationsDto,
     };
 
-    const result = await axios.request<InboxLog[]>(config);
+    const result = await axios.request<Interaction[]>(config);
     if (result.status === 201 && result.data) {
       return result.data;
     }

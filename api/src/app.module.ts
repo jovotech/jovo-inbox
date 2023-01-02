@@ -16,13 +16,7 @@ import { basicAuthMiddleware } from './middlewares/basic-auth.middleware';
     ConfigModule.forRoot(),
     ServeStaticModule.forRoot({
       exclude: ['/api*'],
-      rootPath: join(__dirname, '..', 'public', 'client'),
-      serveRoot: '/',
-    }),
-
-    ServeStaticModule.forRoot({
-      exclude: ['/api*'],
-      rootPath: join(__dirname, '..', 'public', 'images'),
+      rootPath: join(__dirname, '..', '..', 'storage', 'images'),
       serveRoot: '/avatars/',
     }),
     InboxLogModule,

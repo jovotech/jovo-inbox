@@ -117,6 +117,7 @@ import UserSessions from '@/components/conversation/UserSessions.vue';
 import RequestPart from '@/components/conversation/RequestPart.vue';
 import ResponsePart from '@/components/conversation/ResponsePart.vue';
 import InteractionItem from '@/components/conversation/InteractionItem.vue';
+import { LIVE_MODE_POLLING_INTERVAL_IN_MS } from '@/constants';
 
 @Component({
   name: 'main-panel',
@@ -138,7 +139,9 @@ export default class MainPanel extends mixins(BaseMixin) {
   interval?: number;
   expandedSessions: Record<string, boolean> = {};
 
-  mounted() {
+  async mounted() {
+    await this.selectConversation();
+
     this.onSelectedConversation();
   }
 
@@ -170,7 +173,7 @@ export default class MainPanel extends mixins(BaseMixin) {
           appId: lastLog.appId,
           lastId: lastLog.id,
         } as SelectUserConversationsDto);
-      }, 5000);
+      }, LIVE_MODE_POLLING_INTERVAL_IN_MS);
     } else {
       if (this.interval) {
         clearInterval(this.interval);

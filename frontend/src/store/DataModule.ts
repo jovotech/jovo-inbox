@@ -29,7 +29,7 @@ export enum DataAction {
 
 export interface DataState {
   apps: JovoAppMetaData[];
-  conversations: InboxLog[];
+  conversations: Interaction[];
   selectedUserConversations: InboxLog[];
   selectedApp: JovoAppMetaData[];
   selectedInboxLog: InboxLog;
@@ -45,7 +45,7 @@ export interface DataState {
 @Module({ namespaced: true, name: 'DataModule' })
 export class DataModule extends VuexModule<DataState> {
   apps: JovoAppMetaData[] = [];
-  conversations: InboxLog[] = [];
+  conversations: Interaction[] = [];
   selectedUserConversations: InboxLog[] = [];
 
   selectedInboxLog: InboxLog | null = null;

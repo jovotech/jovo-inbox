@@ -40,7 +40,7 @@
               <user-conversation-list-item
                 v-for="conversation in getConversations()"
                 v-bind:key="conversation.id"
-                :part="conversation"
+                :interaction="conversation"
                 :loadingConversation="loadingConversation"
               ></user-conversation-list-item>
 
@@ -60,7 +60,7 @@
 
 <script lang="ts">
 import { Component, Watch } from 'vue-property-decorator';
-import { GetLastConversationsDto, InboxLog } from 'jovo-inbox-core';
+import { GetLastConversationsDto, InboxLog, Interaction } from 'jovo-inbox-core';
 
 import { BaseMixin } from '@/mixins/BaseMixin';
 import { mixins } from 'vue-class-component';
@@ -137,7 +137,7 @@ export default class SidebarLeft extends mixins(BaseMixin) {
     this.isSearchLoading = false;
   }
 
-  getConversations(): InboxLog[] {
+  getConversations(): Interaction[] {
     return this.$store.state.DataModule.conversations;
   }
 
@@ -147,43 +147,6 @@ export default class SidebarLeft extends mixins(BaseMixin) {
       await this.selectConversation();
     }
   }
-
-  async selectConversation() {
-    await this.$store.dispatch('DataModule/fetchUserConversations', {
-      userId: this.$route.params.userId,
-      appId: this.$route.params.appId,
-    });
-  }
-
-  // TODO do we need this?
-  // async selectConversation(inboxLog?: InboxLog) {
-  //   this.loadingConversation = inboxLog?.userId || '';
-  //   if (inboxLog) {
-  //     await this.$store.dispatch('DataModule/fetchUserConversations', {
-  //       userId: inboxLog.userId,
-  //       appId: inboxLog.appId,
-  //     });
-  //   } else {
-  //     if (this.getConversations().length > 0) {
-  //       await this.$store.dispatch('DataModule/fetchUserConversations', {
-  //         userId: this.getConversations()[0].userId,
-  //         appId: this.getConversations()[0].appId,
-  //       });
-  //     }
-  //   }
-  //   this.$router
-  //     .push({
-  //       name: 'conversation',
-  //       params: {
-  //         userId: inboxLog?.userId || '',
-  //         appId: this.app.id,
-  //       },
-  //     })
-  //     .catch(() => {
-  //       //
-  //     });
-  //   this.loadingConversation = '';
-  // }
 
   async handleScroll(event: Event) {
     const target = event.target as HTMLElement;

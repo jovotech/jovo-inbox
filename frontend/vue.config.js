@@ -8,7 +8,6 @@ const ignoreJovoCliPlugin = new webpack.IgnorePlugin({
 
 const externals = {
   '@jest/globals': 'var {}',
-  // 'axios': 'var {}',
   'google-auth-library': 'var { JWT: function JWT() {} }',
   'i18next': 'var {}',
   'json-colorizer': 'var () => {}',
@@ -17,25 +16,24 @@ const externals = {
   './GoogleAssistantRepromptComponent': 'var {}',
   './JovoLogger': 'var { JovoLogger: function JovoLogger() {} }',
 };
+if (process.env.NODE_ENV === 'production') {
+  externals['./JovoProxy'] = 'var { JovoProxy: function JovoProxy() {} }';
+  externals['./BaseComponent'] = 'var { BaseComponent: function BaseComponent() {} }';
+  externals['./BaseOutput'] = 'var { BaseOutput: function BaseOutput() {} }';
+}
 
 module.exports = {
   parallel: false,
-  outputDir: './../api/public/client',
+  outputDir: './dist',
   chainWebpack: (config) => {
     config.resolve.symlinks(false);
   },
   configureWebpack:
     process.env.NODE_ENV === 'production'
       ? {
-          plugins: [
-            ignoreJovoCliPlugin,
-            new webpack.IgnorePlugin({
-              resourceRegExp: /.*(JovoProxy|BaseOutput|BaseComponent)$/,
-            }),
-          ],
+          plugins: [ignoreJovoCliPlugin],
           externals: {
             ...externals,
-            './GoogleAssistantRepromptComponent': 'var {}',
           },
         }
       : {

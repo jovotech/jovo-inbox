@@ -8,8 +8,7 @@
   "scripts": {
     "build": "tsc",
     "tsc": "tsc",
-    "watch": "tsc -w",
-    "postinstall": "npm run build"
+    "watch": "tsc -w"
   },
   "author": "jovotech",
   "license": "Apache-2.0",

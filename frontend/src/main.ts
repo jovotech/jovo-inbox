@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import Vue from 'vue';
 declare module 'vue/types/vue' {
   interface Vue {
@@ -10,6 +11,10 @@ import VueSanitize from 'vue-sanitize';
 import store from '@/store';
 import router from '@/router';
 import Clipboard from 'v-clipboard';
+import { Platform } from '@jovotech/framework';
+import { WebPlatform } from '@jovotech/platform-web';
+import { CorePlatform } from '@jovotech/platform-core';
+import { AlexaPlatform } from '@jovotech/platform-alexa';
 
 Vue.use(Clipboard);
 Vue.config.productionTip = false;
@@ -22,7 +27,7 @@ const defaultOptions = {
   },
 };
 
-Vue.use(VueSanitize, defaultOptions);
+// Vue.use(VueSanitize, defaultOptions);
 
 new Vue({
   render: (h) => h(App),

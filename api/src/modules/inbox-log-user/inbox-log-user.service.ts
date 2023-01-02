@@ -17,6 +17,7 @@ import { InboxLogUserEntity } from '../../entity/inbox-log-user.entity';
 import { UploadedFile } from 'jovo-inbox-core';
 import * as fs from 'fs';
 import { InboxLogService } from '../inbox-log/inbox-log.service';
+import { USER_AVATAR_PATH } from '../../constants';
 
 @Injectable()
 export class InboxLogUserService {
@@ -129,8 +130,9 @@ export class InboxLogUserService {
 
     await getRepository(InboxLogUserEntity).save(user);
 
-    const filesDirectory = path.join(process.cwd(), 'public', 'images');
+    const filesDirectory = path.join(USER_AVATAR_PATH);
 
+    console.log({ filesDirectory });
     if (!fs.existsSync(filesDirectory)) {
       fs.mkdirSync(filesDirectory, { recursive: true });
     }
@@ -148,7 +150,8 @@ export class InboxLogUserService {
     if (!user) {
       throw new NotFoundException();
     }
-    const filePath = path.join(process.cwd(), 'public', 'images', user.image);
+    const filePath = path.join(USER_AVATAR_PATH, user.image);
+    console.log({ filePath });
     if (fs.existsSync(filePath)) {
       fs.unlinkSync(filePath);
     }

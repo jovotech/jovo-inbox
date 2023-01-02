@@ -12,7 +12,7 @@ RUN cd /app/core && npm install && npm run build
 RUN echo "Installing and building core completed"
 
 RUN echo "Installing and building frontend "
-RUN cd /app/frontend && npm install
+RUN cd /app/frontend && npm install && npm run build && npm prune --production
 RUN echo "Installing and building frontend completed"
 
 #COPY . .

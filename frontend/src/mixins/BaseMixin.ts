@@ -19,7 +19,7 @@ export class BaseMixin extends Vue {
 
   getImage(conversation: InboxLog) {
     if (this.nameMap[conversation.userId] && this.nameMap[conversation.userId].image) {
-      return `${API_BASE_URL}/avatars/${this.nameMap[conversation.userId].image}`;
+      return `${API_BASE_URL}/storage/avatars/${this.nameMap[conversation.userId].image}`;
     }
     // return this.createIcon(conversation.userId);
   }
@@ -96,26 +96,6 @@ export class BaseMixin extends Vue {
     return this.$store.state.DataModule.apps;
   }
 
-  // getPlatform(inboxLog: InboxLog): InboxPlatform | undefined {
-  //   for (let i = 0; i < this.platforms.length; i++) {
-  //     const platform = this.platforms[i];
-  //     const requestConstructor = platform.requestClass;
-  //     const request = new requestConstructor();
-  //
-  //     const responseConstructor = platform.responseClass;
-  //     const response = new responseConstructor();
-  //
-  //     if (inboxLog.type === InboxLogType.Request && request.isPlatformRequest(inboxLog.payload)) {
-  //       return platform;
-  //     } else if (
-  //       inboxLog.type === InboxLogType.Response &&
-  //       response.isPlatformResponse(inboxLog.payload)
-  //     ) {
-  //       return platform;
-  //     }
-  //   }
-  // }
-
   getResponsePlatform(inboxLog: InboxLog) {
     return PLATFORMS.find((platform) =>
       Array.isArray(inboxLog.payload)
@@ -191,8 +171,19 @@ export class BaseMixin extends Vue {
     }
   }
 
+  async selectConversation() {
+    await this.$store.dispatch('DataModule/fetchUserConversations', {
+      userId: this.$route.params.userId,
+      appId: this.$route.params.appId,
+    });
+  }
+
   get selectedConversation(): InboxLog[] {
     return this.$store.state.DataModule.selectedUserConversations;
+  }
+
+  getLogByType(interaction: Interaction, type: string) {
+    return interaction.logs.find((item: InboxLog) => item.type === type);
   }
 
   get isLiveMode(): boolean {

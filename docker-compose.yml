@@ -15,9 +15,10 @@ services:
     volumes:
       - ./api/src:/app/api/src
       - ./core/src:/app/core/src
+      - ./storage:/usr/src/app/storage
     ports:
       - "4000:4000"
-    command: 'npm run start:dev:api'
+    command: 'npm run start:prod:api'
     networks:
       - appnetwork
     tty: true
@@ -46,19 +47,35 @@ services:
     env_file: .env
     networks:
       - appnetwork
-  frontend:
+#  frontend:
+#    build:
+#      context: .
+#      dockerfile: ./frontend/Dockerfile
+#    volumes:
+#      - ./frontend/src:/app/frontend/src
+#    stdin_open: true
+#    tty: true
+#    ports:
+#      - "8080:8080"
+#    command: 'npm run start:dev:frontend'
+#    environment:
+#      - CHOKIDAR_USEPOLLING=true
+#    networks:
+#      - appnetwork
+  nginx:
+    working_dir: /usr/src/app
+    container_name: nginx
+    restart: always
     build:
       context: .
-      dockerfile: ./frontend/Dockerfile
+      dockerfile: ./Dockerfile.nginx
     volumes:
-      - ./frontend/src:/app/frontend/src
-    stdin_open: true
-    tty: true
+      - ./storage:/var/www/html/storage/
     ports:
-      - "8080:8080"
-    command: 'npm run start:dev:frontend'
-    environment:
-      - CHOKIDAR_USEPOLLING=true
+      - "80:80"
+      - "443:443"
+    tty: true
+    env_file: .env
     networks:
       - appnetwork
 networks:
@@ -66,3 +83,4 @@ networks:
     driver: bridge
 volumes:
   db_data:
+  storage:

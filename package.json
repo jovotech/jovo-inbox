@@ -8,6 +8,7 @@
     "setup:core": "cd core && npm i && cd ..",
     "setup:frontend": "cd frontend && npm i && cd ..",
     "start:dev:api": "cd api && npm run start:dev",
+    "start:prod:api": "cd api && npm run start:prod",
     "start:dev:frontend": "cd frontend && npm run serve",
     "start:dev:core": "cd core && npm run watch"
   },

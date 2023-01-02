@@ -83,10 +83,6 @@ export default class InteractionItem extends mixins(BaseMixin) {
     }
   }
 
-  getLogByType(interaction: Interaction, type: string) {
-    return interaction.logs.find((item: InboxLog) => item.type === type);
-  }
-
   isInteractionDetailView(interaction: Interaction) {
     return interaction.requestId === this.selectedInteraction?.requestId;
   }
