@@ -75,6 +75,8 @@ services:
       - "80:80"
       - "443:443"
     tty: true
+    environment:
+      VUE_APP_BACKEND_URL: ${VUE_APP_BACKEND_URL
     env_file: .env
     networks:
       - appnetwork
