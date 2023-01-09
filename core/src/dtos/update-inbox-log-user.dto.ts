@@ -6,7 +6,7 @@ export class UpdateInboxLogUserDto {
   id?: string;
 
   @IsString()
-  appId!: string;
+  projectId!: string;
 
   @IsString()
   platformUserId!: string;

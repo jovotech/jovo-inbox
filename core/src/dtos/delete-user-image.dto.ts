@@ -2,8 +2,8 @@ import { IsString } from 'class-validator';
 
 export class DeleteUserImageDto {
   @IsString()
-  appId!: string;
+  projectId!: string;
 
   @IsString()
-  jovoAppUserId!: string;
+  jovoProjectUserId!: string;
 }

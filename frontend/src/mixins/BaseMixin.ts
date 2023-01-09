@@ -1,6 +1,6 @@
 import { Component, Vue } from 'vue-property-decorator';
 import { DisplayHelper } from '@/utils/DisplayHelper';
-import { InboxLog, Interaction, JovoAppMetaData, Session } from 'jovo-inbox-core';
+import { InboxLog, Interaction, Project, Session } from 'jovo-inbox-core';
 import { FormatUtil } from '@/utils/FormatUtil';
 import { API_BASE_URL, PLATFORMS } from '@/constants';
 import { OutputTemplate, OutputTemplateConverter } from '@jovotech/framework';
@@ -16,12 +16,12 @@ export class BaseMixin extends Vue {
       background: [229, 231, 235, 1],
     });
   }
-
   getImage(conversation: InboxLog) {
     if (this.nameMap[conversation.userId] && this.nameMap[conversation.userId].image) {
-      return `${API_BASE_URL}/storage/avatars/${this.nameMap[conversation.userId].image}`;
+      return `${API_BASE_URL}/avatars/${
+        this.nameMap[conversation.userId].image
+      }?random=${Math.random()}`;
     }
-    // return this.createIcon(conversation.userId);
   }
   shortenUserId(inboxLog: InboxLog) {
     return FormatUtil.shortenUserId(inboxLog.userId);
@@ -88,12 +88,12 @@ export class BaseMixin extends Vue {
     });
   }
 
-  get app(): JovoAppMetaData {
-    return this.$store.state.DataModule.selectedApp;
+  get project(): Project {
+    return this.$store.state.DataModule.selectedProject;
   }
 
-  get apps(): JovoAppMetaData[] {
-    return this.$store.state.DataModule.apps;
+  get projects(): Project[] {
+    return this.$store.state.DataModule.projects;
   }
 
   getResponsePlatform(inboxLog: InboxLog) {
@@ -174,7 +174,7 @@ export class BaseMixin extends Vue {
   async selectConversation() {
     await this.$store.dispatch('DataModule/fetchUserConversations', {
       userId: this.$route.params.userId,
-      appId: this.$route.params.appId,
+      projectId: this.$route.params.projectId,
     });
   }
 

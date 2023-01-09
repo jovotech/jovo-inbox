@@ -27,7 +27,7 @@
                 <router-link
                   :to="{
                     name: 'conversation',
-                    params: { appId: app.id, userId: selectedConversation[0].userId },
+                    params: { projectId: project.id, userId: selectedConversation[0].userId },
                   }"
                   aria-current="page"
                   class="text-jovo-blue hover:text-jovo-blue hover:border-jovo-blue whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
@@ -40,7 +40,7 @@
                 <router-link
                   :to="{
                     name: 'sessions',
-                    params: { appId: app.id, userId: selectedConversation[0].userId },
+                    params: { projectId: project.id, userId: selectedConversation[0].userId },
                   }"
                   class="text-gray-500 hover:text-jovo-blue hover:border-jovo-blue whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
                   :class="[$route.name === 'sessions' ? 'border-jovo-blue' : 'border-transparent']"
@@ -170,7 +170,7 @@ export default class MainPanel extends mixins(BaseMixin) {
         const lastLog = this.selectedConversation[this.selectedConversation.length - 1];
         await this.$store.dispatch('DataModule/appendUserConversations', {
           userId: lastLog.userId,
-          appId: lastLog.appId,
+          projectId: lastLog.projectId,
           lastId: lastLog.id,
         } as SelectUserConversationsDto);
       }, LIVE_MODE_POLLING_INTERVAL_IN_MS);

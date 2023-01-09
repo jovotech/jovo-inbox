@@ -3,7 +3,7 @@
     <router-link
       :to="{
         name: 'conversation',
-        params: { appId: app.id, userId: interaction.logs[0].userId },
+        params: { projectId: project.id, userId: interaction.logs[0].userId },
       }"
       class="group block hover:bg-gray-100 focus:bg-gray-200"
       :class="[isSelected(interaction) ? 'bg-gray-200' : '']"
@@ -104,7 +104,7 @@ export default class UserConversationListItem extends mixins(BaseMixin) {
       return false;
     }
     return (
-      selectedConversations[0].appId === interaction.logs[0].appId &&
+      selectedConversations[0].projectId === interaction.logs[0].projectId &&
       selectedConversations[0].userId === interaction.logs[0].userId
     );
   }

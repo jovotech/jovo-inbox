@@ -1,20 +1,16 @@
 import 'reflect-metadata';
 import Vue from 'vue';
+import App from './App.vue';
+import store from '@/store';
+import router from '@/router';
+import Clipboard from 'v-clipboard';
+
 declare module 'vue/types/vue' {
   interface Vue {
     $clipboard(value: string): void;
   }
 }
-import App from './App.vue';
 export const BASE_URL = process.env.VUE_APP_BACKEND_URL;
-import VueSanitize from 'vue-sanitize';
-import store from '@/store';
-import router from '@/router';
-import Clipboard from 'v-clipboard';
-import { Platform } from '@jovotech/framework';
-import { WebPlatform } from '@jovotech/platform-web';
-import { CorePlatform } from '@jovotech/platform-core';
-import { AlexaPlatform } from '@jovotech/platform-alexa';
 
 Vue.use(Clipboard);
 Vue.config.productionTip = false;

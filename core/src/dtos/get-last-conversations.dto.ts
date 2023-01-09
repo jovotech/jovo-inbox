@@ -2,7 +2,7 @@ import { IsOptional, IsString } from 'class-validator';
 
 export class GetLastConversationsDto {
   @IsString()
-  appId!: string;
+  projectId!: string;
 
   @IsOptional()
   last?: Date;

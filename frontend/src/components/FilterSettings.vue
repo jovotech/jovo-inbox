@@ -97,7 +97,7 @@
           <div
             v-for="platform in filterPlatforms"
             v-bind:key="platform"
-            @click="handleFilterSelectedPlatform(pla2tform)"
+            @click="handleFilterSelectedPlatform(platform)"
             class="block px-4 py-2 text-sm cursor-pointer text-gray-700 hover:bg-gray-100 hover:text-gray-900 flex justify-between items-center"
             role="menuitem"
           >
@@ -174,25 +174,25 @@ export default class FilterSettings extends mixins(BaseMixin) {
   interval?: number;
 
   async mounted() {
-    await this.updateAppPlatforms();
+    await this.updateProjectPlatforms();
   }
 
-  async updateAppPlatforms() {
-    if (this.app.id) {
-      const response = await Api.getAppPlatforms(this.app.id);
+  async updateProjectPlatforms() {
+    if (this.project.id) {
+      const response = await Api.getProjectPlatforms(this.project.id);
 
       this.filterPlatforms = response.data;
     }
   }
 
-  @Watch('app')
-  async onAppChange() {
-    await this.updateAppPlatforms();
+  @Watch('project')
+  async onProjectChange() {
+    await this.updateProjectPlatforms();
   }
 
   getFilter() {
     return {
-      appId: this.app.id,
+      projectId: this.project.id,
       withErrors: this.filterSelectedWithErrors,
       platform: this.filterSelectedPlatform,
     };
@@ -225,7 +225,7 @@ export default class FilterSettings extends mixins(BaseMixin) {
   async handleFilter() {
     this.opened = false;
     this.$emit('loadConversations', {
-      appId: this.app.id,
+      projectId: this.project.id,
       withErrors: this.filterSelectedWithErrors,
       platform: this.filterSelectedPlatform,
     });
@@ -234,7 +234,7 @@ export default class FilterSettings extends mixins(BaseMixin) {
   @Watch('filterSelectedWithErrors')
   async watchFilterSelectedWithErrors() {
     this.$emit('loadConversations', {
-      appId: this.app.id,
+      projectId: this.project.id,
       withErrors: this.filterSelectedWithErrors,
       platform: this.filterSelectedPlatform,
     });
@@ -269,7 +269,7 @@ export default class FilterSettings extends mixins(BaseMixin) {
       this.$emit('updateSearchLoading', true);
 
       await this.$store.dispatch('DataModule/fetchConversations', {
-        appId: this.app.id,
+        projectId: this.project.id,
         search: this.search,
       });
       this.$emit('updateSearchLoading', false);
@@ -281,7 +281,7 @@ export default class FilterSettings extends mixins(BaseMixin) {
     if (this.isLiveMode) {
       this.interval = window.setInterval(async () => {
         this.$emit('loadConversations', {
-          appId: this.app.id,
+          projectId: this.project.id,
           withErrors: this.filterSelectedWithErrors,
           platform: this.filterSelectedPlatform,
         });

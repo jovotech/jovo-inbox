@@ -34,8 +34,8 @@ export class InboxLogService {
         .subQuery()
         .select('platformUserId')
         .from(InboxLogUserEntity, 'loguser')
-        .where('loguser.appId = :appId', {
-          appId: getLastConversationsDto.appId,
+        .where('loguser.projectId = :projectId', {
+          projectId: getLastConversationsDto.projectId,
         })
         .andWhere('loguser.name LIKE :name', {
           name: `%${getLastConversationsDto.search}%`,
@@ -50,11 +50,11 @@ export class InboxLogService {
         .groupBy('log.userId');
       qb1
         .where('inboxlog.id IN ' + subQuery1.getQuery())
-        .andWhere('appId = :appId')
+        .andWhere('projectId = :projectId')
 
         .setParameter('type', InboxLogType.Response)
         .setParameter('last', last)
-        .setParameter('appId', getLastConversationsDto.appId)
+        .setParameter('projectId', getLastConversationsDto.projectId)
         .orderBy('inboxlog.id', 'DESC');
 
       const foundInMappings = await qb1.getMany();
@@ -78,7 +78,7 @@ export class InboxLogService {
       .andWhere('log.createdAt < :last')
 
       .andWhere('log.id NOT IN (:...foundMappingIds)', { foundMappingIds })
-      .groupBy('log.appId')
+      .groupBy('log.projectId')
       .addGroupBy('log.userId');
 
     if (getLastConversationsDto.search) {
@@ -112,11 +112,11 @@ export class InboxLogService {
     }
 
     qb.where('inboxlog.id IN ' + subQuery.getQuery())
-      .andWhere('appId = :appId')
+      .andWhere('projectId = :projectId')
       .andWhere('inboxlog.createdAt < :last')
       .setParameter('type', InboxLogType.Response)
       .setParameter('last', last)
-      .setParameter('appId', getLastConversationsDto.appId)
+      .setParameter('projectId', getLastConversationsDto.projectId)
       .orderBy('inboxlog.id', 'DESC')
       .take(take);
 
@@ -130,6 +130,10 @@ export class InboxLogService {
 
     // create array with extracted requestId from foundlogs
     const requestIds = foundLogs.map((log: InboxLog) => log.requestId);
+
+    if (requestIds.length === 0) {
+      return [];
+    }
 
     const q = getRepository(InboxLogEntity)
       .createQueryBuilder('inboxlog')
@@ -162,7 +166,7 @@ export class InboxLogService {
   ): Promise<UserConversationsResponse> {
     const conditions: FindManyOptions<InboxLog> = {
       where: {
-        appId: selectUserConversationsDto.appId,
+        projectId: selectUserConversationsDto.projectId,
         userId: selectUserConversationsDto.userId,
       },
       take: LOGS_PER_REQUEST,
@@ -195,12 +199,12 @@ export class InboxLogService {
     };
   }
 
-  async getPlatforms(appId: string) {
+  async getPlatforms(projectId: string) {
     const qb = getRepository(InboxLogEntity).createQueryBuilder('inboxlog');
 
     qb.select('platform')
-      .where('appId = :appId')
-      .setParameter('appId', appId)
+      .where('projectId = :projectId')
+      .setParameter('projectId', projectId)
       .groupBy('platform')
       .orderBy('platform', 'ASC');
 
@@ -209,7 +213,7 @@ export class InboxLogService {
     return rawResult.map((item: { platform: string }) => item.platform);
   }
 
-  async exportLogs(appId: string, from?: Date, to?: Date) {
+  async exportLogs(projectId: string, from?: Date, to?: Date) {
     if (!to) {
       to = new Date();
     }
@@ -217,7 +221,7 @@ export class InboxLogService {
     const options: FindManyOptions<InboxLog> = {
       where: [
         {
-          appId,
+          projectId,
           createdAt: Between(from, to),
         },
       ],
@@ -230,8 +234,8 @@ export class InboxLogService {
     return await getRepository(InboxLogEntity).find(options);
   }
 
-  // async exportLogsToCsv(appId: string, from?: Date, to?: Date) {
-  //   const logs = await this.exportLogs(appId, from, to);
+  // async exportLogsToCsv(projectId: string, from?: Date, to?: Date) {
+  //   const logs = await this.exportLogs(projectId, from, to);
   //
   //   const platforms: InboxPlatform[] = [
   //   ];
@@ -242,7 +246,7 @@ export class InboxLogService {
   //     decimalSeparator: '.',
   //     showLabels: true,
   //     showTitle: true,
-  //     title: `Exported data: ${appId}`,
+  //     title: `Exported data: ${projectId}`,
   //     useTextFile: false,
   //     useBom: true,
   //     useKeysAsHeaders: true,

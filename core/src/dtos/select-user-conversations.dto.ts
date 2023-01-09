@@ -2,7 +2,7 @@ import { IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class SelectUserConversationsDto {
   @IsString()
-  appId!: string;
+  projectId!: string;
 
   @IsString()
   userId!: string;

@@ -4,11 +4,11 @@ import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { InboxLogModule } from './modules/inbox-log/inbox-log.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { JovoAppModule } from './modules/jovo-app/jovo-app.module';
 import { InboxLogUserModule } from './modules/inbox-log-user/inbox-log-user.module';
 import { join } from 'path';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { basicAuthMiddleware } from './middlewares/basic-auth.middleware';
+import { ProjectModule } from './modules/project/project.module';
 
 @Module({
   imports: [
@@ -16,11 +16,11 @@ import { basicAuthMiddleware } from './middlewares/basic-auth.middleware';
     ConfigModule.forRoot(),
     ServeStaticModule.forRoot({
       exclude: ['/api*'],
-      rootPath: join(__dirname, '..', '..', 'storage', 'images'),
+      rootPath: join(__dirname, '..', '..', 'storage', 'avatars'),
       serveRoot: '/avatars/',
     }),
     InboxLogModule,
-    JovoAppModule,
+    ProjectModule,
     InboxLogUserModule,
   ],
   controllers: [AppController],

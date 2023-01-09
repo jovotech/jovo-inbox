@@ -39,9 +39,9 @@ export class InboxLogUserController {
     return this.service.getUserConversations(getInboxLogUser);
   }
 
-  @Get(':appId')
-  getAppUsers(@Param('appId') appId: string) {
-    return this.service.geAppUser(appId);
+  @Get(':projectId')
+  getAppUsers(@Param('projectId') projectId: string) {
+    return this.service.geProjectUser(projectId);
   }
 
   @Post('upload-image')

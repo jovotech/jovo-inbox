@@ -16,7 +16,7 @@ export class InboxLogEntity implements InboxLog {
 
   @Index()
   @Column()
-  appId!: string;
+  projectId!: string;
 
   @Index()
   @Column()

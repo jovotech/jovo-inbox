@@ -2,7 +2,7 @@ import { IsString } from 'class-validator';
 
 export class SearchUserDto {
   @IsString()
-  appId!: string;
+  projectId!: string;
 
   @IsString()
   query!: string;

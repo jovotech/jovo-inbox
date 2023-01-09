@@ -3,7 +3,7 @@ import { IsOptional, IsString } from 'class-validator';
 export class GetInboxLogUserDto {
   @IsString()
   @IsOptional()
-  appId?: string;
+  projectId?: string;
 
   @IsString()
   @IsOptional()

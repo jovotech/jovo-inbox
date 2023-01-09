@@ -35,9 +35,9 @@ export class InboxLogUserService {
       cond.where = {
         id: dto.id,
       };
-    } else if (dto.appId && dto.platformUserId) {
+    } else if (dto.projectId && dto.platformUserId) {
       cond.where = {
-        appId: dto.appId,
+        projectId: dto.projectId,
         platformUserId: dto.platformUserId,
       };
     }
@@ -47,7 +47,7 @@ export class InboxLogUserService {
     if (!user) {
       user = new InboxLogUserEntity();
       user.platformUserId = dto.platformUserId;
-      user.appId = dto.appId;
+      user.projectId = dto.projectId;
     }
     user.name = dto.name;
     user.notes = dto.notes;
@@ -65,9 +65,9 @@ export class InboxLogUserService {
       cond.where = {
         id: dto.id,
       };
-    } else if (dto.appId && dto.platformUserId) {
+    } else if (dto.projectId && dto.platformUserId) {
       cond.where = {
-        appId: dto.appId,
+        projectId: dto.projectId,
         platformUserId: dto.platformUserId,
       };
     }
@@ -80,7 +80,9 @@ export class InboxLogUserService {
     return user;
   }
 
-  async getUserConversations(dto: Pick<GetInboxLogUserDto, 'id' | 'appId'>) {
+  async getUserConversations(
+    dto: Pick<GetInboxLogUserDto, 'id' | 'projectId'>,
+  ) {
     const user = await getRepository(InboxLogUserEntity).findOne({
       id: dto.id,
     });
@@ -92,15 +94,15 @@ export class InboxLogUserService {
     const service = new InboxLogService();
 
     return service.getUserConversations({
-      appId: user.appId,
+      projectId: user.projectId,
       userId: user.platformUserId,
     });
   }
 
-  async geAppUser(appId: string) {
+  async geProjectUser(projectId: string) {
     return await getRepository(InboxLogUserEntity).find({
       where: {
-        appId: appId,
+        projectId: projectId,
       },
     });
   }
@@ -115,7 +117,7 @@ export class InboxLogUserService {
 
     let user = await getRepository(InboxLogUserEntity).findOne({
       where: {
-        appId: updateInboxLogUserDto.appId,
+        projectId: updateInboxLogUserDto.projectId,
         platformUserId: updateInboxLogUserDto.platformUserId,
       },
     });
@@ -132,7 +134,6 @@ export class InboxLogUserService {
 
     const filesDirectory = path.join(USER_AVATAR_PATH);
 
-    console.log({ filesDirectory });
     if (!fs.existsSync(filesDirectory)) {
       fs.mkdirSync(filesDirectory, { recursive: true });
     }
@@ -143,7 +144,7 @@ export class InboxLogUserService {
   async deleteImage(deleteUserImageDto: DeleteUserImageDto) {
     const user = await getRepository(InboxLogUserEntity).findOne({
       where: {
-        id: deleteUserImageDto.jovoAppUserId,
+        id: deleteUserImageDto.jovoProjectUserId,
       },
     });
 
@@ -151,7 +152,6 @@ export class InboxLogUserService {
       throw new NotFoundException();
     }
     const filePath = path.join(USER_AVATAR_PATH, user.image);
-    console.log({ filePath });
     if (fs.existsSync(filePath)) {
       fs.unlinkSync(filePath);
     }

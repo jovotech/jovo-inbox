@@ -1,11 +1,3 @@
-export interface InboxConfig {
-  apps: AppConfig[];
-}
-
-export interface AppConfig {
-  name: string;
-  id: string;
-}
 
 export interface ExportInboxLog {
   userId: string;

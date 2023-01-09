@@ -6,7 +6,7 @@ export class AddInboxLogDto implements Omit<InboxLog, 'id' | 'createdAt'> {
   type!: InboxLogType;
 
   @IsString()
-  appId!: string;
+  projectId!: string;
 
   @IsString()
   userId!: string;

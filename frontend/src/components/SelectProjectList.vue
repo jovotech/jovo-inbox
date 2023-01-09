@@ -12,7 +12,7 @@
         <span class="flex w-full justify-between items-center">
           <span class="flex min-w-0 items-center justify-between space-x-3">
             <span class="flex-1 min-w-0">
-              <span class="text-gray-900 text-sm font-medium truncate">{{ app.name }}</span>
+              <span class="text-gray-900 text-sm font-medium truncate">{{ project.name }}</span>
             </span>
           </span>
           <svg
@@ -44,15 +44,15 @@
         class="max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto scrollbar focus:outline-none sm:text-sm"
       >
         <span
-          v-for="a in apps"
+          v-for="a in projects"
           v-bind:key="a.id"
-          @click="selectApp(a)"
+          @click="selectProject(a)"
           class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 group text-gray-900 cursor-default select-none relative pl-3 pr-9 hover:bg-primary-600 hover:text-white"
           role="menuitem"
           >{{ a.name }}
 
           <span
-            v-if="a.id === app.id"
+            v-if="a.id === project.id"
             class="text-primary-600 group-hover:text-jovo-blue absolute inset-y-0 right-0 flex items-center pr-4"
           >
             <svg
@@ -72,20 +72,46 @@
           </span>
         </span>
       </div>
+      <span
+        @click="handleOpenNewProjectModal()"
+        class="block px-4 py-3 border-t text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 group text-gray-900 cursor-default select-none flex items-center relative pl-3 pr-9 hover:bg-primary-600 hover:text-white"
+        role="menuitem"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          class="w-4 h-4 mr-2"
+        >
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+        </svg>
+
+        Create new project
+      </span>
     </div>
+    <new-project-modal
+      v-if="showNewProjectModal"
+      :show="showNewProjectModal"
+      @close="showNewProjectModal = false"
+      @created="onNewProjectCreated"
+    ></new-project-modal>
   </div>
 </template>
 <script lang="ts">
-import { JovoAppMetaData } from 'jovo-inbox-core';
 import Component, { mixins } from 'vue-class-component';
 import { BaseMixin } from '@/mixins/BaseMixin';
+import { Project } from 'jovo-inbox-core';
+import NewProjectModal from '@/components/NewProjectModal.vue';
 
 @Component({
-  name: 'select-app-list',
-  components: {},
+  name: 'select-project-list',
+  components: { NewProjectModal },
 })
-export default class SelectAppList extends mixins(BaseMixin) {
+export default class SelectProjectList extends mixins(BaseMixin) {
   opened = false;
+  showNewProjectModal = false;
 
   open() {
     if (this.opened) {
@@ -111,17 +137,23 @@ export default class SelectAppList extends mixins(BaseMixin) {
       this.close();
     }
   }
-  async selectApp(app: JovoAppMetaData) {
-    await this.$store.dispatch('DataModule/selectApp', app);
-    await this.$store.dispatch('DataModule/fetchConversations', {
-      appId: app.id,
-    });
+  async selectProject(project: Project) {
+    await this.$store.dispatch('DataModule/selectProject', project);
 
     this.close();
     this.$emit('select-conversation');
-    this.$router.push({ name: 'app', params: { appId: app.id } }).catch(() => {
+    this.$router.push({ name: 'project', params: { projectId: project.id } }).catch(() => {
       // ignore
     });
+  }
+  handleOpenNewProjectModal() {
+    this.showNewProjectModal = true;
+    this.close();
+  }
+
+  async onNewProjectCreated(project: Project) {
+    this.$store.commit('DataModule/addProject', project);
+    await this.$store.dispatch('DataModule/selectProject', project);
   }
 }
 </script>

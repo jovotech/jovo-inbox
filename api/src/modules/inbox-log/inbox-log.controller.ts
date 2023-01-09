@@ -48,21 +48,21 @@ export class InboxLogController {
     );
   }
 
-  @Get('platform/:appId')
-  getPlatforms(@Param('appId') appId: string): Promise<any> {
-    return this.inboxLogService.getPlatforms(appId);
+  @Get('platform/:projectId')
+  getPlatforms(@Param('projectId') projectId: string): Promise<any> {
+    return this.inboxLogService.getPlatforms(projectId);
   }
 
   @Get('export')
   @Header('Content-type', 'text/csv; charset=utf-8')
   async exportLog(
-    @Query('appId') appId: string,
+    @Query('projectId') projectId: string,
     @Query('from') from: string,
     @Query('to') to: string,
   ) {
     // TODO: temporary not useable
     // return this.inboxLogService.exportLogsToCsv(
-    //   appId,
+    //   projectId,
     //   from ? new Date(from) : undefined,
     //   to ? new Date(to) : undefined,
     // );

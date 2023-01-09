@@ -217,12 +217,12 @@ export default class UserSettingsModal extends mixins(BaseMixin) {
     }
     try {
       await Api.updateInboxLogUser({
-        appId: this.conversation.appId,
+        projectId: this.conversation.projectId,
         platformUserId: this.conversation.userId,
         notes: this.user.notes,
         name: this.user.name,
       });
-      await this.$store.dispatch('DataModule/buildAppUsersMap', this.app.id);
+      await this.$store.dispatch('DataModule/buildProjectUsersMap', this.project.id);
       this.cancel();
     } catch (e) {
       console.log(e);
@@ -241,14 +241,14 @@ export default class UserSettingsModal extends mixins(BaseMixin) {
     try {
       await Api.uploadUserImage(
         {
-          appId: this.conversation.appId,
+          projectId: this.conversation.projectId,
           platformUserId: this.conversation.userId,
         },
         formData,
       );
       (this.$refs.file as HTMLFormElement).value = '';
       await this.getInboxLogUserData();
-      await this.$store.dispatch('DataModule/buildAppUsersMap', this.app.id);
+      await this.$store.dispatch('DataModule/buildProjectUsersMap', this.project.id);
     } catch (e) {
       console.log(e);
     }
@@ -299,12 +299,12 @@ export default class UserSettingsModal extends mixins(BaseMixin) {
     try {
       if (this.user?.id) {
         await Api.deleteUserImage({
-          appId: this.app.id,
-          jovoAppUserId: this.user.id,
+          projectId: this.project.id,
+          jovoProjectUserId: this.user.id,
         });
         this.user.image = undefined;
         await this.getInboxLogUserData();
-        await this.$store.dispatch('DataModule/buildAppUsersMap', this.app.id);
+        await this.$store.dispatch('DataModule/buildProjectUsersMap', this.project.id);
       }
     } catch (e) {
       console.log(e);
@@ -318,7 +318,7 @@ export default class UserSettingsModal extends mixins(BaseMixin) {
       }
       const result = await Api.getInboxLogUser({
         platformUserId: this.conversation.userId,
-        appId: this.conversation.appId,
+        projectId: this.conversation.projectId,
       });
 
       this.user = {

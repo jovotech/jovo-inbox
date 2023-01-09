@@ -20,21 +20,21 @@ const routes: Array<RouteConfig> = [
     },
   },
   {
-    path: '/:appId',
-    name: 'app',
-    component: () => import(/* webpackChunkName: "help" */ '@/views/AppView.vue'),
+    path: '/:projectId',
+    name: 'project',
+    component: () => import(/* webpackChunkName: "help" */ '@/views/ProjectView.vue'),
     meta: {
-      layout: 'app-layout',
+      layout: 'project-layout',
     },
   },
   {
     name: 'conversation',
-    path: '/:appId/:userId',
-    component: () => import(/* webpackChunkName: "help" */ '@/views/AppView.vue'),
+    path: '/:projectId/:userId',
+    component: () => import(/* webpackChunkName: "help" */ '@/views/ProjectView.vue'),
     children: [
       {
         name: 'sessions',
-        path: '/:appId/:userId/sessions',
+        path: '/:projectId/:userId/sessions',
       },
     ],
   },

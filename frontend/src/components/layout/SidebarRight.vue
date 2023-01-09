@@ -93,10 +93,10 @@ export default class SidebarRight extends mixins(BaseMixin) {
     if (!this.user.id) {
       try {
         await Api.updateInboxLogUser({
-          appId: this.conversation.appId,
+          projectId: this.conversation.projectId,
           platformUserId: this.conversation.userId,
         });
-        await this.$store.dispatch('DataModule/buildAppUsersMap', this.app.id);
+        await this.$store.dispatch('DataModule/buildProjectUsersMap', this.project.id);
         // await this.getInboxLogUserData();
       } catch (e) {
         console.log(e);

@@ -1,15 +1,18 @@
-import { Module, MutationAction, VuexModule } from 'vuex-module-decorators';
+import { Module, Mutation, MutationAction, VuexModule } from 'vuex-module-decorators';
 import {
   InboxLog,
-  JovoAppMetaData,
   SelectUserConversationsDto,
   InboxLogUser,
   GetLastConversationsDto,
   Interaction,
+  Project,
 } from 'jovo-inbox-core';
 import { Api } from '@/Api';
 export enum DataAction {
-  fetchApps = 'fetchApps',
+  fetchProjects = 'fetchProjects',
+  addProject = 'addProject',
+  deleteProject = 'deleteProject',
+
   fetchConversations = 'fetchConversations',
   clearConversations = 'clearConversations',
 
@@ -20,18 +23,18 @@ export enum DataAction {
   appendUserConversations = 'appendUserConversations',
   appendLastConversations = 'appendLastConversations',
 
-  buildAppUsersMap = 'buildAppUsersMap',
+  buildProjectUsersMap = 'buildProjectUsersMap',
 
-  selectApp = 'selectApp',
+  selectProject = 'selectProject',
   selectInboxLog = 'selectInboxLog',
   selectInteraction = 'selectInteraction',
 }
 
 export interface DataState {
-  apps: JovoAppMetaData[];
+  projects: Project[];
   conversations: Interaction[];
   selectedUserConversations: InboxLog[];
-  selectedApp: JovoAppMetaData[];
+  selectedProject: Project;
   selectedInboxLog: InboxLog;
   nameMap: Record<
     string,
@@ -44,14 +47,14 @@ export interface DataState {
 
 @Module({ namespaced: true, name: 'DataModule' })
 export class DataModule extends VuexModule<DataState> {
-  apps: JovoAppMetaData[] = [];
+  projects: Project[] = [];
   conversations: Interaction[] = [];
   selectedUserConversations: InboxLog[] = [];
 
   selectedInboxLog: InboxLog | null = null;
   selectedInteraction: Interaction | null = null;
 
-  selectedApp: JovoAppMetaData | null = null;
+  selectedProject: Project | null = null;
   nameMap: Record<
     string,
     {
@@ -60,16 +63,29 @@ export class DataModule extends VuexModule<DataState> {
     }
   > = {};
 
-  @MutationAction({ mutate: ['apps'], rawError: true })
-  async [DataAction.fetchApps]() {
-    const result = await Api.getApps();
-    return { apps: result.apps };
+  @MutationAction({ mutate: ['projects'], rawError: true })
+  async [DataAction.fetchProjects]() {
+    const result = await Api.getProjects();
+    return { projects: result };
   }
 
-  @MutationAction({ mutate: ['selectedApp'], rawError: true })
-  async [DataAction.selectApp](app: JovoAppMetaData) {
-    document.title = app.name + ' -  Jovo Inbox';
-    return { selectedApp: app };
+  @MutationAction({ mutate: ['selectedProject'], rawError: true })
+  async [DataAction.selectProject](project: Project) {
+    document.title = project.name + ' -  Jovo Inbox';
+    return { selectedProject: project };
+  }
+
+  @Mutation
+  [DataAction.addProject](project: Project) {
+    this.projects.push(project);
+  }
+
+  @MutationAction({ mutate: ['projects'], rawError: true })
+  async [DataAction.deleteProject](project: Project) {
+    await Api.deleteProject(project.id);
+    const responseGetProjects = await Api.getProjects();
+
+    return { projects: responseGetProjects };
   }
 
   @MutationAction({ mutate: ['conversations'], rawError: true })
@@ -118,8 +134,8 @@ export class DataModule extends VuexModule<DataState> {
   }
 
   @MutationAction({ mutate: ['nameMap'], rawError: true })
-  async [DataAction.buildAppUsersMap](appId: string) {
-    const result = await Api.getInboxAppUsers(appId);
+  async [DataAction.buildProjectUsersMap](projectId: string) {
+    const result = await Api.getInboxProjectUsers(projectId);
 
     const nameMap: Record<
       string,

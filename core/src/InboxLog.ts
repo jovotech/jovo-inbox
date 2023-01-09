@@ -16,7 +16,7 @@ export interface InboxLog {
   id: number;
   createdAt: Date;
   type: InboxLogTypeLike;
-  appId: string;
+  projectId: string;
   platform: string;
   userId: string;
   requestId: string;
