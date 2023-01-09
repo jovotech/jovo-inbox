@@ -69,6 +69,8 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile.nginx
+      args:
+        - VUE_APP_BACKEND_URL=${VUE_APP_BACKEND_URL}
     volumes:
       - ./storage:/var/www/html/storage/
     ports:
