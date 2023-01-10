@@ -74,6 +74,7 @@ services:
         - VUE_APP_API_BASE_URL=${VUE_APP_API_BASE_URL}
     volumes:
       - ./storage:/var/www/html/storage/
+      - /etc/letsencrypt:/etc/letsencrypt
     ports:
       - "80:80"
       - "443:443"
