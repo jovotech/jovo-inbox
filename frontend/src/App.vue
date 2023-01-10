@@ -8,7 +8,7 @@
     <div v-else class="flex items-center justify-center h-screen">
       <div
         @click="showNewProjectModal = true"
-        class="text-center text-lg py-3 px-4 border-2 flex items-center text-gray-600 hover:text-gray-800 border-dashed rounded-lg cursor-pointer border-gray-500 hover:border-gray-800"
+        class="text-center text-lg py-3 px-4 border-2a flex items-center text-gray-600 hover:text-gray-800 border-dasheds rounded-lg cursor-pointer border-gray-500 hover:border-gray-800"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -20,7 +20,7 @@
         >
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
         </svg>
-        New project
+        <span>New project</span>
       </div>
     </div>
     <new-project-modal

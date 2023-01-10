@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
-import { BASE_URL } from '@/main';
+import { BASE_API_URL } from '@/main';
 import {
   CreateProjectDto,
   DeleteUserImageDto,
@@ -18,7 +18,7 @@ export class Api {
   static async getLastConversations(getLastConversationsDto: GetLastConversationsDto) {
     const config: AxiosRequestConfig = {
       method: 'POST',
-      url: `${BASE_URL}/logs/conversations`,
+      url: `${BASE_API_URL}/logs/conversations`,
       data: getLastConversationsDto,
     };
 
@@ -31,7 +31,7 @@ export class Api {
   static async getUserConversations(selectUserConversationsDto: SelectUserConversationsDto) {
     const config: AxiosRequestConfig = {
       method: 'POST',
-      url: `${BASE_URL}/logs/user/conversation`,
+      url: `${BASE_API_URL}/logs/user/conversation`,
       data: selectUserConversationsDto,
     };
     const result = await axios.request<UserConversationsResponse>(config);
@@ -44,7 +44,7 @@ export class Api {
   static async getProjects() {
     const config: AxiosRequestConfig = {
       method: 'GET',
-      url: `${BASE_URL}/project`,
+      url: `${BASE_API_URL}/project`,
     };
     const result = await axios.request<Project[]>(config);
     if (result.status === 200 && result.data) {
@@ -56,7 +56,7 @@ export class Api {
   static async updateInboxLogUser(updateInboxLogUserDto: UpdateInboxLogUserDto) {
     const config: AxiosRequestConfig = {
       method: 'PUT',
-      url: `${BASE_URL}/inboxloguser`,
+      url: `${BASE_API_URL}/inboxloguser`,
       data: updateInboxLogUserDto,
     };
 
@@ -66,7 +66,7 @@ export class Api {
   static async getInboxLogUser(getInboxLogUserDto: GetInboxLogUserDto) {
     const config: AxiosRequestConfig = {
       method: 'POST',
-      url: `${BASE_URL}/inboxloguser`,
+      url: `${BASE_API_URL}/inboxloguser`,
       data: getInboxLogUserDto,
     };
     return await axios.request<InboxLogUser>(config);
@@ -75,7 +75,7 @@ export class Api {
   static async getInboxProjectUsers(projectId: string) {
     const config: AxiosRequestConfig = {
       method: 'GET',
-      url: `${BASE_URL}/inboxloguser/${projectId}`,
+      url: `${BASE_API_URL}/inboxloguser/${projectId}`,
     };
     return await axios.request<InboxLogUser[]>(config);
   }
@@ -83,7 +83,7 @@ export class Api {
   static async getProjectPlatforms(projectId: string) {
     const config: AxiosRequestConfig = {
       method: 'GET',
-      url: `${BASE_URL}/logs/platform/${projectId}`,
+      url: `${BASE_API_URL}/logs/platform/${projectId}`,
     };
     return await axios.request<string[]>(config);
   }
@@ -93,7 +93,7 @@ export class Api {
   ) {
     const config: AxiosRequestConfig = {
       method: 'POST',
-      url: `${BASE_URL}/inboxloguser/conversations`,
+      url: `${BASE_API_URL}/inboxloguser/conversations`,
       data: getInboxLogUserDto,
     };
     return await axios.request<{ logs: InboxLog[] }>(config);
@@ -107,7 +107,7 @@ export class Api {
 
     const config: AxiosRequestConfig = {
       method: 'POST',
-      url: `${BASE_URL}/inboxloguser/upload-image`,
+      url: `${BASE_API_URL}/inboxloguser/upload-image`,
       data,
     };
 
@@ -117,7 +117,7 @@ export class Api {
   static async deleteUserImage(deleteUserImageDto: DeleteUserImageDto): Promise<void> {
     const config: AxiosRequestConfig = {
       method: 'DELETE',
-      url: `${BASE_URL}/inboxloguser/delete-image`,
+      url: `${BASE_API_URL}/inboxloguser/delete-image`,
       data: deleteUserImageDto,
     };
     await axios.request<void>(config);
@@ -126,7 +126,7 @@ export class Api {
   static async createProject(dto: CreateProjectDto): Promise<AxiosResponse<Project>> {
     const config: AxiosRequestConfig = {
       method: 'PUT',
-      url: `${BASE_URL}/project`,
+      url: `${BASE_API_URL}/project`,
       data: dto,
     };
 
@@ -139,7 +139,7 @@ export class Api {
   ): Promise<AxiosResponse<Project>> {
     const config: AxiosRequestConfig = {
       method: 'POST',
-      url: `${BASE_URL}/project/${projectId}`,
+      url: `${BASE_API_URL}/project/${projectId}`,
       data: dto,
     };
 
@@ -149,7 +149,7 @@ export class Api {
   static async deleteProject(projectId: string): Promise<AxiosResponse<void>> {
     const config: AxiosRequestConfig = {
       method: 'DELETE',
-      url: `${BASE_URL}/project/${projectId}`,
+      url: `${BASE_API_URL}/project/${projectId}`,
     };
 
     return await axios.request<void>(config);

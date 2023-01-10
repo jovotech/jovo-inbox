@@ -6,7 +6,7 @@ import { GoogleBusinessPlatform } from '@jovotech/platform-googlebusiness';
 import { GoogleAssistantPlatform } from '@jovotech/platform-googleassistant';
 import { WebPlatform } from '@jovotech/platform-web';
 
-export const API_BASE_URL = process.env.VUE_APP_API_BASE_URL;
+export const BASE_URL = process.env.VUE_APP_BASE_APP_URL;
 
 export const LIVE_MODE_POLLING_INTERVAL_IN_MS = 5000;
 export const DEBUGGER_PLATFORM_TYPE = 'jovo-debugger';

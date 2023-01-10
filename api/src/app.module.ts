@@ -13,7 +13,9 @@ import { ProjectModule } from './modules/project/project.module';
 @Module({
   imports: [
     TypeOrmModule.forRoot(),
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({
+      envFilePath: './../.env',
+    }),
     ServeStaticModule.forRoot({
       exclude: ['/api*'],
       rootPath: join(__dirname, '..', '..', 'storage', 'avatars'),

@@ -2,7 +2,7 @@ import { Component, Vue } from 'vue-property-decorator';
 import { DisplayHelper } from '@/utils/DisplayHelper';
 import { InboxLog, Interaction, Project, Session } from 'jovo-inbox-core';
 import { FormatUtil } from '@/utils/FormatUtil';
-import { API_BASE_URL, PLATFORMS } from '@/constants';
+import { BASE_URL, PLATFORMS } from '@/constants';
 import { OutputTemplate, OutputTemplateConverter } from '@jovotech/framework';
 
 @Component
@@ -18,7 +18,7 @@ export class BaseMixin extends Vue {
   }
   getImage(conversation: InboxLog) {
     if (this.nameMap[conversation.userId] && this.nameMap[conversation.userId].image) {
-      return `${API_BASE_URL}/avatars/${
+      return `${BASE_URL}/avatars/${
         this.nameMap[conversation.userId].image
       }?random=${Math.random()}`;
     }

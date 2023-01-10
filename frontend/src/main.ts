@@ -10,7 +10,7 @@ declare module 'vue/types/vue' {
     $clipboard(value: string): void;
   }
 }
-export const BASE_URL = process.env.VUE_APP_BACKEND_URL;
+export const BASE_API_URL = process.env.VUE_APP_BASE_APP_URL + '/api';
 
 Vue.use(Clipboard);
 Vue.config.productionTip = false;

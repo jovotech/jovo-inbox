@@ -1,6 +1,10 @@
 const webpack = require('webpack');
 const path = require('path');
 
+require('dotenv').config({
+  path: `../.env`, // take .env file from root folder
+});
+
 const ignoreJovoCliPlugin = new webpack.IgnorePlugin({
   resourceRegExp: /.\/cli$/,
   contextRegExp: /@jovotech[/\\]platform-\w+[/\\]dist[/\\]\w+$/,
