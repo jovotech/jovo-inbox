@@ -71,8 +71,7 @@ services:
       context: .
       dockerfile: ./Dockerfile.nginx
       args:
-        - VUE_APP_BACKEND_URL=${VUE_APP_BACKEND_URL}
-        - VUE_APP_API_BASE_URL=${VUE_APP_API_BASE_URL}
+        - VUE_APP_BASE_APP_URL=${VUE_APP_BASE_APP_URL}
     volumes:
       - ./storage:/var/www/html/storage/
       - /etc/letsencrypt:/etc/letsencrypt
