@@ -28,7 +28,7 @@ services:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_HOST: ${MYSQL_HOST}
       MYSQL_USER: ${MYSQL_USER}
-      MYSQL_USER_PASS: ${MYSQL_USER_PASS}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     env_file: .env
   db:
     image: mysql:latest
