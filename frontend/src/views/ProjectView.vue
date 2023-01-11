@@ -18,6 +18,7 @@
           v-if="showEditProjectModal"
           :show="showEditProjectModal"
           @close="showEditProjectModal = false"
+          @updated="handleProjectUpdated"
           @deleted="handleProjectDeleted"
         ></edit-project-modal>
       </div>
@@ -38,6 +39,7 @@ import MainPanel from '@/components/layout/MainPanel.vue';
 import SidebarRight from '@/components/layout/SidebarRight.vue';
 import { EditIcon } from 'vue-feather-icons';
 import EditProjectModal from '@/components/EditProjectModal.vue';
+import { Project } from 'jovo-inbox-core';
 
 @Component({
   name: 'project-view',
@@ -60,6 +62,11 @@ export default class ProjectView extends mixins(BaseMixin) {
         this.$store.state.DataModule.projects[0],
       );
     }
+  }
+
+  async handleProjectUpdated(project: Project) {
+    await this.$store.dispatch('DataModule/fetchProjects');
+    await this.$store.dispatch('DataModule/selectProject', project);
   }
 }
 </script>

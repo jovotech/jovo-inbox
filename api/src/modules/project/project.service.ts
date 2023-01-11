@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { CreateProjectDto, UpdateProjectDto } from 'jovo-inbox-core';
 import { getRepository } from 'typeorm';
 import { ProjectEntity } from '../../entity/project.entity';
+import { InboxLogEntity } from '../../entity/inbox-log.entity';
+import { InboxLogUserEntity } from '../../entity/inbox-log-user.entity';
 
 @Injectable()
 export class ProjectService {
@@ -46,9 +48,30 @@ export class ProjectService {
     project.id = dto.id;
     project.name = dto.name;
 
-    // TODO: change inbox logs project id
+    // update project id in all logs with old project id
+    if (projectId !== dto.id) {
+      await getRepository(InboxLogEntity)
+        .createQueryBuilder()
+        .update(InboxLogEntity)
+        .set({ projectId: dto.id })
+        .where('projectId = :oldProjectId', { oldProjectId: projectId })
+        .execute();
 
-    return getRepository(ProjectEntity).save(project);
+      await getRepository(InboxLogUserEntity)
+        .createQueryBuilder()
+        .update(InboxLogUserEntity)
+        .set({ projectId: dto.id })
+        .where('projectId = :oldProjectId', { oldProjectId: projectId })
+        .execute();
+    }
+    await getRepository(ProjectEntity).save(project);
+
+    const oldProject = await getRepository(ProjectEntity).findOne({
+      where: { id: projectId },
+    });
+    await getRepository(ProjectEntity).remove(oldProject);
+
+    return project;
   }
 
   async deleteProject(projectId: string) {
@@ -56,7 +79,21 @@ export class ProjectService {
       where: { id: projectId },
     });
 
-    // todo: delete all logs for this project
+    if (!project) {
+      throw new Error("Project doesn't exists");
+    }
+
+    await getRepository(InboxLogEntity)
+      .createQueryBuilder()
+      .delete()
+      .where('projectId = :projectId', { projectId })
+      .execute();
+
+    await getRepository(InboxLogUserEntity)
+      .createQueryBuilder()
+      .delete()
+      .where('projectId = :projectId', { projectId })
+      .execute();
 
     return getRepository(ProjectEntity).remove(project);
   }
