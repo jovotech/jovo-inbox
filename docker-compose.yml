@@ -36,7 +36,6 @@ services:
     container_name: ${MYSQL_HOST}
     command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     volumes:
-      - storage:/usr/src/app/storage
       - db_data:/var/lib/mysql
     ports:
       - "3308:3306"
@@ -75,6 +74,7 @@ services:
     volumes:
       - ./storage:/var/www/html/storage/
       - /etc/letsencrypt:/etc/letsencrypt
+      - /root/certs-data/:/data/letsencrypt/
     ports:
       - "80:80"
       - "443:443"
