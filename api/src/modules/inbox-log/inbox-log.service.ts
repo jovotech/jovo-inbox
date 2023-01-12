@@ -2,6 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { InboxLogEntity } from '../../entity/inbox-log.entity';
 import {
   GetLastConversationsDto,
+  getOutputText,
+  getPlatformRequest,
+  getPlatformResponseOutputTemplate,
   InboxLog,
   InboxLogType,
   Interaction,
@@ -11,6 +14,8 @@ import {
 import { Between, FindManyOptions, getRepository, MoreThan } from 'typeorm';
 import { LOGS_PER_REQUEST } from '../../constants';
 import { InboxLogUserEntity } from '../../entity/inbox-log-user.entity';
+import { ExportToCsv } from 'export-to-csv';
+import { ExportInboxLog } from '../interfaces';
 
 @Injectable()
 export class InboxLogService {
@@ -234,67 +239,56 @@ export class InboxLogService {
     return await getRepository(InboxLogEntity).find(options);
   }
 
-  // async exportLogsToCsv(projectId: string, from?: Date, to?: Date) {
-  //   const logs = await this.exportLogs(projectId, from, to);
-  //
-  //   const platforms: InboxPlatform[] = [
-  //   ];
-  //
-  //   const options = {
-  //     fieldSeparator: ',',
-  //     quoteStrings: '"',
-  //     decimalSeparator: '.',
-  //     showLabels: true,
-  //     showTitle: true,
-  //     title: `Exported data: ${projectId}`,
-  //     useTextFile: false,
-  //     useBom: true,
-  //     useKeysAsHeaders: true,
-  //   };
-  //
-  //   const csvExporter = new ExportToCsv(options);
-  //
-  //   const data: Partial<ExportInboxLog>[] = [];
-  //
-  //   let lastUser = '';
-  //   for (let i = 0; i < logs.length; i++) {
-  //     const log = logs[i];
-  //     const row: Partial<ExportInboxLog> = {};
-  //
-  //     // user id
-  //     if (lastUser !== log.userId) {
-  //       row.userId = log.userId;
-  //       lastUser = log.userId;
-  //     } else {
-  //       row.userId = '';
-  //     }
-  //
-  //     const platformRequest = InboxPlatform.getPlatformRequest(log, platforms);
-  //
-  //     // user said
-  //     row.userSaid = platformRequest ? platformRequest.getPlainText() : '';
-  //
-  //     const platformResponse = InboxPlatform.getPlatformResponse(
-  //       log,
-  //       platforms,
-  //     );
-  //
-  //     // bot said
-  //     row.botSaid = platformResponse
-  //       ? platformResponse
-  //           .getSpeechPlain()
-  //           .replace(/<[^>]*>?/gm, '')
-  //           .replace(/&nbsp;/g, ' ')
-  //       : '';
-  //     // intent
-  //     row.intent = platformResponse?.getNluPlain()
-  //       ? platformResponse?.getNluPlain()
-  //       : '';
-  //
-  //     row.timestamp = log.createdAt.toISOString();
-  //     data.push(row);
-  //   }
-  //
-  //   return csvExporter.generateCsv(data, true);
-  // }
+  async exportLogsToCsv(projectId: string, from?: Date, to?: Date) {
+    const logs = await this.exportLogs(projectId, from, to);
+
+    const options = {
+      fieldSeparator: ',',
+      quoteStrings: '"',
+      decimalSeparator: '.',
+      showLabels: true,
+      showTitle: true,
+      title: `Exported data: ${projectId}`,
+      useTextFile: false,
+      useBom: true,
+      useKeysAsHeaders: true,
+    };
+
+    const csvExporter = new ExportToCsv(options);
+
+    const data: Partial<ExportInboxLog>[] = [];
+
+    let lastUser = '';
+    for (let i = 0; i < logs.length; i++) {
+      const log = logs[i];
+      const row: Partial<ExportInboxLog> = {};
+
+      // user id
+      if (lastUser !== log.userId) {
+        row.userId = log.userId;
+        lastUser = log.userId;
+      } else {
+        row.userId = '';
+      }
+
+      const platformRequest = getPlatformRequest(log);
+      row.userSaid = platformRequest.text;
+
+      const outputTemplate = await getPlatformResponseOutputTemplate(log);
+      if (outputTemplate && outputTemplate.length > 0) {
+        const lastOutput = outputTemplate[outputTemplate.length - 1];
+
+        // bot said
+        row.botSaid = getOutputText(lastOutput);
+      }
+
+      // intent
+      // TODO: get intent from log
+
+      row.timestamp = log.createdAt.toISOString();
+      data.push(row);
+    }
+
+    return csvExporter.generateCsv(data, true);
+  }
 }

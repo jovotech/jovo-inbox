@@ -16,7 +16,14 @@
     "class-validator": "^0.13.2",
     "lodash.get": "^4.4.2",
     "lodash.merge": "^4.6.2",
-    "lodash.set": "^4.3.2"
+    "lodash.set": "^4.3.2",
+    "@jovotech/framework": "^4.5.2",
+    "@jovotech/platform-alexa": "^4.5.2",
+    "@jovotech/platform-core": "^4.5.2",
+    "@jovotech/platform-facebookmessenger": "^4.5.2",
+    "@jovotech/platform-googleassistant": "^4.5.2",
+    "@jovotech/platform-googlebusiness": "^4.5.2",
+    "@jovotech/platform-web": "^4.5.2"
   },
   "devDependencies": {
     "@types/lodash.get": "^4.4.6",

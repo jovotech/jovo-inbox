@@ -60,11 +60,10 @@ export class InboxLogController {
     @Query('from') from: string,
     @Query('to') to: string,
   ) {
-    // TODO: temporary not useable
-    // return this.inboxLogService.exportLogsToCsv(
-    //   projectId,
-    //   from ? new Date(from) : undefined,
-    //   to ? new Date(to) : undefined,
-    // );
+    return this.inboxLogService.exportLogsToCsv(
+      projectId,
+      from ? new Date(from) : undefined,
+      to ? new Date(to) : undefined,
+    );
   }
 }

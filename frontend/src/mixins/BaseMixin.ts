@@ -1,21 +1,21 @@
 import { Component, Vue } from 'vue-property-decorator';
-import { DisplayHelper } from '@/utils/DisplayHelper';
-import { InboxLog, Interaction, Project, Session } from 'jovo-inbox-core';
+import {
+  getOutputText,
+  getPlatformRequest,
+  getPlatformResponseOutputTemplate,
+  getRequestPlatform,
+  getResponsePlatform,
+  InboxLog,
+  Interaction,
+  Project,
+  Session,
+} from 'jovo-inbox-core';
 import { FormatUtil } from '@/utils/FormatUtil';
-import { BASE_URL, PLATFORMS } from '@/constants';
-import { OutputTemplate, OutputTemplateConverter } from '@jovotech/framework';
+import { BASE_URL } from '@/constants';
+import { OutputTemplate } from '@jovotech/framework';
 
 @Component
 export class BaseMixin extends Vue {
-  createIcon(id: string, size = 20) {
-    return DisplayHelper.toDisplayIcon(id, {
-      size,
-      format: 'svg',
-      saturation: 0.2,
-      brightness: 0.5,
-      background: [229, 231, 235, 1],
-    });
-  }
   getImage(conversation: InboxLog) {
     if (this.nameMap[conversation.userId] && this.nameMap[conversation.userId].image) {
       return `${BASE_URL}/avatars/${
@@ -97,52 +97,19 @@ export class BaseMixin extends Vue {
   }
 
   getResponsePlatform(inboxLog: InboxLog) {
-    return PLATFORMS.find((platform) =>
-      Array.isArray(inboxLog.payload)
-        ? inboxLog.payload.every((res) => platform.isResponseRelated(res))
-        : platform.isResponseRelated(inboxLog.payload),
-    );
+    return getResponsePlatform(inboxLog);
   }
 
   getRequestPlatform(inboxLog: InboxLog) {
-    return PLATFORMS.find((platform) =>
-      Array.isArray(inboxLog.payload)
-        ? inboxLog.payload.every((req) => platform.isRequestRelated(req))
-        : platform.isRequestRelated(inboxLog.payload),
-    );
+    return getRequestPlatform(inboxLog);
   }
 
   async getPlatformResponseOutputTemplate(inboxLog: InboxLog): Promise<OutputTemplate[]> {
-    const platform = this.getResponsePlatform(inboxLog);
-    if (platform) {
-      const outputTemplateConverter = new OutputTemplateConverter(
-        platform.outputTemplateConverterStrategy,
-      );
-      const output = await outputTemplateConverter.fromResponse(inboxLog.payload);
-
-      if (Array.isArray(output)) {
-        return output;
-      }
-      return [output];
-    }
-
-    return [];
+    return getPlatformResponseOutputTemplate(inboxLog);
   }
 
   getOutputText(output: OutputTemplate): string {
-    if (typeof output.message === 'string') {
-      return output.message;
-    }
-
-    if (Array.isArray(output.message)) {
-      return output.message.join(' ');
-    }
-
-    return output.message?.text || this.removeSSML(output.message!.speech || '');
-  }
-
-  removeSSML(ssml: string): string {
-    return ssml.replace(/<[^>]*>/g, '');
+    return getOutputText(output);
   }
 
   formatMessage(str: string) {
@@ -150,25 +117,7 @@ export class BaseMixin extends Vue {
   }
 
   getPlatformRequest(inboxLog: InboxLog) {
-    const platform = this.getRequestPlatform(inboxLog);
-
-    if (platform) {
-      const platformRequest = platform.createRequestInstance(inboxLog.payload);
-
-      const requestIntent = platformRequest.getIntent();
-      const requestIntentName =
-        typeof requestIntent === 'string' ? requestIntent : requestIntent?.name;
-      const text =
-        platformRequest.getInputText() ||
-        requestIntentName ||
-        (platformRequest.getInputType() as string | undefined) ||
-        '<Unknown>';
-
-      return {
-        type: 'user',
-        text: text,
-      };
-    }
+    return getPlatformRequest(inboxLog);
   }
 
   async selectConversation() {
