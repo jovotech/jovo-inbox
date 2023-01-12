@@ -62,18 +62,6 @@ export default class App extends mixins(BaseMixin) {
           'DataModule/selectProject',
           this.$store.state.DataModule.projects[0],
         );
-      } else {
-        await this.$store.dispatch('DataModule/selectProject', this.project);
-        this.$router
-          .push({
-            name: 'project',
-            params: {
-              projectId: this.project.id,
-            },
-          })
-          .catch(() => {
-            //
-          });
       }
     } catch (e) {
       console.log(e);

@@ -107,10 +107,6 @@ export default class SidebarLeft extends mixins(BaseMixin) {
             id: this.$route.params.id,
             projectId: this.project.id,
           });
-          if (result.data?.logs.length > 0) {
-            // TODO: selection of user doesn't work properly with many users
-            // await this.selectConversation(result.data?.logs[0]);
-          }
         }
       } catch (e) {
         console.log(e);
