@@ -15,7 +15,7 @@ services:
     volumes:
       - ./api/src:/app/api/src
       - ./core/src:/app/core/src
-      - ./storage:/usr/src/app/storage
+      - ./storage:/app/storage
     ports:
       - "4000:4000"
     command: 'npm run start:prod:api'
@@ -26,7 +26,7 @@ services:
     environment:
       MYSQL_PORT: ${MYSQL_PORT}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_HOST: ${MYSQL_HOST}
+      MYSQL_HOST: db
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     env_file: .env
@@ -36,8 +36,7 @@ services:
     container_name: ${MYSQL_HOST}
     command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     volumes:
-      - storage:/usr/src/app/storage
-      - db_data:/var/lib/mysql
+      - mysql_data:/var/lib/mysql
     ports:
       - "3308:3306"
     environment:
@@ -63,28 +62,28 @@ services:
 #      - CHOKIDAR_USEPOLLING=true
 #    networks:
 #      - appnetwork
-  nginx:
-    working_dir: /usr/src/app
-    container_name: nginx
-    restart: always
-    build:
-      context: .
-      dockerfile: ./Dockerfile.nginx
-      args:
-        - VUE_APP_BASE_APP_URL=${VUE_APP_BASE_APP_URL}
-    volumes:
-      - ./storage:/var/www/html/storage/
-      - /etc/letsencrypt:/etc/letsencrypt
-    ports:
-      - "80:80"
-      - "443:443"
-    tty: true
-    env_file: .env
-    networks:
-      - appnetwork
+#  nginx:
+#    working_dir: /usr/src/app
+#    container_name: nginx
+#    restart: always
+#    build:
+#      context: .
+#      dockerfile: ./Dockerfile.nginx
+#      args:
+#        - VUE_APP_BASE_APP_URL=${VUE_APP_BASE_APP_URL}
+#    volumes:
+#      - ./storage:/var/www/html/storage/
+#      - /etc/letsencrypt:/etc/letsencrypt
+#    ports:
+#      - "80:80"
+#      - "443:443"
+#    tty: true
+#    env_file: .env
+#    networks:
+#      - appnetwork
 networks:
   appnetwork:
     driver: bridge
 volumes:
-  db_data:
+  mysql_data:
   storage:
