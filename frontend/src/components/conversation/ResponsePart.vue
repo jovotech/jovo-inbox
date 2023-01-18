@@ -7,10 +7,30 @@
           v-bind:key="index"
           class="py-2 px-4 inline self-end text-gray-800 rounded-xl mb-2 inline-flex px-4 py-2 rounded-xl text-sm bg-white shadow-sm"
         >
-          <p
-            class="font-sans leading-6 whitespace-pre-wrap"
-            v-html="formatMessage(getOutputText(out))"
-          ></p>
+          <div class="font-sans leading-6 whitespace-pre-wrap">
+            <div
+              class="inline ml-0.5"
+              v-for="(chunk, index) in getMessageChunks(getOutputText(out))"
+              v-bind:key="index"
+            >
+              <div v-if="chunk.type === 'audio'" class="inline-flex items-center bg-gray-100">
+                <span class="tag-audio pr-1 inline-block rounded-lg"
+                  ><audio :src="chunk.src" class="audio-player"></audio></span
+                ><span
+                  title="${a}"
+                  class="bg-gray-100 text-gray-400 ml-1 text-sm rounded rounded-l-none pr-1"
+                  >{{ chunk.filename }}</span
+                >
+              </div>
+
+              <span
+                v-else-if="chunk.type === 'break'"
+                class="tag-break italic text-gray-400 font-mono"
+                >(Break {{ chunk.time }})</span
+              >
+              <span v-else-if="chunk.type === 'text'">{{ chunk.text }}</span>
+            </div>
+          </div>
         </div>
         <div class="pl-2">
           <span
@@ -72,7 +92,7 @@ export default class ResponsePart extends mixins(BaseMixin) {
   @Watch('part')
   async watchPart() {
     this.$nextTick(async () => {
-      // this.initPlyrPlayer();
+      this.initPlyrPlayer();
     });
   }
 

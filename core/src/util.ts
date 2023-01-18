@@ -67,7 +67,7 @@ export const getOutputText = (output: OutputTemplate): string => {
     return output.message.join(' ');
   }
 
-  return output.message?.text || removeSSML(output.message!.speech || '');
+  return output.message?.text || output.message?.speech || '';
 };
 
 export const removeSSML = (ssml: string): string => {

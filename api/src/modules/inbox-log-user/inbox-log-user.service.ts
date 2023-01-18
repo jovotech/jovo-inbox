@@ -132,7 +132,6 @@ export class InboxLogUserService {
     await getRepository(InboxLogUserEntity).save(user);
 
     const filesDirectory = path.join(process.env.AVATARS_PATH);
-    console.log(filesDirectory);
 
     if (!fs.existsSync(filesDirectory)) {
       fs.mkdirSync(filesDirectory, { recursive: true });

@@ -79,6 +79,7 @@ import UserConversationListItem from '@/components/layout/partials/UserConversat
 import NewProjectModal from '@/components/NewProjectModal.vue';
 dayjs.extend(utc);
 dayjs.extend(timezone);
+
 @Component({
   name: 'sidebar-left',
   components: {
@@ -101,16 +102,6 @@ export default class SidebarLeft extends mixins(BaseMixin) {
       await this.loadConversations({
         projectId: this.project.id,
       });
-      try {
-        if (this.$route.params.id) {
-          const result = await Api.getInboxLogUserConversations({
-            id: this.$route.params.id,
-            projectId: this.project.id,
-          });
-        }
-      } catch (e) {
-        console.log(e);
-      }
     }
   }
 

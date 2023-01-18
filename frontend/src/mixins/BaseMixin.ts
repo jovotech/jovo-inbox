@@ -112,8 +112,8 @@ export class BaseMixin extends Vue {
     return getOutputText(output);
   }
 
-  formatMessage(str: string) {
-    return FormatUtil.formatMessage(str);
+  getMessageChunks(str: string) {
+    return FormatUtil.getMessageChunks(str);
   }
 
   getPlatformRequest(inboxLog: InboxLog) {

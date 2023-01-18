@@ -73,7 +73,7 @@ import Component, { mixins } from 'vue-class-component';
 import { Prop } from 'vue-property-decorator';
 import { InboxLog, Interaction } from 'jovo-inbox-core';
 import { BaseMixin } from '@/mixins/BaseMixin';
-import { FormatUtil } from '@/utils/FormatUtil';
+import { BreakObject, FormatUtil, TextObject } from '@/utils/FormatUtil';
 import LoadingSpinner from '@/components/layout/partials/LoadingSpinner.vue';
 
 @Component({
@@ -129,11 +129,29 @@ export default class UserConversationListItem extends mixins(BaseMixin) {
         const lastOutput = outputTemplate[outputTemplate.length - 1];
 
         const str = this.getOutputText(lastOutput);
-        if (str.length > 30) {
-          return str.substring(0, 30) + '...';
+
+        const chunks = FormatUtil.getMessageChunks(str);
+
+        let previewText = '';
+
+        for (let i = 0; i < chunks.length; i++) {
+          const chunk = chunks[i];
+          if (chunk.type === 'audio') {
+            previewText += '*Audio* ';
+          }
+          if (chunk.type === 'text') {
+            previewText += (chunk as TextObject).text + ' ';
+          }
+          if (chunk.type === 'break') {
+            previewText += '*break* ';
+          }
         }
 
-        return str;
+        if (previewText.length > 30) {
+          return previewText.substring(0, 30) + '...';
+        }
+
+        return previewText;
       }
     }
 
