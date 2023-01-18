@@ -15,24 +15,10 @@ $ npm run setup:api
 $ npm run setup:frontend
 ```
 
-In `/api` , do 2 things:
 
-* Copy `inbox.config.example.ts` and rename it to `inbox.config.ts`
 * Copy the `.env.example` file and rename it to `.env`
 
-You can add your first app by updating the `.env` file:
 
-```
-APP1_NAME=
-APP1_ID=
-APP1_DB_TYPE=mysql
-APP1_DB_HOST=
-APP1_DB_USER=
-APP1_DB_PASSWORD=
-APP1_DB_DATABASE=
-```
-
-More apps can be added in the `inbox.config.ts` file.
 
 ### Start Services
 
@@ -110,6 +96,69 @@ Available query params:
 Structure of the exported columns:
 `userId`, `userSaid`, `botSaid`, `intent`, `timestamp`
 
+### Run Docker image on Ubuntu
+
+1. Install Docker on Ubuntu: https://docs.docker.com/engine/install/ubuntu/
+```shell
+$ sudo apt-get update
+$ sudo apt-get install \
+   ca-certificates \
+   curl \
+   gnupg \
+   lsb-release
+$ sudo mkdir -p /etc/apt/keyrings
+$ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+$  echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+$ sudo apt-get update
+$ sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin
+  
+```
+2. Clone repository (e.g. /opt)
+```shell
+$ cd /opt
+$ git clone https://github.com/jovotech/jovo-inbox.git
+```
+3. Change owner of the folder
+```shell
+$ sudo chown -R $USER:$USER /opt/jovo-inbox
+```
+4. Create .env file in project folder
+```shell
+$ cd /opt/jovo-inbox
+$ cp .env.example .env
+```
+5. Edit .env file
+```shell
+NODE_ENV=production
+
+MYSQL_HOST=db
+MYSQL_PORT=3306
+MYSQL_USER=jovoinbox
+MYSQL_PASSWORD=
+MYSQL_DATABASE=jovoinbox
+
+
+MYSQL_USER_PASS=pass123
+MYSQL_ROOT_PASSWORD=pass123
+
+VUE_APP_BASE_APP_URL=https://my-domain.com
+```
+6. Install Letsencrypt
+```shell
+$ sudo apt install certbot python3-certbot-nginx
+```
+7. Create certificate for domain
+```shell
+$ sudo systemctl start nginx
+$ sudo certbot --nginx -d my-domain.com
+$ sudo systemctl stop nginx
+```
+8.Run docker container
+```shell
+$ sudo docker-compose up -d
+```
 
 
 
