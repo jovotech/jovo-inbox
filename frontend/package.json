@@ -35,9 +35,7 @@
     "vuex": "^3.5.1",
     "vuex-persist": "^3.1.3",
     "dayjs": "^1.9.7",
-    "identicon.js": "^2.3.3",
-    "md5-hex": "^3.0.1",
-    "vue-sanitize": "^0.2.2"
+    "md5-hex": "^3.0.1"
   },
   "devDependencies": {
     "@types/identicon.js": "^2.3.0",
