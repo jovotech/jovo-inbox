@@ -10,16 +10,16 @@ WORKDIR /app
 # Copy the project into production
 COPY package*.json ./
 COPY core ./core
-COPY api ./api
+COPY backend ./backend
 
 # Install dependencies and compile the files
 RUN echo "Installing and building core (development)"
 RUN cd /app/core && npm ci && npm run build
 RUN echo "Installing and building core (development) completed"
 
-RUN echo "Installing and building api  (development)"
-RUN cd /app/api && npm ci --prefer-offline --no-audit && npm run build
-RUN echo "Installing and building api  (development) completed"
+RUN echo "Installing and building backend  (development)"
+RUN cd /app/backend && npm ci --prefer-offline --no-audit && npm run build
+RUN echo "Installing and building backend  (development) completed"
 
 EXPOSE 4000
 
@@ -36,18 +36,17 @@ WORKDIR /app
 # Copy the project into production
 COPY package*.json ./
 COPY core ./core
-COPY api ./api
+COPY backend ./backend
 
-ENV NODE_ENV production
 
 # Install dependencies and compile the files
 RUN echo "Installing and building core (production)"
-RUN cd /app/core && npm ci --only=production && npm cache clean --force && npm run build
+RUN cd /app/core && npm i && npm run build:commonjs && npm prune --production
 RUN echo "Installing and building core (production) completed"
 
-RUN echo "Installing and building api (production)"
-RUN cd /app/api && npm ci --prefer-offline --no-audit --only=production && npm cache clean --force && npm run build
-RUN echo "Installing and building api (production) completed"
+RUN echo "Installing and building backend (production)"
+RUN cd /app/backend && npm i --prefer-offline --no-audit && npm run build && npm prune --production
+RUN echo "Installing and building backend (production) completed"
 
 
 ###################
@@ -56,9 +55,8 @@ RUN echo "Installing and building api (production) completed"
 
 FROM node:16-alpine As production
 
-# Copy the bundled code from the build stage to the production image
-COPY --from=build /app/node_modules ./node_modules
-COPY --from=build /app/dist ./dist
+# Create app directory
+WORKDIR /app
 
-# Start the server using the production build
-CMD [ "node", "dist/main.js" ]
+# Copy the bundled code from the build stage to the production image
+COPY --from=build /. /.

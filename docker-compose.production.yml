@@ -1,0 +1,19 @@
+version: '3.5'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: ./backend/Dockerfile
+      target: production
+    command: 'npm run start:prod:backend'
+  frontend:
+    build:
+      context: .
+      dockerfile: ./frontend/Dockerfile
+      target: production
+    volumes:
+      - ./storage:/var/www/html/storage/
+    ports:
+      - "80:80"
+      - "443:443"

@@ -1,24 +1,23 @@
 version: '3.5'
 
 services:
-  api:
+  backend:
     working_dir: /app
     restart: always
-    container_name: api
+    container_name: backend
     build:
       context: .
-      dockerfile: ./api/Dockerfile
+      dockerfile: ./backend/Dockerfile
     links:
       - db:${MYSQL_HOST}
     depends_on:
       - db
     volumes:
-      - ./api/src:/app/api/src
+      - ./backend/src:/app/backend/src
       - ./core/src:/app/core/src
       - ./storage:/app/storage
     ports:
-      - "4000:4000"
-    command: 'npm run start:prod:api'
+      - "4000"
     networks:
       - appnetwork
     tty: true
@@ -47,40 +46,19 @@ services:
     env_file: .env
     networks:
       - appnetwork
-#  frontend:
-#    build:
-#      context: .
-#      dockerfile: ./frontend/Dockerfile
-#    volumes:
-#      - ./frontend/src:/app/frontend/src
-#    stdin_open: true
-#    tty: true
-#    ports:
-#      - "8080:8080"
-#    command: 'npm run start:dev:frontend'
-#    environment:
-#      - CHOKIDAR_USEPOLLING=true
-#    networks:
-#      - appnetwork
-#  nginx:
-#    working_dir: /usr/src/app
-#    container_name: nginx
-#    restart: always
-#    build:
-#      context: .
-#      dockerfile: ./Dockerfile.nginx
-#      args:
-#        - VUE_APP_BASE_APP_URL=${VUE_APP_BASE_APP_URL}
-#    volumes:
-#      - ./storage:/var/www/html/storage/
-#      - /etc/letsencrypt:/etc/letsencrypt
-#    ports:
-#      - "80:80"
-#      - "443:443"
-#    tty: true
-#    env_file: .env
-#    networks:
-#      - appnetwork
+  frontend:
+    depends_on:
+      - backend
+    build:
+      context: .
+      dockerfile: ./frontend/Dockerfile
+      args:
+        - VUE_APP_BASE_APP_URL=${VUE_APP_BASE_APP_URL}
+    stdin_open: true
+    tty: true
+    env_file: .env
+    networks:
+      - appnetwork
 networks:
   appnetwork:
     driver: bridge
