@@ -24,6 +24,8 @@ if (process.env.NODE_ENV === 'production') {
   externals['./JovoProxy'] = 'var { JovoProxy: function JovoProxy() {} }';
   externals['./BaseComponent'] = 'var { BaseComponent: function BaseComponent() {} }';
   externals['./BaseOutput'] = 'var { BaseOutput: function BaseOutput() {} }';
+  externals['./AsyncJovo'] = 'var { AsyncJovo: function AsyncJovo() {} }';
+  externals['./TestJovo'] = 'var { TestJovo: function TestJovo() {} }';
 }
 
 module.exports = {

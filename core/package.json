@@ -8,7 +8,9 @@
   "scripts": {
     "build": "tsc",
     "tsc": "tsc",
-    "watch": "tsc -w"
+    "watch": "tsc -w",
+    "build:esnext": "tsc --module esnext",
+    "build:commonjs": "tsc --module commonjs"
   },
   "author": "jovotech",
   "license": "Apache-2.0",
