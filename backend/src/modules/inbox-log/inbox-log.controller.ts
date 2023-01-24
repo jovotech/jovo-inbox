@@ -39,6 +39,7 @@ export class InboxLogController {
     return this.inboxLogService.getConversations(dto);
   }
 
+  // TODO: could be moved to inbox-log-user.controller.ts
   @Post('user/conversation')
   getUserConversation(
     @Body() selectUserConversationsDto: SelectUserConversationsDto,

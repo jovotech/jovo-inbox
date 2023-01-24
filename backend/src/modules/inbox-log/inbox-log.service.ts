@@ -181,11 +181,13 @@ export class InboxLogService {
     };
 
     if (selectUserConversationsDto.last) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       conditions.where.createdAt = MoreThan(selectUserConversationsDto.last);
     }
 
     if (selectUserConversationsDto.lastId) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       conditions.where.id = MoreThan(selectUserConversationsDto.lastId);
     }
@@ -242,6 +244,28 @@ export class InboxLogService {
   async exportLogsToCsv(projectId: string, from?: Date, to?: Date) {
     const logs = await this.exportLogs(projectId, from, to);
 
+    console.log(logs);
+    const interactions: Record<string, Interaction> = {};
+
+    for (let i = 0; i < logs.length; i++) {
+      const conversation = logs[i];
+
+      if (!interactions[conversation.requestId]) {
+        interactions[conversation.requestId] = {
+          requestId: conversation.requestId,
+          logs: [],
+          start: new Date(conversation.createdAt),
+          hasSessionStarted: false,
+        };
+      }
+      interactions[conversation.requestId].logs.push(conversation);
+    }
+
+    const sorted = Object.values(interactions).sort((a, b) => {
+      return b.start.getTime() - a.start.getTime();
+    });
+    console.log(sorted);
+
     const options = {
       fieldSeparator: ',',
       quoteStrings: '"',
@@ -258,23 +282,26 @@ export class InboxLogService {
 
     const data: Partial<ExportInboxLog>[] = [];
 
-    let lastUser = '';
-    for (let i = 0; i < logs.length; i++) {
-      const log = logs[i];
+    for (let i = 0; i < sorted.length; i++) {
+      const interaction = sorted[i];
       const row: Partial<ExportInboxLog> = {};
 
-      // user id
-      if (lastUser !== log.userId) {
-        row.userId = log.userId;
-        lastUser = log.userId;
-      } else {
-        row.userId = '';
-      }
+      row.userId = interaction.logs[0].userId;
 
-      const platformRequest = getPlatformRequest(log);
+      const platformRequestLog = interaction.logs.find(
+        (log) => log.type === 'request',
+      );
+
+      const platformRequest = getPlatformRequest(platformRequestLog);
       row.userSaid = platformRequest.text;
 
-      const outputTemplate = await getPlatformResponseOutputTemplate(log);
+      const platformResponseLog = interaction.logs.find(
+        (log) => log.type === 'response',
+      );
+
+      const outputTemplate = await getPlatformResponseOutputTemplate(
+        platformResponseLog,
+      );
       if (outputTemplate && outputTemplate.length > 0) {
         const lastOutput = outputTemplate[outputTemplate.length - 1];
 
@@ -283,9 +310,10 @@ export class InboxLogService {
       }
 
       // intent
-      // TODO: get intent from log
+      const nluLog = interaction.logs.find((log) => log.type === 'nlu');
+      row.intent = nluLog?.payload.intent?.name;
 
-      row.timestamp = log.createdAt.toISOString();
+      row.timestamp = platformRequestLog.createdAt.toISOString();
       data.push(row);
     }
 
