@@ -14,6 +14,7 @@ services:
       target: production
     volumes:
       - ./storage:/var/www/html/storage/
+      - /etc/letsencrypt:/etc/letsencrypt
     ports:
       - "80:80"
       - "443:443"
