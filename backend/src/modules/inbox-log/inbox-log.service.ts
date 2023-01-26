@@ -244,7 +244,6 @@ export class InboxLogService {
   async exportLogsToCsv(projectId: string, from?: Date, to?: Date) {
     const logs = await this.exportLogs(projectId, from, to);
 
-    console.log(logs);
     const interactions: Record<string, Interaction> = {};
 
     for (let i = 0; i < logs.length; i++) {
@@ -264,7 +263,6 @@ export class InboxLogService {
     const sorted = Object.values(interactions).sort((a, b) => {
       return b.start.getTime() - a.start.getTime();
     });
-    console.log(sorted);
 
     const options = {
       fieldSeparator: ',',
