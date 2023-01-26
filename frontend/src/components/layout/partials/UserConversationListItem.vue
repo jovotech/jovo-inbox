@@ -3,17 +3,17 @@
     <router-link
       :to="{
         name: 'conversation',
-        params: { projectId: project.id, userId: interaction.logs[0].userId },
+        params: { projectId: project.id, userId: requestLog.userId },
       }"
       class="group block hover:bg-gray-100 focus:bg-gray-200"
       :class="[isSelected(interaction) ? 'bg-gray-200' : '']"
     >
       <div class="px-2 py-2 sm:px-3 n flex text-xs">
         <img
-          v-if="getImage(interaction.logs[0])"
+          v-if="getImage(requestLog)"
           class="h-10 w-10 rounded-full ml-0.5 mr-0.5"
-          :src="getImage(interaction.logs[0])"
-          :title="interaction.logs[0].userId"
+          :src="getImage(requestLog)"
+          :title="requestLog.userId"
           alt=""
         />
         <span v-else class="h-auto w-14">
@@ -28,35 +28,33 @@
 
         <div class="w-full ml-2 mt-0.5">
           <div class="flex items-center justify-between">
-            <p class="text-sm font-medium truncate" :title="interaction.logs[0].userId">
-              {{ getName(interaction.logs[0]) }}
+            <p class="text-sm font-medium truncate" :title="requestLog.userId">
+              {{ getName(requestLog) }}
             </p>
             <div class="mr-2.5 flex-shrink-0 flex">
               <p
-                v-if="loadingConversation !== interaction.logs[0].userId"
+                v-if="loadingConversation !== requestLog.userId"
                 class="inline-flex text-xs leading-5 text-gray-400 group-hover:text-gray-500 group-focus:text-gray-600"
-                :title="lastConversationItemDate(interaction.logs[0], false)"
-                :class="[isSelected(interactions) ? 'text-gray-600' : '']"
+                :title="lastConversationItemDate(requestLog, false)"
+                :class="[isSelected(interaction) ? 'text-gray-600' : '']"
               >
                 <span>
                   <span
-                    v-if="isUserActive(interaction.logs[0])"
+                    v-show="isActive"
                     class="inline-block h-2 w-2 mr-0.5 rounded-full bg-green-400"
                   ></span>
 
-                  {{ lastConversationItemDate(interaction.logs[0]) }}</span
+                  {{ lastConversationItemDate(requestLog) }}</span
                 >
               </p>
-              <loading-spinner
-                v-if="loadingConversation === interaction.logs[0].userId"
-              ></loading-spinner>
+              <loading-spinner v-if="loadingConversation === requestLog.userId"></loading-spinner>
             </div>
           </div>
           <div class="mt-1q sm:flex sm:justify-between">
             <div class="sm:flex">
               <p
                 class="flex items-center text-xs text-gray-400 group-hover:text-gray-500 group-focus:text-gray-600"
-                :class="[isSelected(interactions) ? 'text-gray-600' : '']"
+                :class="[isSelected(interaction) ? 'text-gray-600' : '']"
               >
                 {{ lastConversationItemRequestText }}
               </p>
@@ -73,8 +71,9 @@ import Component, { mixins } from 'vue-class-component';
 import { Prop } from 'vue-property-decorator';
 import { InboxLog, Interaction } from 'jovo-inbox-core';
 import { BaseMixin } from '@/mixins/BaseMixin';
-import { BreakObject, FormatUtil, TextObject } from '@/utils/FormatUtil';
+import { FormatUtil, TextObject } from '@/utils/FormatUtil';
 import LoadingSpinner from '@/components/layout/partials/LoadingSpinner.vue';
+import dayjs from 'dayjs';
 
 @Component({
   name: 'user-conversation-list-item',
@@ -88,11 +87,24 @@ export default class UserConversationListItem extends mixins(BaseMixin) {
 
   lastConversationItemRequestText = '';
 
+  isActive = false;
+
   async mounted() {
     this.lastConversationItemRequestText = await this.retrieveLastConversationItemRequestText(
       this.interaction,
     );
+
+    this.isActive = await this.isUserActive();
   }
+
+  get requestLog() {
+    return this.getLogByType(this.interaction, 'request');
+  }
+
+  get responseLog() {
+    return this.getLogByType(this.interaction, 'response');
+  }
+
   isSelected(interaction: Interaction) {
     const selectedConversations = this.$store.state.DataModule.selectedUserConversations;
     if (
@@ -162,20 +174,19 @@ export default class UserConversationListItem extends mixins(BaseMixin) {
     return '...';
   }
 
-  isUserActive(log: InboxLog): boolean {
-    if (!this.isLiveMode) {
+  async isUserActive() {
+    if (!this.isLiveMode || !this.responseLog) {
       return false;
     }
 
-    // TODO: check if user is active
-    // const platformResponse = this.getRequestPlatform(log);
-    // if (platformResponse) {
-    //   const logCreatedAt = dayjs(log.createdAt);
-    //   const nowMinus5Minutes = dayjs().subtract(5, 'minute');
-    //   return !platformResponse.hasSessionEnded() && logCreatedAt.isAfter(nowMinus5Minutes);
-    // }
+    const platformResponse = await this.getPlatformResponseOutputTemplate(this.responseLog);
 
-    return false;
+    const notListening = platformResponse?.some((o) => o.listen === false);
+
+    const logCreatedAt = dayjs(this.responseLog.createdAt);
+    const nowMinus5Minutes = dayjs().subtract(5, 'minute');
+
+    return !notListening && logCreatedAt.isAfter(nowMinus5Minutes);
   }
 }
 </script>
