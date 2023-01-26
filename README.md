@@ -3,7 +3,7 @@
 ## Installation
 ### Install Services
 
-Run setup (installs dependencies for `/core` `/api` and `/frontend`):
+Run setup (installs dependencies for `/core` `/backend` and `/frontend`):
 
 ```
 $ npm run setup
@@ -11,7 +11,7 @@ $ npm run setup
 or
 
 $ npm run setup:core
-$ npm run setup:api
+$ npm run setup:backend
 $ npm run setup:frontend
 ```
 
@@ -25,7 +25,7 @@ $ npm run setup:frontend
 Start the API service:
 
 ```
-$ cd api
+$ cd backend
 $ npm run start:dev
 ```
 
@@ -71,7 +71,7 @@ npm run build
 Run the api and open `http://<MY_SERVER>:4000`
 
 ```shell
-cd /api
+cd /backend
 npm start
 ```
 
@@ -112,7 +112,7 @@ $  echo \
   "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
   $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 $ sudo apt-get update
-$ sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin
+$ sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin docker-compose
   
 ```
 2. Clone repository (e.g. /opt)
@@ -131,16 +131,18 @@ $ cp .env.example .env
 ```
 5. Edit .env file
 ```shell
+$ nano .env
+```
+
+```shell
 NODE_ENV=production
 
 MYSQL_HOST=db
 MYSQL_PORT=3306
 MYSQL_USER=jovoinbox
-MYSQL_PASSWORD=
+MYSQL_PASSWORD=pass123
 MYSQL_DATABASE=jovoinbox
 
-
-MYSQL_USER_PASS=pass123
 MYSQL_ROOT_PASSWORD=pass123
 
 VUE_APP_BASE_APP_URL=https://my-domain.com
@@ -152,10 +154,20 @@ $ sudo apt install certbot python3-certbot-nginx
 7. Create certificate for domain
 ```shell
 $ sudo systemctl start nginx
-$ sudo certbot --nginx -d my-domain.com
+$ sudo certbot --nginx -d inbox.jovo.cloud
 $ sudo systemctl stop nginx
 ```
-8.Run docker container
+8. Open nginx config and remove comment from last line `include /etc/nginx/nginx.production.conf;`
+```shell
+$ nano /opt/jovo-inbox/nginx.conf
+```
+
+9. Open `production` config and update server_name and certificates to my-domain.com
+```shell
+$ nano /opt/jovo-inbox/nginx.production.conf
+```
+
+10.Run docker container
 ```shell
 $ sudo docker-compose up -d
 ```
