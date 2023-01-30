@@ -61,12 +61,13 @@ export default class App extends mixins(BaseMixin) {
   showNewProjectModal = false;
   async mounted() {
     try {
+      // fetch all projects
       await this.$store.dispatch('DataModule/fetchProjects');
-
       if (this.projects.length === 0) {
         return;
       }
 
+      // select first project if none is selected
       if (!this.project) {
         await this.$store.dispatch(
           'DataModule/selectProject',

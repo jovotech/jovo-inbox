@@ -3,28 +3,7 @@ import isToday from 'dayjs/plugin/isToday';
 import isYesterday from 'dayjs/plugin/isYesterday';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
-
-export interface SSMLObject {
-  type: string;
-}
-
-export interface AudioObject extends SSMLObject {
-  src: string;
-  filename: string;
-}
-
-export interface BreakObject extends SSMLObject {
-  time: string;
-}
-
-export interface InterpretAsObject extends SSMLObject {
-  interpretAs: string;
-  text: string;
-}
-
-export interface TextObject extends SSMLObject {
-  text: string;
-}
+import { AudioObject, BreakObject, InterpretAsObject, SSMLObject, TextObject } from '@/types';
 
 dayjs.extend(utc);
 dayjs.extend(isToday);

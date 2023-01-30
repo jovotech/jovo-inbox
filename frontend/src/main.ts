@@ -17,7 +17,6 @@ declare module 'vue/types/vue' {
     };
   }
 }
-export const BASE_API_URL = process.env.VUE_APP_BASE_APP_URL + '/api';
 
 Vue.use(Clipboard);
 Vue.config.productionTip = false;
@@ -43,7 +42,7 @@ Vue.prototype.$notify = {
 };
 
 Vue.prototype.$showNotification = function (notification: NotificationData) {
-  this.$store.commit('notifications/add', notification);
+  this.$store.commit('NotificationsModule/add', notification);
 };
 
 new Vue({

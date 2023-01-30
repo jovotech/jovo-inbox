@@ -13,3 +13,25 @@ export interface NotificationData {
   description?: string;
   duration?: number;
 }
+
+export interface SSMLObject {
+  type: string;
+}
+
+export interface AudioObject extends SSMLObject {
+  src: string;
+  filename: string;
+}
+
+export interface BreakObject extends SSMLObject {
+  time: string;
+}
+
+export interface InterpretAsObject extends SSMLObject {
+  interpretAs: string;
+  text: string;
+}
+
+export interface TextObject extends SSMLObject {
+  text: string;
+}

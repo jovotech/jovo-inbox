@@ -1,5 +1,4 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
-import { BASE_API_URL } from '@/main';
 import {
   CreateProjectDto,
   DeleteUserImageDto,
@@ -13,6 +12,7 @@ import {
   UpdateInboxLogUserDto,
   UserConversationsResponse,
 } from 'jovo-inbox-core';
+import { BASE_API_URL } from '@/constants';
 
 export class Api {
   static async getLastConversations(getLastConversationsDto: GetLastConversationsDto) {

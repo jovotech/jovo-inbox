@@ -71,9 +71,10 @@ import Component, { mixins } from 'vue-class-component';
 import { Prop } from 'vue-property-decorator';
 import { InboxLog, Interaction } from 'jovo-inbox-core';
 import { BaseMixin } from '@/mixins/BaseMixin';
-import { FormatUtil, TextObject } from '@/utils/FormatUtil';
+import { FormatUtil } from '@/utils/FormatUtil';
 import LoadingSpinner from '@/components/layout/partials/LoadingSpinner.vue';
 import dayjs from 'dayjs';
+import { TextObject } from '@/types';
 
 @Component({
   name: 'user-conversation-list-item',

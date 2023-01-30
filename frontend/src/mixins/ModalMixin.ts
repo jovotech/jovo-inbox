@@ -7,7 +7,6 @@ export class ModalMixin extends Vue {
       this.$emit('close');
     }
   }
-
   cancel() {
     this.$emit('close');
   }

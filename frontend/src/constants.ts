@@ -1,26 +1,6 @@
 export const BASE_URL = process.env.VUE_APP_BASE_APP_URL;
-
+export const BASE_API_URL = process.env.VUE_APP_BASE_APP_URL + '/api';
 export const LIVE_MODE_POLLING_INTERVAL_IN_MS = 5000;
-// export const DEBUGGER_PLATFORM_TYPE = 'jovo-debugger';
-
-// export const DEBUGGER_PLATFORM = new CorePlatform({
-//   type: DEBUGGER_PLATFORM_TYPE,
-//   platform: DEBUGGER_PLATFORM_TYPE,
-// });
-//
-// export const PLATFORMS: Platform[] = [
-//   DEBUGGER_PLATFORM,
-//   new AlexaPlatform(),
-//   new CorePlatform(),
-//   new WebPlatform(),
-//   new FacebookMessengerPlatform({
-//     pageAccessToken: '',
-//   }),
-//   new GoogleAssistantPlatform(),
-//   new GoogleBusinessPlatform({
-//     serviceAccount: {},
-//   }),
-// ];
 
 export const PLATFORM_LOGOS: Record<string, string> = {
   AlexaPlatform:

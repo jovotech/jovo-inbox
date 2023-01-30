@@ -49,13 +49,11 @@
 
 <script lang="ts">
 import { Component, Prop } from 'vue-property-decorator';
-import ConversationPart from '@/components/conversation/ConversationPart.vue';
-import { InboxLog, Interaction } from 'jovo-inbox-core';
+import { Interaction } from 'jovo-inbox-core';
 import DetailConversationPart from '@/components/conversation/DetailConversationPart.vue';
 import { mixins } from 'vue-class-component';
 import { BaseMixin } from '@/mixins/BaseMixin';
 import { ChevronDownIcon, ChevronUpIcon } from 'vue-feather-icons';
-import UserSessions from '@/components/conversation/UserSessions.vue';
 import RequestPart from '@/components/conversation/RequestPart.vue';
 import ResponsePart from '@/components/conversation/ResponsePart.vue';
 import ErrorPart from '@/components/conversation/ErrorPart.vue';
@@ -66,8 +64,6 @@ import ErrorPart from '@/components/conversation/ErrorPart.vue';
     ErrorPart,
     ResponsePart,
     RequestPart,
-    UserSessions,
-    ConversationPart,
     DetailConversationPart,
     ChevronDownIcon,
     ChevronUpIcon,

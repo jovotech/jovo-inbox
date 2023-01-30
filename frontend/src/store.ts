@@ -3,7 +3,7 @@ import Vuex from 'vuex';
 import VuexPersistence from 'vuex-persist';
 import { DataModule, DataState } from '@/store/DataModule';
 import { PreferencesModule, PreferencesState } from '@/store/PreferencesModule';
-import { NotificationsModule, NotificationsModuleState } from '@/store/notifications';
+import { NotificationsModule, NotificationsModuleState } from '@/store/NotificationsModule';
 
 export interface RootState {
   data: DataState;
