@@ -1,6 +1,8 @@
 <template>
   <div id="app" class="h-screen max-h-screen bg-gray-100 flex flex-col">
     <inbox-header></inbox-header>
+    <notification-container />
+
     <router-view
       v-if="this.projects.length > 0"
       class="flex overflow-hidden bg-white w-full h-full"
@@ -43,9 +45,17 @@ import { BaseMixin } from '@/mixins/BaseMixin';
 import { mixins } from 'vue-class-component';
 import NewProjectModal from '@/components/NewProjectModal.vue';
 import { Project } from 'jovo-inbox-core';
+import NotificationContainer from '@/components/NotificationContainer.vue';
 
 @Component({
-  components: { NewProjectModal, MainPanel, SidebarRight, SidebarLeft, InboxHeader },
+  components: {
+    NotificationContainer,
+    NewProjectModal,
+    MainPanel,
+    SidebarRight,
+    SidebarLeft,
+    InboxHeader,
+  },
 })
 export default class App extends mixins(BaseMixin) {
   showNewProjectModal = false;
@@ -65,8 +75,8 @@ export default class App extends mixins(BaseMixin) {
       } else {
         await this.goToProject();
       }
-    } catch (e) {
-      console.log(e);
+    } catch (e: any) {
+      this.$notify.error(`Could not load projects: ${e.message}`);
     }
   }
   @Watch('project')

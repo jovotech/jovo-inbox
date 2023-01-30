@@ -132,8 +132,8 @@ export default class NewProjectModal extends mixins(BaseMixin, ModalMixin) {
       });
       this.$emit('created', response.data);
       this.$emit('close');
-    } catch (e) {
-      console.log(e);
+    } catch (e: any) {
+      this.$notify.error(`Could not create project: ${e.message}`);
     }
   }
 

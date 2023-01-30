@@ -224,8 +224,8 @@ export default class UserSettingsModal extends mixins(BaseMixin) {
       });
       await this.$store.dispatch('DataModule/buildProjectUsersMap', this.project.id);
       this.cancel();
-    } catch (e) {
-      console.log(e);
+    } catch (e: any) {
+      this.$notify.error(`Could not save user: ${e.message}`);
     }
   }
 
@@ -249,8 +249,8 @@ export default class UserSettingsModal extends mixins(BaseMixin) {
       (this.$refs.file as HTMLFormElement).value = '';
       await this.getInboxLogUserData();
       await this.$store.dispatch('DataModule/buildProjectUsersMap', this.project.id);
-    } catch (e) {
-      console.log(e);
+    } catch (e: any) {
+      this.$notify.error(`Could not upload image: ${e.message}`);
     }
   }
 
@@ -306,8 +306,8 @@ export default class UserSettingsModal extends mixins(BaseMixin) {
         await this.getInboxLogUserData();
         await this.$store.dispatch('DataModule/buildProjectUsersMap', this.project.id);
       }
-    } catch (e) {
-      console.log(e);
+    } catch (e: any) {
+      this.$notify.error(`Could not delete image: ${e.message}`);
     }
   }
 

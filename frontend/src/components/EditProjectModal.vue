@@ -142,8 +142,8 @@ export default class EditProjectModal extends mixins(BaseMixin, ModalMixin) {
         this.$emit('updated', response.data);
         this.$emit('close');
       }
-    } catch (e) {
-      console.log(e);
+    } catch (e: any) {
+      this.$notify.error(`Could not update project: ${e.message}`);
     }
   }
 
@@ -154,8 +154,9 @@ export default class EditProjectModal extends mixins(BaseMixin, ModalMixin) {
         this.$emit('deleted');
         this.$emit('close');
       }
-    } catch (e) {
-      console.log(e);
+      this.$notify.success(`Project successfully deleted.`);
+    } catch (e: any) {
+      this.$notify.error(`Could not delete project: ${e.message}`);
     }
   }
 
