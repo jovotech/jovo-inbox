@@ -62,6 +62,8 @@ export default class App extends mixins(BaseMixin) {
           'DataModule/selectProject',
           this.$store.state.DataModule.projects[0],
         );
+      } else {
+        await this.goToProject();
       }
     } catch (e) {
       console.log(e);
@@ -69,6 +71,14 @@ export default class App extends mixins(BaseMixin) {
   }
   @Watch('project')
   async onProjectChanged() {
+    await this.goToProject();
+  }
+  async onNewProjectCreated(project: Project) {
+    this.$store.commit('DataModule/addProject', project);
+    await this.$store.dispatch('DataModule/selectProject', project);
+  }
+
+  async goToProject() {
     this.$router
       .push({
         name: 'project',
@@ -83,10 +93,6 @@ export default class App extends mixins(BaseMixin) {
     await this.$store.dispatch('DataModule/fetchConversations', {
       projectId: this.project.id,
     });
-  }
-  async onNewProjectCreated(project: Project) {
-    this.$store.commit('DataModule/addProject', project);
-    await this.$store.dispatch('DataModule/selectProject', project);
   }
 }
 </script>
