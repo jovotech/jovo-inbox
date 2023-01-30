@@ -7,7 +7,6 @@ import { InboxLogUserEntity } from '../../entity/inbox-log-user.entity';
 
 @Injectable()
 export class ProjectService {
-  constructor() {}
   async createProject(dto: CreateProjectDto) {
     const existingProjectId = await getRepository(ProjectEntity).findOne({
       where: { id: dto.id },
@@ -32,7 +31,7 @@ export class ProjectService {
     });
 
     if (!project) {
-      throw new Error("Project doesn't exists");
+      throw new Error("Project doesn't exist");
     }
 
     if (projectId !== dto.id) {
@@ -80,15 +79,17 @@ export class ProjectService {
     });
 
     if (!project) {
-      throw new Error("Project doesn't exists");
+      throw new Error("Project doesn't exist");
     }
 
+    // delete all logs with project id
     await getRepository(InboxLogEntity)
       .createQueryBuilder()
       .delete()
       .where('projectId = :projectId', { projectId })
       .execute();
 
+    // delete all users with project id
     await getRepository(InboxLogUserEntity)
       .createQueryBuilder()
       .delete()

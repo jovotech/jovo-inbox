@@ -23,7 +23,7 @@ export class InboxLogUserController {
   constructor(private readonly service: InboxLogUserService) {}
 
   @Put()
-  updateUser(@Body() updateInboxLogUserDto: UpdateInboxLogUserDto): any {
+  updateUser(@Body() updateInboxLogUserDto: UpdateInboxLogUserDto) {
     return this.service.updateUser(updateInboxLogUserDto);
   }
 

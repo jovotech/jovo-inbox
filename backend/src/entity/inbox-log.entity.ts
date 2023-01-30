@@ -39,6 +39,5 @@ export class InboxLogEntity implements InboxLog {
   locale!: string;
 
   @Column('simple-json')
-  // tslint:disable-next-line:no-any
-  payload!: any;
+  payload!: unknown;
 }

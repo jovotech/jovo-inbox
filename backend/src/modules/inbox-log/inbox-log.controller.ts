@@ -35,7 +35,7 @@ export class InboxLogController {
   }
 
   @Post('conversations')
-  getLastConversations(@Body() dto: GetLastConversationsDto): Promise<any> {
+  getLastConversations(@Body() dto: GetLastConversationsDto) {
     return this.inboxLogService.getConversations(dto);
   }
 
@@ -50,7 +50,7 @@ export class InboxLogController {
   }
 
   @Get('platform/:projectId')
-  getPlatforms(@Param('projectId') projectId: string): Promise<any> {
+  getPlatforms(@Param('projectId') projectId: string) {
     return this.inboxLogService.getPlatforms(projectId);
   }
 

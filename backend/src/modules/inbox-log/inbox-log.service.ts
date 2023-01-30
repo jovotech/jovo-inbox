@@ -15,13 +15,11 @@ import { Between, FindManyOptions, getRepository, MoreThan } from 'typeorm';
 import { LOGS_PER_REQUEST } from '../../constants';
 import { InboxLogUserEntity } from '../../entity/inbox-log-user.entity';
 import { ExportToCsv } from 'export-to-csv';
-import { ExportInboxLog } from '../interfaces';
+import { ExportInboxLog } from '../../interfaces';
 
 @Injectable()
 export class InboxLogService {
-  async getConversations(
-    getLastConversationsDto: GetLastConversationsDto,
-  ): Promise<any> {
+  async getConversations(getLastConversationsDto: GetLastConversationsDto) {
     const last = getLastConversationsDto.last || new Date();
     const take = getLastConversationsDto.search ? 1000 : 15;
 
