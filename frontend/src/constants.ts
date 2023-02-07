@@ -1,4 +1,4 @@
-export const BASE_URL = process.env.VUE_APP_BASE_APP_URL;
+export const BASE_URL = process.env.VUE_APP_BASE_APP_URL || new URL(document.location.href).origin;
 export const BASE_API_URL = process.env.VUE_APP_BASE_APP_URL + '/api';
 export const LIVE_MODE_POLLING_INTERVAL_IN_MS = 5000;
 
