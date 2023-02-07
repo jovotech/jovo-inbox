@@ -30,7 +30,6 @@ jobs:
         context: ./
         file: ./frontend/Dockerfile
         push: true
-        build-args: VUE_APP_BASE_APP_URL=/
         target: production
         tags: ${{ secrets.DOCKER_HUB_USERNAME }}/jovo-inbox-frontend:latest
     - name: "Build and push frontend"
