@@ -15,7 +15,7 @@ jobs:
     - name: Check Out Repo
       uses: actions/checkout@v2
       with:
-        ref: v4/latest
+        ref: v4/docker
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
     - name: Login to Docker Hub
