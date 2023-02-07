@@ -11,6 +11,8 @@ services:
     build:
       context: .
       dockerfile: ./frontend/Dockerfile
+      args:
+        - VUE_APP_BASE_APP_URL=${VUE_APP_BASE_APP_URL}
       target: development
     command: 'npm run start:dev:frontend'
     ports:

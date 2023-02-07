@@ -5,9 +5,6 @@ services:
     working_dir: /app
     restart: always
     container_name: backend
-    build:
-      context: .
-      dockerfile: ./backend/Dockerfile
     links:
       - db:${MYSQL_HOST}
     depends_on:
@@ -49,11 +46,6 @@ services:
   frontend:
     depends_on:
       - backend
-    build:
-      context: .
-      dockerfile: ./frontend/Dockerfile
-      args:
-        - VUE_APP_BASE_APP_URL=${VUE_APP_BASE_APP_URL}
     stdin_open: true
     tty: true
     env_file: .env
