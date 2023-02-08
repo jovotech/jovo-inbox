@@ -9,8 +9,7 @@ services:
     volumes:
       - ./storage:/var/www/html/storage/
       - /etc/letsencrypt:/etc/letsencrypt
-      - ./docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
-      - ./docker/nginx/nginx.production.conf:/etc/nginx/nginx.production.conf
+      - ./docker/nginx/config/:/etc/nginx/config
     ports:
       - "80:80"
       - "443:443"
