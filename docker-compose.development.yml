@@ -7,6 +7,8 @@ services:
       dockerfile: ./backend/Dockerfile
       target: development
     command: 'npm run start:dev:backend'
+    ports:
+      - "4000:4000"
   frontend:
     build:
       context: .
