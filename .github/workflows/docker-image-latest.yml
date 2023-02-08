@@ -32,7 +32,7 @@ jobs:
         push: true
         target: production
         tags: ${{ secrets.DOCKER_HUB_USERNAME }}/jovo-inbox-frontend:latest
-    - name: "Build and push frontend"
+    - name: "Build and push backend"
       id: docker_build_backend_latest
       uses: docker/build-push-action@v2
       with:
