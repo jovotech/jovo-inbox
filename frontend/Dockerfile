@@ -49,9 +49,6 @@ FROM nginx:alpine as production
 RUN rm -rf /var/www/html/*
 RUN nginx -V
 
-# Add custom configuration to work with HTML5 History Mode
-COPY docker/nginx/nginx.conf /etc/nginx/conf.d/default.conf
-
 
 #COPY --from=frontend-builder /usr/src/app/index.html /var/www/html/index.html
 COPY --from=build /app/frontend/dist /var/www/html
