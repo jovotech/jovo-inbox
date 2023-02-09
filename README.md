@@ -76,20 +76,16 @@ npm start
 ```
 
 
-### Basic Auth
-Uncomment `BASIC_AUTH_USER` and `BASIC_AUTH_PASSWORD` in `/api/.env` to provide 
-basic authentication
-
 
 
 ### CSV Export
 
 Logs can be exported in csv format calling this api url: 
 
-`http://localhost:4000/api/inboxlog/export?appId=<APP_ID>&from=2021-11-23&to=2021-11-24`
+`http://localhost:4000/api/inboxlog/export?projectId=<PROJECT_ID>&from=2021-11-23&to=2021-11-24`
 
 Available query params:
-* appId: App ID defined in `inbox.config.ts`
+* projectId: Project ID defined in `inbox.config.ts`
 * from: Timestamp `YYYY-MM-DD`
 * to: Timestamp `YYYY-MM-DD`
 
@@ -167,9 +163,19 @@ $ nano /opt/jovo-inbox/nginx.conf
 $ nano /opt/jovo-inbox/nginx.production.conf
 ```
 
-10.Run docker container
+10. 
+
+You have two options to start the docker container: Build it yourself or use the prebuild image from docker hub.
+
+
+a.) Build docker image and run container
 ```shell
-$ sudo docker-compose up -d
+$ sudo docker-compose -f docker-compose.yml -f docker-compose.production.yml up -d --build
+```
+
+b.) Pull docker image and run container
+```shell
+$ sudo docker-compose -f docker-compose.yml -f docker-compose.production.yml up -d
 ```
 
 
