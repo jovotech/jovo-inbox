@@ -1,5 +1,4 @@
-
-export interface ExportInboxLog {
+export interface InboxLogExportCsvRow {
   userId: string;
   userSaid: string;
   botSaid: string;

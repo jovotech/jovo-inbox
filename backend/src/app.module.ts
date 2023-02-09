@@ -7,7 +7,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { InboxLogUserModule } from './modules/inbox-log-user/inbox-log-user.module';
 import { join } from 'path';
 import { ServeStaticModule } from '@nestjs/serve-static';
-import { basicAuthMiddleware } from './middlewares/basic-auth.middleware';
 import { ProjectModule } from './modules/project/project.module';
 
 @Module({
@@ -30,12 +29,6 @@ import { ProjectModule } from './modules/project/project.module';
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
-    // exclude all public routes and the login-route
-    if (process.env.BASIC_AUTH_USER && process.env.BASIC_AUTH_PASSWORD) {
-      consumer
-        .apply(basicAuthMiddleware)
-        .exclude('avatars/(.+)')
-        .forRoutes('*');
-    }
+    //
   }
 }

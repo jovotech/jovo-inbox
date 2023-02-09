@@ -6,6 +6,7 @@ import {
   getPlatformRequest,
   getPlatformResponseOutputTemplate,
   InboxLog,
+  InboxLogExportCsvRow,
   InboxLogType,
   Interaction,
   SelectUserConversationsDto,
@@ -15,7 +16,6 @@ import { Between, FindManyOptions, getRepository, MoreThan } from 'typeorm';
 import { LOGS_PER_REQUEST } from '../../constants';
 import { InboxLogUserEntity } from '../../entity/inbox-log-user.entity';
 import { ExportToCsv } from 'export-to-csv';
-import { ExportInboxLog } from '../../interfaces';
 
 @Injectable()
 export class InboxLogService {
@@ -276,11 +276,11 @@ export class InboxLogService {
 
     const csvExporter = new ExportToCsv(options);
 
-    const data: Partial<ExportInboxLog>[] = [];
+    const data: Partial<InboxLogExportCsvRow>[] = [];
 
     for (let i = 0; i < sorted.length; i++) {
       const interaction = sorted[i];
-      const row: Partial<ExportInboxLog> = {};
+      const row: Partial<InboxLogExportCsvRow> = {};
 
       row.userId = interaction.logs[0].userId;
 
