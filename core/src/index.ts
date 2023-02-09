@@ -9,6 +9,7 @@ import { GoogleBusinessPlatform } from '@jovotech/platform-googlebusiness';
 export * from './InboxLog';
 export * from './InboxLogUser';
 export * from './Project';
+export * from './InboxLogExportCsvRow';
 
 export * from './JovoAppMetaData';
 export * from './dtos/select-user-conversations.dto';
