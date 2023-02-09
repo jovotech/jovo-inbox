@@ -62,7 +62,7 @@ import Plyr from 'plyr';
 import 'plyr/src/sass/plyr.scss';
 import { BaseMixin } from '@/mixins/BaseMixin';
 import { mixins } from 'vue-class-component';
-import { OutputTemplate } from '@jovotech/framework';
+import type { OutputTemplate } from '@jovotech/framework';
 import { getPlatformLogo } from '@/util';
 
 @Component({

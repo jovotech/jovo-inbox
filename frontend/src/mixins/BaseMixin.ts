@@ -12,7 +12,7 @@ import {
 } from 'jovo-inbox-core';
 import { FormatUtil } from '@/utils/FormatUtil';
 import { BASE_URL } from '@/constants';
-import { OutputTemplate } from '@jovotech/framework';
+import type { OutputTemplate } from '@jovotech/framework';
 
 @Component
 export class BaseMixin extends Vue {
