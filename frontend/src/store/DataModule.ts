@@ -1,35 +1,19 @@
-import { Module, MutationAction, VuexModule } from 'vuex-module-decorators';
+import { Module, Mutation, MutationAction, VuexModule } from 'vuex-module-decorators';
 import {
   InboxLog,
-  JovoAppMetaData,
   SelectUserConversationsDto,
   InboxLogUser,
   GetLastConversationsDto,
+  Interaction,
+  Project,
 } from 'jovo-inbox-core';
 import { Api } from '@/Api';
-export enum DataAction {
-  fetchApps = 'fetchApps',
-  fetchConversations = 'fetchConversations',
-  clearConversations = 'clearConversations',
-
-  searchConversations = 'searchConversations',
-
-  fetchUserConversations = 'fetchUserConversations',
-
-  appendUserConversations = 'appendUserConversations',
-  appendLastConversations = 'appendLastConversations',
-
-  buildAppUsersMap = 'buildAppUsersMap',
-
-  selectApp = 'selectApp',
-  selectInboxLog = 'selectInboxLog',
-}
 
 export interface DataState {
-  apps: JovoAppMetaData[];
-  conversations: InboxLog[];
+  projects: Project[];
+  conversations: Interaction[];
   selectedUserConversations: InboxLog[];
-  selectedApp: JovoAppMetaData[];
+  selectedProject: Project;
   selectedInboxLog: InboxLog;
   nameMap: Record<
     string,
@@ -42,13 +26,14 @@ export interface DataState {
 
 @Module({ namespaced: true, name: 'DataModule' })
 export class DataModule extends VuexModule<DataState> {
-  apps: JovoAppMetaData[] = [];
-  conversations: InboxLog[] = [];
+  projects: Project[] = [];
+  conversations: Interaction[] = [];
   selectedUserConversations: InboxLog[] = [];
 
   selectedInboxLog: InboxLog | null = null;
+  selectedInteraction: Interaction | null = null;
 
-  selectedApp: JovoAppMetaData | null = null;
+  selectedProject: Project | null = null;
   nameMap: Record<
     string,
     {
@@ -57,61 +42,75 @@ export class DataModule extends VuexModule<DataState> {
     }
   > = {};
 
-  @MutationAction({ mutate: ['apps'], rawError: true })
-  async [DataAction.fetchApps]() {
-    const result = await Api.getApps();
-    return { apps: result.apps };
+  @MutationAction({ mutate: ['projects'], rawError: true })
+  async fetchProjects() {
+    const result = await Api.getProjects();
+    return { projects: result };
   }
 
-  @MutationAction({ mutate: ['selectedApp'], rawError: true })
-  async [DataAction.selectApp](app: JovoAppMetaData) {
-    document.title = app.name + ' -  Jovo Inbox';
-    return { selectedApp: app };
+  @MutationAction({ mutate: ['selectedProject'], rawError: true })
+  async selectProject(project: Project) {
+    document.title = project.name + ' -  Jovo Inbox';
+    return { selectedProject: project };
+  }
+
+  @Mutation
+  addProject(project: Project) {
+    this.projects.push(project);
+  }
+
+  @MutationAction({ mutate: ['projects'], rawError: true })
+  async deleteProject(project: Project) {
+    await Api.deleteProject(project.id);
+    const responseGetProjects = await Api.getProjects();
+
+    return { projects: responseGetProjects };
   }
 
   @MutationAction({ mutate: ['conversations'], rawError: true })
-  async [DataAction.fetchConversations](getLastConversationsDto: GetLastConversationsDto) {
+  async fetchConversations(getLastConversationsDto: GetLastConversationsDto) {
     const result = await Api.getLastConversations(getLastConversationsDto);
     return { conversations: result };
   }
 
   @MutationAction({ mutate: ['conversations'], rawError: true })
-  async [DataAction.clearConversations]() {
+  async clearConversations() {
     return { conversations: [] };
   }
 
   @MutationAction({ mutate: ['selectedUserConversations'], rawError: true })
-  async [DataAction.fetchUserConversations](
-    selectUserConversationsDto: SelectUserConversationsDto,
-  ) {
+  async fetchUserConversations(selectUserConversationsDto: SelectUserConversationsDto) {
     const result = await Api.getUserConversations(selectUserConversationsDto);
     return { selectedUserConversations: result.logs };
   }
 
   @MutationAction({ mutate: ['selectedUserConversations'], rawError: true })
-  async [DataAction.appendUserConversations](
-    selectUserConversationsDto: SelectUserConversationsDto,
-  ) {
+  async appendUserConversations(selectUserConversationsDto: SelectUserConversationsDto) {
     const result = await Api.getUserConversations(selectUserConversationsDto);
     const selectedUserConversations = (this.state as DataState).selectedUserConversations;
     return { selectedUserConversations: selectedUserConversations.concat(result.logs) };
   }
 
   @MutationAction({ mutate: ['conversations'], rawError: true })
-  async [DataAction.appendLastConversations](getLastConversationsDto: GetLastConversationsDto) {
+  async appendLastConversations(getLastConversationsDto: GetLastConversationsDto) {
     const result = await Api.getLastConversations(getLastConversationsDto);
     const conversations = (this.state as DataState).conversations;
     return { conversations: conversations.concat(result) };
   }
 
   @MutationAction({ mutate: ['selectedInboxLog'], rawError: true })
-  async [DataAction.selectInboxLog](inboxLog: InboxLog) {
+  async selectInboxLog(inboxLog: InboxLog) {
     return { selectedInboxLog: inboxLog };
   }
 
+  @MutationAction({ mutate: ['selectedInteraction'], rawError: true })
+  async selectInteraction(interaction: Interaction) {
+    return { selectedInteraction: interaction };
+  }
+
   @MutationAction({ mutate: ['nameMap'], rawError: true })
-  async [DataAction.buildAppUsersMap](appId: string) {
-    const result = await Api.getInboxAppUsers(appId);
+  async buildProjectUsersMap(projectId: string) {
+    const result = await Api.getInboxProjectUsers(projectId);
 
     const nameMap: Record<
       string,

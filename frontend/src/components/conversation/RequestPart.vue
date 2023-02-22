@@ -22,13 +22,13 @@
         v-if="printRequest(part).type === 'user'"
         class="py-2 px-4 inline text-sm bg-jovo-blue self-start text-right text-white rounded-xl"
       >
-        <p class="font-sans leading-6 whitespace-pre-wrap ">
+        <p class="font-sans leading-6 whitespace-pre-wrap">
           {{ printRequest(part).text }}
         </p>
       </div>
       <div
         v-else-if="printRequest(part).type === 'platform'"
-        class="py-2 px-1 inline text-sm  self-start text-right text-gray-400 italic rounded-xl"
+        class="py-2 px-1 inline text-sm self-start text-right text-gray-400 italic rounded-xl"
       >
         <p
           class="font-sans leading-6 whitespace-pre-wrap text-left"
@@ -40,21 +40,11 @@
             href="#"
             class="whitespace-nowrap font-medium text-gray-400 ml-2 hover:text-gray-500"
           >
-            <chevron-down-icon
-              v-if="!isErrorCollapsed"
-              size="16"
-              class="inline
-"
-            ></chevron-down-icon
-            ><chevron-up-icon
-              v-if="isErrorCollapsed"
-              size="16"
-              class="inline
-"
-            ></chevron-up-icon
+            <chevron-down-icon v-if="!isErrorCollapsed" size="16" class="inline"></chevron-down-icon
+            ><chevron-up-icon v-if="isErrorCollapsed" size="16" class="inline"></chevron-up-icon
           ></a>
         </p>
-        <span v-if="isErrorCollapsed" class="text-left text-xs block px-1 ">
+        <span v-if="isErrorCollapsed" class="text-left text-xs block px-1">
           {{ printRequest(part).subtext }}
         </span>
       </div>
@@ -65,12 +55,10 @@
 <script lang="ts">
 import DetailConversationPart from '@/components/conversation/DetailConversationPart.vue';
 import ScreenConversationPart from '@/components/conversation/ScreenConversationPart.vue';
-import { InboxLog, JovoInboxPlatformRequest } from 'jovo-inbox-core';
+import { InboxLog } from 'jovo-inbox-core';
 import { ChevronDownIcon, ChevronUpIcon, CodeIcon, MonitorIcon, UserIcon } from 'vue-feather-icons';
-import { Component, Prop, Watch } from 'vue-property-decorator';
-import Plyr from 'plyr';
+import { Component, Prop } from 'vue-property-decorator';
 import 'plyr/src/sass/plyr.scss';
-import { FormatUtil } from '@/utils/FormatUtil';
 import { BaseMixin } from '@/mixins/BaseMixin';
 import { mixins } from 'vue-class-component';
 
@@ -90,20 +78,10 @@ export default class RequestPart extends mixins(BaseMixin) {
   @Prop({ required: true, type: Object })
   part!: InboxLog;
 
-  platformRequest: JovoInboxPlatformRequest | undefined;
-
   isErrorCollapsed = false;
 
   printRequest(log: InboxLog) {
-    this.platformRequest = this.getPlatformRequest(log);
-    if (this.platformRequest) {
-      return this.platformRequest.getText();
-    }
-
-    return {
-      type: 'user',
-      text: 'error',
-    };
+    return this.getPlatformRequest(log);
   }
 }
 </script>

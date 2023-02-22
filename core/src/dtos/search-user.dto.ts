@@ -1,4 +1,9 @@
-export interface SearchUserDto {
-  appId: string;
-  query: string;
+import { IsString } from 'class-validator';
+
+export class SearchUserDto {
+  @IsString()
+  projectId!: string;
+
+  @IsString()
+  query!: string;
 }

@@ -1,15 +1,36 @@
 <template>
   <div id="app" class="h-screen max-h-screen bg-gray-100 flex flex-col">
     <inbox-header></inbox-header>
-    <div class=" flex overflow-hidden bg-white">
-      <sidebar-left></sidebar-left>
-      <div class="flex flex-col min-w-0 flex-1 overflow-hidden">
-        <div class="flex-1 relative z-0 flex overflow-hidden">
-          <main-panel></main-panel>
-          <sidebar-right></sidebar-right>
-        </div>
+    <notification-container />
+
+    <router-view
+      v-if="this.projects.length > 0"
+      class="flex overflow-hidden bg-white w-full h-full"
+    />
+    <div v-else class="flex items-center justify-center h-screen">
+      <div
+        @click="showNewProjectModal = true"
+        class="text-center text-lg py-3 px-4 border-2a flex items-center text-gray-600 hover:text-gray-800 border-dasheds rounded-lg cursor-pointer border-gray-500 hover:border-gray-800"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          class="w-6 h-6 mr-2"
+        >
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+        </svg>
+        <span>New project</span>
       </div>
     </div>
+    <new-project-modal
+      v-if="showNewProjectModal"
+      :show="showNewProjectModal"
+      @close="showNewProjectModal = false"
+      @created="onNewProjectCreated"
+    ></new-project-modal>
   </div>
 </template>
 
@@ -22,28 +43,67 @@ import SidebarRight from '@/components/layout/SidebarRight.vue';
 import MainPanel from '@/components/layout/MainPanel.vue';
 import { BaseMixin } from '@/mixins/BaseMixin';
 import { mixins } from 'vue-class-component';
+import NewProjectModal from '@/components/NewProjectModal.vue';
+import { Project } from 'jovo-inbox-core';
+import NotificationContainer from '@/components/NotificationContainer.vue';
 
 @Component({
-  components: { MainPanel, SidebarRight, SidebarLeft, InboxHeader },
+  components: {
+    NotificationContainer,
+    NewProjectModal,
+    MainPanel,
+    SidebarRight,
+    SidebarLeft,
+    InboxHeader,
+  },
 })
 export default class App extends mixins(BaseMixin) {
+  showNewProjectModal = false;
   async mounted() {
     try {
-      await this.$store.dispatch('DataModule/fetchApps');
-      if (!this.app) {
-        await this.$store.dispatch('DataModule/selectApp', this.$store.state.DataModule.apps[0]);
-      } else {
-        await this.$store.dispatch('DataModule/selectApp', this.app);
+      // fetch all projects
+      await this.$store.dispatch('DataModule/fetchProjects');
+      if (this.projects.length === 0) {
+        return;
       }
-      await this.$store.dispatch('DataModule/buildAppUsersMap', this.app.id);
-    } catch (e) {
-      console.log(e);
+
+      // select first project if none is selected
+      if (!this.project) {
+        await this.$store.dispatch(
+          'DataModule/selectProject',
+          this.$store.state.DataModule.projects[0],
+        );
+      } else {
+        await this.goToProject();
+      }
+    } catch (e: any) {
+      this.$notify.error(`Could not load projects: ${e.message}`);
     }
   }
+  @Watch('project')
+  async onProjectChanged() {
+    await this.goToProject();
+  }
+  async onNewProjectCreated(project: Project) {
+    this.$store.commit('DataModule/addProject', project);
+    await this.$store.dispatch('DataModule/selectProject', project);
+  }
 
-  @Watch('app')
-  async onAppChanged() {
-    await this.$store.dispatch('DataModule/buildAppUsersMap', this.app.id);
+  async goToProject() {
+    this.$router
+      .push({
+        name: 'project',
+        params: {
+          projectId: this.project.id,
+        },
+      })
+      .catch(() => {
+        //
+      });
+    await this.$store.dispatch('DataModule/buildProjectUsersMap', this.project.id);
+    await this.$store.dispatch('DataModule/fetchConversations', {
+      projectId: this.project.id,
+    });
   }
 }
 </script>

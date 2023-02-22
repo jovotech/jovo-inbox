@@ -6,17 +6,17 @@
   >
     <div class="flex flex-col w-80">
       <!-- Sidebar component, swap this element with another sidebar if you like -->
-      <div class="flex flex-col h-0 flex-1 border-r border-gray-200 bg-gray-50">
+      <div class="flex flex-col h-0 flex-1 border-r pb-3 border-gray-200 bg-gray-50">
         <div
           class="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto"
           :class="[isContentHovered ? 'scrollbar' : 'scrollbar-invisible']"
         >
           <div class="flex items-center flex-shrink-0 px-3">
-            <div class="w-full ">
-              <select-app-list @selectConversation="selectConversation"></select-app-list>
+            <div class="w-full">
+              <select-project-list @select-conversation="selectConversation"></select-project-list>
             </div>
           </div>
-          <div class="px-3 my-3.5">
+          <div class="px-3 mt-2.5 pb-3" v-if="projects.length > 0">
             <filter-settings
               @loadConversations="loadConversations"
               @updateSearchMode="updateSearchMode"
@@ -25,7 +25,7 @@
             ></filter-settings>
           </div>
           <div
-            class="bg-white  w-auto ml-1 flex-1 flex flex-col overflow-y-auto"
+            class="bg-white w-auto ml-1 flex-1 flex flex-col overflow-y-auto"
             :class="[isContentHovered ? 'scrollbar' : 'scrollbar-invisible']"
             @scroll="handleScroll"
           >
@@ -40,10 +40,13 @@
               <user-conversation-list-item
                 v-for="conversation in getConversations()"
                 v-bind:key="conversation.id"
-                :part="conversation"
+                :interaction="conversation"
                 :loadingConversation="loadingConversation"
-                @select-conversation="selectConversation"
               ></user-conversation-list-item>
+
+              <li v-if="getConversations().length === 0">
+                <div class="text-center text-sm py-2 px-2 text-gray-400">No conversations yet</div>
+              </li>
 
               <li
                 class="text-center justify-center items-center pt-2"
@@ -60,12 +63,12 @@
 </template>
 
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
-import { GetLastConversationsDto, InboxLog } from 'jovo-inbox-core';
+import { Component, Watch } from 'vue-property-decorator';
+import { GetLastConversationsDto, InboxLog, Interaction } from 'jovo-inbox-core';
 
 import { BaseMixin } from '@/mixins/BaseMixin';
 import { mixins } from 'vue-class-component';
-import SelectAppList from '@/components/SelectAppList.vue';
+import SelectProjectList from '@/components/SelectProjectList.vue';
 import FilterSettings from '@/components/FilterSettings.vue';
 import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
@@ -73,11 +76,19 @@ import utc from 'dayjs/plugin/utc';
 import LoadingSpinner from '@/components/layout/partials/LoadingSpinner.vue';
 import { Api } from '@/Api';
 import UserConversationListItem from '@/components/layout/partials/UserConversationListItem.vue';
+import NewProjectModal from '@/components/NewProjectModal.vue';
 dayjs.extend(utc);
 dayjs.extend(timezone);
+
 @Component({
   name: 'sidebar-left',
-  components: { LoadingSpinner, FilterSettings, SelectAppList, UserConversationListItem },
+  components: {
+    NewProjectModal,
+    LoadingSpinner,
+    FilterSettings,
+    SelectProjectList,
+    UserConversationListItem,
+  },
 })
 export default class SidebarLeft extends mixins(BaseMixin) {
   isContentHovered = false;
@@ -87,22 +98,10 @@ export default class SidebarLeft extends mixins(BaseMixin) {
   loadingConversation = '';
 
   async mounted() {
-    await this.loadConversations({
-      appId: this.app.id,
-    });
-    try {
-      if (this.$route.params.id) {
-        const result = await Api.getInboxLogUserConversations({
-          id: this.$route.params.id,
-          appId: this.app.id,
-        });
-        if (result.data?.logs.length > 0) {
-          // TODO: selection of user doesn't work properly with many users
-          await this.selectConversation(result.data?.logs[0]);
-        }
-      }
-    } catch (e) {
-      console.log(e);
+    if (this.project) {
+      await this.loadConversations({
+        projectId: this.project.id,
+      });
     }
   }
 
@@ -138,26 +137,15 @@ export default class SidebarLeft extends mixins(BaseMixin) {
     this.isSearchLoading = false;
   }
 
-  getConversations(): InboxLog[] {
+  getConversations(): Interaction[] {
     return this.$store.state.DataModule.conversations;
   }
 
-  async selectConversation(inboxLog?: InboxLog) {
-    this.loadingConversation = inboxLog?.userId || '';
-    if (inboxLog) {
-      await this.$store.dispatch('DataModule/fetchUserConversations', {
-        userId: inboxLog.userId,
-        appId: inboxLog.appId,
-      });
-    } else {
-      if (this.getConversations().length > 0) {
-        await this.$store.dispatch('DataModule/fetchUserConversations', {
-          userId: this.getConversations()[0].userId,
-          appId: this.getConversations()[0].appId,
-        });
-      }
+  @Watch('$route')
+  async onRouteChange() {
+    if (this.$route.name === 'conversation') {
+      await this.selectConversation();
     }
-    this.loadingConversation = '';
   }
 
   async handleScroll(event: Event) {

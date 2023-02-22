@@ -4,7 +4,7 @@ export interface InboxLogUser {
   updatedAt: Date;
 
   platformUserId: string;
-  appId: string;
+  projectId: string;
   name: string;
   notes?: string;
   image?: string;

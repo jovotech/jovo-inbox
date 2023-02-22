@@ -5,17 +5,36 @@ Vue.use(VueRouter);
 
 const routes: Array<RouteConfig> = [
   {
-    path: '/user',
-    name: 'user',
+    path: '/',
+    name: 'index',
     meta: {
-      rule: 'editor',
-      layout: 'layout-guest',
-      title: 'User conversation',
+      title: 'Jovo Inbox',
     },
+  },
+  {
+    path: '/settings',
+    name: 'settings',
+    component: () => import(/* webpackChunkName: "help" */ '@/views/SettingsView.vue'),
+    meta: {
+      title: 'Settings - Jovo Inbox',
+    },
+  },
+  {
+    path: '/:projectId',
+    name: 'project',
+    component: () => import(/* webpackChunkName: "help" */ '@/views/ProjectView.vue'),
+    meta: {
+      layout: 'project-layout',
+    },
+  },
+  {
+    name: 'conversation',
+    path: '/:projectId/:userId',
+    component: () => import(/* webpackChunkName: "help" */ '@/views/ProjectView.vue'),
     children: [
       {
-        path: ':id',
-        name: 'detail',
+        name: 'sessions',
+        path: '/:projectId/:userId/sessions',
       },
     ],
   },
