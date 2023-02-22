@@ -1,0 +1,25 @@
+version: '3.5'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: ./backend/Dockerfile
+      target: development
+    command: 'npm run start:dev:backend'
+    ports:
+      - "4000:4000"
+  frontend:
+    build:
+      context: .
+      dockerfile: ./frontend/Dockerfile
+      args:
+        - VUE_APP_BASE_APP_URL=${VUE_APP_BASE_APP_URL}
+      target: development
+    command: 'npm run start:dev:frontend'
+    ports:
+      - "8080:8080"
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    volumes:
+      - ./frontend/src:/app/frontend/src

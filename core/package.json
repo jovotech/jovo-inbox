@@ -9,14 +9,23 @@
     "build": "tsc",
     "tsc": "tsc",
     "watch": "tsc -w",
-    "postinstall": "npm run build"
+    "build:esnext": "tsc --module esnext",
+    "build:commonjs": "tsc --module commonjs"
   },
   "author": "jovotech",
   "license": "Apache-2.0",
   "dependencies": {
+    "class-validator": "^0.13.2",
     "lodash.get": "^4.4.2",
     "lodash.merge": "^4.6.2",
-    "lodash.set": "^4.3.2"
+    "lodash.set": "^4.3.2",
+    "@jovotech/framework": "^4.5.2",
+    "@jovotech/platform-alexa": "^4.5.2",
+    "@jovotech/platform-core": "^4.5.2",
+    "@jovotech/platform-facebookmessenger": "^4.5.2",
+    "@jovotech/platform-googleassistant": "^4.5.2",
+    "@jovotech/platform-googlebusiness": "^4.5.2",
+    "@jovotech/platform-web": "^4.5.2"
   },
   "devDependencies": {
     "@types/lodash.get": "^4.4.6",
@@ -24,12 +33,7 @@
     "@types/lodash.set": "^4.3.6",
     "@types/node": "^14.14.22",
     "@types/validator": "^13.7.9",
-    "jovo-core": "^3.4.1",
-    "jovo-platform-alexa": "^3.4.0",
-    "jovo-platform-dialogflow": "^3.4.1",
-    "jovo-platform-googleassistant": "^3.4.1",
-    "jovo-platform-googleassistantconv": "^3.4.1",
-    "jovo-platform-web": "^3.4.1",
+    "@jovotech/common": "^4.4.2",
     "prettier": "^2.0.5",
     "tslint": "^5.20.0",
     "typescript": "^4.4.4"

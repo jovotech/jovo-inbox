@@ -14,7 +14,7 @@
     <div class="flex flex-row bg-gray-50">
       <section
         ref="sidebar"
-        class="absolute inset-y-0 right-0 shadow-xl flex "
+        class="absolute inset-y-0 right-0 shadow-xl flex"
         style="width: 450px"
         aria-labelledby="slide-over-heading"
       >
@@ -30,8 +30,8 @@
             <path d="M8 5h2v14H8zM14 5h2v14h-2z"></path>
           </svg>
         </div>
-        <div class="w-screen ">
-          <div class="h-full flex flex-col py-6 bg-white  overflow-y-scroll">
+        <div class="w-screen">
+          <div class="h-full flex flex-col py-6 bg-white overflow-y-scroll">
             <div class="px-4 sm:px-6">
               <div class="flex items-start justify-between">
                 <h2 id="slide-over-heading" class="text-lg font-medium text-gray-900">
@@ -76,41 +76,12 @@
             </div>
             <div class="mt-6 relative flex-1 px-4 sm:px-6">
               <!-- Replace with your content -->
-              <div class="absolute inset-0 px-4 sm:px-6">
-                <div class="flex items-center justify-between">
-                  <h3>Payload</h3>
-                  <chevron-down-icon
-                    v-if="expandedPayload"
-                    size="16"
-                    class="flex-shrink-1 mr-1 cursor-pointer"
-                    @click="expandedPayload = !expandedPayload"
-                  ></chevron-down-icon>
-                  <chevron-up-icon
-                    v-else-if="!expandedPayload"
-                    size="16"
-                    class="flex-shrink-1 mr-1 cursor-pointer"
-                    @click="expandedPayload = !expandedPayload"
-                  ></chevron-up-icon>
-                </div>
-                <div
-                  v-if="expandedPayload"
-                  class="h-96 mt-2 bg-gray-50 overflow-x-hidden p-3 rounded-lg"
-                  aria-hidden="true"
-                  :class="[isContentHovered ? 'scrollbar' : 'scrollbar-invisible']"
-                  @mouseenter="isContentHovered = true"
-                  @mouseleave="isContentHovered = false"
-                >
-                  <vue-json-pretty :data="json"> </vue-json-pretty>
-                </div>
-
-                <div v-if="hasApl" class="flex items-center justify-between mt-6">
-                  <h3>{{ deviceName }}</h3>
-                </div>
-                <div class="mt-5 qbg-gray-50 overflow-x-hidden" aria-hidden="true">
-                  <div class="w-full" ref="apl-parent">
-                    <div id="aplviewer" ref="apl-viewer"></div>
-                  </div>
-                </div>
+              <div
+                v-for="log in selectedInteraction.logs"
+                v-bind:key="log.id"
+                class="bg-white shadow rounded-lg divide-y divide-gray-200 border mb-4"
+              >
+                <inbox-log-type-detail :log="log"></inbox-log-type-detail>
               </div>
               <!-- /End replace -->
             </div>
@@ -123,13 +94,7 @@
 
 <script lang="ts">
 import { Component, Watch } from 'vue-property-decorator';
-import {
-  AlexaRequest,
-  AlexaResponse,
-  InboxLog,
-  InboxLogType,
-  JovoInboxPlatformResponse,
-} from 'jovo-inbox-core';
+import { InboxLog, InboxLogType, Interaction } from 'jovo-inbox-core';
 import VueJsonPretty from 'vue-json-pretty';
 import 'vue-json-pretty/lib/styles.css';
 import { ArrowDownIcon, ArrowUpIcon, ChevronDownIcon, ChevronUpIcon } from 'vue-feather-icons';
@@ -137,15 +102,20 @@ import * as AplRenderer from 'apl-viewhost-web';
 import { mixins } from 'vue-class-component';
 import { BaseMixin } from '@/mixins/BaseMixin';
 import _get from 'lodash.get';
+import { EVENT_TYPE_ICON_MAP } from '@/constants';
+import InboxLogTypeDetail from '@/components/conversation/InboxLogTypeDetail.vue';
 @Component({
   name: 'detail-conversation-part',
-  components: { VueJsonPretty, ArrowUpIcon, ArrowDownIcon, ChevronDownIcon, ChevronUpIcon },
+  components: {
+    InboxLogTypeDetail,
+    VueJsonPretty,
+    ArrowUpIcon,
+    ArrowDownIcon,
+    ChevronDownIcon,
+    ChevronUpIcon,
+  },
 })
 export default class DetailConversationPart extends mixins(BaseMixin) {
-  isContentHovered = false;
-
-  expandedPayload = true;
-
   isArrowUpEnabled = true;
   arrowUpActive = false;
 
@@ -154,28 +124,19 @@ export default class DetailConversationPart extends mixins(BaseMixin) {
 
   resizeActive = false;
 
-  // TODO: temp
-  hasApl = false;
-  deviceName = 'Screen';
-
-  // eslint-disable-next-line
-  renderer: any;
-
-  platformResponse: JovoInboxPlatformResponse | undefined;
-
   get selectedInboxLog(): InboxLog | null {
     return this.$store.state.DataModule.selectedInboxLog;
   }
   get visible() {
-    return !!this.selectedInboxLog;
+    return !!this.selectedInteraction;
   }
 
   activateButtons() {
-    const index = this.selectedConversation.findIndex(
-      (item: InboxLog) => item.id === this.selectedInboxLog?.id,
+    const index = this.interactions.findIndex(
+      (item: Interaction) => item.requestId === this.selectedInteraction?.requestId,
     );
 
-    if (index + 1 === this.selectedConversation.length) {
+    if (index + 1 === this.interactions.length) {
       this.isArrowDownEnabled = false;
     } else {
       this.isArrowDownEnabled = true;
@@ -188,143 +149,23 @@ export default class DetailConversationPart extends mixins(BaseMixin) {
     }
   }
 
-  @Watch('selectedInboxLog', { deep: true })
-  private async onSelectedInboxLogChange() {
+  @Watch('selectedInteraction', { deep: true })
+  private async onSelectedInteractionChange() {
     this.activateButtons();
 
     this.$nextTick(async () => {
       if (this.$refs['sidebarcontainer']) {
         (this.$refs['sidebarcontainer'] as HTMLElement).focus();
       }
-      this.resetAplViewer();
-
-      await this.renderApl();
     });
-  }
-
-  resetAplViewer() {
-    const aplViewerElement = this.$refs['apl-viewer'] as HTMLElement;
-
-    if (aplViewerElement) {
-      (this.$refs['apl-viewer'] as HTMLElement).innerHTML = '';
-
-      (this.$refs['apl-viewer'] as HTMLElement).style.width = '0';
-      (this.$refs['apl-viewer'] as HTMLElement).style.height = '0';
-      (this.$refs['apl-viewer'] as HTMLElement).style.background = 'none';
-    }
-  }
-
-  async renderApl() {
-    // TODO: Temporary
-    if (this.selectedInboxLog) {
-      this.platformResponse = this.getPlatformResponse(this.selectedInboxLog);
-      if (this.platformResponse) {
-        if (this.platformResponse.constructor.name === 'AlexaResponse') {
-          const alexaResponse = this.platformResponse as AlexaResponse;
-          this.hasApl = alexaResponse.hasApl();
-          if (this.hasApl) {
-            const previousRequest = this.getPreviousRequest();
-
-            if (previousRequest) {
-              const previousAlexaRequest = this.getPlatformRequest(previousRequest) as AlexaRequest;
-              await this.handleRenderInit(alexaResponse, previousAlexaRequest);
-            }
-          }
-        }
-      } else {
-        this.hasApl = false;
-      }
-    }
-  }
-
-  getPreviousRequest(): InboxLog | undefined {
-    const index = this.selectedConversation.findIndex(
-      (item: InboxLog) => item.id === this.selectedInboxLog?.id,
-    );
-    for (let i = index - 1; i >= 0; i--) {
-      if (this.selectedConversation[i].type === InboxLogType.REQUEST) {
-        return this.selectedConversation[i];
-      }
-    }
-  }
-
-  async handleRenderInit(alexaResponse: AlexaResponse, previousAlexaRequest: AlexaRequest) {
-    const aplViewerDiv = document.getElementById('aplviewer');
-
-    if (aplViewerDiv) {
-      aplViewerDiv.innerHTML = '';
-    }
-
-    const directive = alexaResponse.response.directives?.find(
-      (item: { type: string }) => item.type === 'Alexa.Presentation.APL.RenderDocument',
-    );
-
-    const requestDpi = _get(previousAlexaRequest, 'context.Viewport.dpi', 160);
-    const requestWidth = _get(previousAlexaRequest, 'context.Viewport.pixelWidth', 960);
-    const requestHeight = _get(previousAlexaRequest, 'context.Viewport.pixelHeight', 480);
-    const requestRatio = requestWidth / requestHeight;
-
-    this.deviceName = previousAlexaRequest.getDeviceName();
-
-    const doc = directive.document;
-    doc.version = '1.4';
-    const datasource = directive.datasources || {};
-    const content = AplRenderer.Content.create(JSON.stringify(doc));
-    if (content && datasource) {
-      content.addData('payload', JSON.stringify(datasource));
-    }
-
-    const width = (this.$refs['apl-parent'] as HTMLElement).offsetWidth;
-
-    const calcDpi = (width * requestDpi) / requestWidth;
-
-    const viewPortDpi = Math.round(calcDpi);
-    const viewportWidth = (viewPortDpi * requestWidth) / requestDpi;
-
-    const viewportHeight = viewportWidth / requestRatio;
-
-    this.renderer = AplRenderer.default.create({
-      content: content /* return value of the AplRenderer.Content.create call */,
-      view: document.getElementById(
-        'aplviewer',
-      ) /* element where the APL document should be rendered to */,
-      environment: {
-        agentName: 'APL Sandbox',
-        agentVersion: '1.0',
-        allowOpenUrl: true,
-        disallowVideo: false,
-      },
-      viewport: {
-        width: viewportWidth,
-        height: viewportHeight,
-        dpi: viewPortDpi,
-      },
-      theme: 'dark',
-      developerToolOptions: {
-        mappingKey: 'auth-id',
-        writeKeys: ['auth-banana', 'auth-id'],
-      },
-      utcTime: Date.now(),
-      localTimeAdjustment: -new Date().getTimezoneOffset() * 60 * 1000,
-    });
-
-    await this.renderer.init();
   }
 
   get selectedConversation(): InboxLog[] {
     return this.$store.state.DataModule.selectedUserConversations;
   }
 
-  get json() {
-    return this.selectedInboxLog?.payload;
-  }
-
-  get sessionjson() {
-    return this.selectedInboxLog?.payload;
-  }
-
   async hide() {
-    await this.$store.dispatch('DataModule/selectInboxLog', null);
+    await this.$store.dispatch('DataModule/selectInteraction', null);
     this.$emit('hide');
   }
 
@@ -333,15 +174,14 @@ export default class DetailConversationPart extends mixins(BaseMixin) {
     setTimeout(async () => {
       this.arrowDownActive = false;
 
-      const index = this.selectedConversation.findIndex(
-        (item: InboxLog) => item.id === this.selectedInboxLog?.id,
+      const index = this.interactions.findIndex(
+        (item: Interaction) =>
+          new Date(item.start).getTime() ===
+          new Date(this.selectedInteraction?.start || new Date()).getTime(),
       );
 
-      if (index + 1 < this.selectedConversation.length) {
-        await this.$store.dispatch(
-          'DataModule/selectInboxLog',
-          this.selectedConversation[index + 1],
-        );
+      if (index + 1 < this.interactions.length) {
+        await this.$store.dispatch('DataModule/selectInteraction', this.interactions[index + 1]);
       }
       this.activateButtons();
     }, 100);
@@ -351,15 +191,12 @@ export default class DetailConversationPart extends mixins(BaseMixin) {
     setTimeout(async () => {
       this.arrowUpActive = false;
 
-      const index = this.selectedConversation.findIndex(
-        (item: InboxLog) => item.id === this.selectedInboxLog?.id,
+      const index = this.interactions.findIndex(
+        (item: Interaction) => item.requestId === this.selectedInteraction?.requestId,
       );
 
       if (index - 1 >= 0) {
-        await this.$store.dispatch(
-          'DataModule/selectInboxLog',
-          this.selectedConversation[index - 1],
-        );
+        await this.$store.dispatch('DataModule/selectInteraction', this.interactions[index - 1]);
       }
 
       this.activateButtons();
@@ -371,8 +208,6 @@ export default class DetailConversationPart extends mixins(BaseMixin) {
   async resizeEnd() {
     if (this.resizeActive) {
       this.resizeActive = false;
-
-      await this.renderApl();
     }
   }
   move(evt: MouseEvent) {
@@ -391,6 +226,10 @@ export default class DetailConversationPart extends mixins(BaseMixin) {
     if (!(this.$refs.sidebar as HTMLElement).contains(event.target as HTMLElement)) {
       this.hide();
     }
+  }
+
+  getIcon(type: string): string {
+    return EVENT_TYPE_ICON_MAP[type] || '';
   }
 }
 </script>

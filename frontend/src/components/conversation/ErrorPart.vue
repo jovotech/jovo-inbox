@@ -1,5 +1,5 @@
 <template>
-  <div class="rounded-md bg-red-50 p-4 m-auto w-5/6 text-sm mb-6">
+  <div class="rounded-md bg-red-50 p-4 m-auto w-5/6 text-sm mb-6 border-2 border-red-800">
     <div class="flex">
       <div class="flex-shrink-0">
         <!-- Heroicon name: solid/x-circle -->
@@ -18,27 +18,15 @@
         </svg>
       </div>
       <div class="ml-3 flex-1 md:flex md:justify-between">
-        <p class="text-sm text-red-800">
-          An error has occurred.
-        </p>
+        <p class="text-sm text-red-800">An error has occurred.</p>
         <p class="mt-3 text-sm md:mt-0 md:ml-6">
           <a
             @click="isErrorCollapsed = !isErrorCollapsed"
             href="#"
             class="whitespace-nowrap font-medium text-red-700 hover:text-red-800"
             >Details
-            <chevron-down-icon
-              v-if="!isErrorCollapsed"
-              size="16"
-              class="inline
-"
-            ></chevron-down-icon
-            ><chevron-up-icon
-              v-if="isErrorCollapsed"
-              size="16"
-              class="inline
-"
-            ></chevron-up-icon
+            <chevron-down-icon v-if="!isErrorCollapsed" size="16" class="inline"></chevron-down-icon
+            ><chevron-up-icon v-if="isErrorCollapsed" size="16" class="inline"></chevron-up-icon
           ></a>
         </p>
       </div>

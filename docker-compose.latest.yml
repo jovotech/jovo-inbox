@@ -1,0 +1,16 @@
+version: '3.5'
+
+services:
+  backend:
+    image: jovotech/jovo-inbox-backend:latest
+    command: 'npm run start:prod:backend'
+  frontend:
+    image: jovotech/jovo-inbox-frontend:latest
+    volumes:
+      - ./storage:/var/www/html/storage/
+      - /etc/letsencrypt:/etc/letsencrypt
+      - ./docker/nginx/config/:/etc/nginx/config
+      - ./docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - "80:80"
+      - "443:443"

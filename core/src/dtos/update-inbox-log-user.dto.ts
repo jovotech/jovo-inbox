@@ -1,7 +1,19 @@
-export interface UpdateInboxLogUserDto {
+import { IsOptional, IsString } from 'class-validator';
+
+export class UpdateInboxLogUserDto {
+  @IsString()
+  @IsOptional()
   id?: string;
-  appId: string;
-  platformUserId: string;
+
+  @IsString()
+  projectId!: string;
+
+  @IsString()
+  platformUserId!: string;
+
+  @IsString()
   name?: string;
+
+  @IsString()
   notes?: string;
 }
