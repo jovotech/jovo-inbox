@@ -26,6 +26,7 @@ export class InboxLogController {
     @Body() inboxLog: AddInboxLogDto | AddInboxLogDto[],
   ): Promise<void> {
     const logs = Array.isArray(inboxLog) ? inboxLog : [inboxLog];
+
     await getConnection()
       .createQueryBuilder()
       .insert()

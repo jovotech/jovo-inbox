@@ -94,16 +94,15 @@
 
 <script lang="ts">
 import { Component, Watch } from 'vue-property-decorator';
-import { InboxLog, InboxLogType, Interaction } from 'jovo-inbox-core';
+import { InboxLog, Interaction } from 'jovo-inbox-core';
 import VueJsonPretty from 'vue-json-pretty';
 import 'vue-json-pretty/lib/styles.css';
 import { ArrowDownIcon, ArrowUpIcon, ChevronDownIcon, ChevronUpIcon } from 'vue-feather-icons';
-import * as AplRenderer from 'apl-viewhost-web';
 import { mixins } from 'vue-class-component';
 import { BaseMixin } from '@/mixins/BaseMixin';
-import _get from 'lodash.get';
 import { EVENT_TYPE_ICON_MAP } from '@/constants';
 import InboxLogTypeDetail from '@/components/conversation/InboxLogTypeDetail.vue';
+
 @Component({
   name: 'detail-conversation-part',
   components: {
