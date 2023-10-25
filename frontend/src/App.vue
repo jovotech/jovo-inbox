@@ -44,7 +44,7 @@ import MainPanel from '@/components/layout/MainPanel.vue';
 import { BaseMixin } from '@/mixins/BaseMixin';
 import { mixins } from 'vue-class-component';
 import NewProjectModal from '@/components/NewProjectModal.vue';
-import { Project } from 'jovo-inbox-core';
+import { Project } from '@jovotech/inbox-core';
 import NotificationContainer from '@/components/NotificationContainer.vue';
 
 @Component({

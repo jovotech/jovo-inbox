@@ -102,7 +102,7 @@
 <script lang="ts">
 import Component, { mixins } from 'vue-class-component';
 import { BaseMixin } from '@/mixins/BaseMixin';
-import { Project } from 'jovo-inbox-core';
+import { Project } from '@jovotech/inbox-core';
 import NewProjectModal from '@/components/NewProjectModal.vue';
 
 @Component({

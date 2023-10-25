@@ -11,7 +11,7 @@ import {
   Interaction,
   SelectUserConversationsDto,
   UserConversationsResponse,
-} from 'jovo-inbox-core';
+} from '@jovotech/inbox-core';
 import { Between, FindManyOptions, getRepository, MoreThan } from 'typeorm';
 import { LOGS_PER_REQUEST } from '../../constants';
 import { InboxLogUserEntity } from '../../entity/inbox-log-user.entity';

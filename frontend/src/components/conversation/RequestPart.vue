@@ -55,7 +55,7 @@
 <script lang="ts">
 import DetailConversationPart from '@/components/conversation/DetailConversationPart.vue';
 import ScreenConversationPart from '@/components/conversation/ScreenConversationPart.vue';
-import { InboxLog } from 'jovo-inbox-core';
+import { InboxLog } from '@jovotech/inbox-core';
 import { ChevronDownIcon, ChevronUpIcon, CodeIcon, MonitorIcon, UserIcon } from 'vue-feather-icons';
 import { Component, Prop } from 'vue-property-decorator';
 import 'plyr/src/sass/plyr.scss';

@@ -9,7 +9,7 @@ import {
   Interaction,
   Project,
   Session,
-} from 'jovo-inbox-core';
+} from '@jovotech/inbox-core';
 import { FormatUtil } from '@/utils/FormatUtil';
 import { BASE_URL } from '@/constants';
 import type { OutputTemplate } from '@jovotech/framework';

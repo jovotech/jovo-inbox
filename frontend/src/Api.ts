@@ -11,7 +11,7 @@ import {
   SelectUserConversationsDto,
   UpdateInboxLogUserDto,
   UserConversationsResponse,
-} from 'jovo-inbox-core';
+} from '@jovotech/inbox-core';
 import { BASE_API_URL } from '@/constants';
 
 export class Api {

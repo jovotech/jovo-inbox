@@ -10,6 +10,6 @@ async function bootstrap() {
     methods: 'GET,POST,OPTIONS,PUT,DELETE',
   });
   app.setGlobalPrefix('api');
-  await app.listen(4000);
+  await app.listen(process.env.BACKEND_PORT || 4000);
 }
 bootstrap();

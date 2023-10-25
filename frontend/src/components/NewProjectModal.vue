@@ -107,7 +107,7 @@
 
 <script lang="ts">
 import { Component, Prop, Watch } from 'vue-property-decorator';
-import { Project } from 'jovo-inbox-core';
+import { Project } from '@jovotech/inbox-core';
 import 'vue-json-pretty/lib/styles.css';
 import { mixins } from 'vue-class-component';
 import { BaseMixin } from '@/mixins/BaseMixin';

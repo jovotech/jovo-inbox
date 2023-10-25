@@ -49,7 +49,7 @@
 
 <script lang="ts">
 import { Component, Prop } from 'vue-property-decorator';
-import { Interaction } from 'jovo-inbox-core';
+import { Interaction } from '@jovotech/inbox-core';
 import DetailConversationPart from '@/components/conversation/DetailConversationPart.vue';
 import { mixins } from 'vue-class-component';
 import { BaseMixin } from '@/mixins/BaseMixin';

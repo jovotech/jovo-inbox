@@ -10,11 +10,11 @@ import {
   DeleteUserImageDto,
   GetInboxLogUserDto,
   UpdateInboxLogUserDto,
-} from 'jovo-inbox-core';
+} from '@jovotech/inbox-core';
 import { FindOneOptions, getRepository, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { InboxLogUserEntity } from '../../entity/inbox-log-user.entity';
-import { UploadedFile } from 'jovo-inbox-core';
+import { UploadedFile } from '@jovotech/inbox-core';
 import * as fs from 'fs';
 import { InboxLogService } from '../inbox-log/inbox-log.service';
 

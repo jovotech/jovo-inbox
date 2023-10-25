@@ -13,7 +13,7 @@ import {
   GetLastConversationsDto,
   SelectUserConversationsDto,
   UserConversationsResponse,
-} from 'jovo-inbox-core';
+} from '@jovotech/inbox-core';
 import { InboxLogEntity } from '../../entity/inbox-log.entity';
 import { getConnection } from 'typeorm';
 

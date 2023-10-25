@@ -94,7 +94,7 @@
 
 <script lang="ts">
 import { Component, Watch } from 'vue-property-decorator';
-import { InboxLog, Interaction } from 'jovo-inbox-core';
+import { InboxLog, Interaction } from '@jovotech/inbox-core';
 import VueJsonPretty from 'vue-json-pretty';
 import 'vue-json-pretty/lib/styles.css';
 import { ArrowDownIcon, ArrowUpIcon, ChevronDownIcon, ChevronUpIcon } from 'vue-feather-icons';

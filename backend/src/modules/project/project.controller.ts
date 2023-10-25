@@ -7,7 +7,7 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
-import { CreateProjectDto } from 'jovo-inbox-core';
+import { CreateProjectDto } from '@jovotech/inbox-core';
 import { ProjectService } from './project.service';
 import { getRepository } from 'typeorm';
 import { ProjectEntity } from '../../entity/project.entity';

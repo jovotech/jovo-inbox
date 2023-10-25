@@ -1,5 +1,5 @@
 <template>
-  <div v-if="visible" class="fixed z-30 inset-0 overflow-y-auto text-gray-800 ">
+  <div v-if="visible" class="fixed z-30 inset-0 overflow-y-auto text-gray-800">
     <div
       class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0"
     >
@@ -32,7 +32,7 @@
           To: "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
       -->
       <div
-        class="inline-block align-bottom w-auto  bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle "
+        class="inline-block align-bottom w-auto bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle"
         role="dialog"
         aria-modal="true"
         aria-labelledby="modal-headline"
@@ -64,7 +64,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
-import { InboxLog } from 'jovo-inbox-core';
+import { InboxLog } from '@jovotech/inbox-core';
 import VueJsonPretty from 'vue-json-pretty';
 import 'vue-json-pretty/lib/styles.css';
 import * as AplRenderer from 'apl-viewhost-web';

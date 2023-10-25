@@ -61,7 +61,7 @@ import { Component } from 'vue-property-decorator';
 import { CheckIcon, Share2Icon, UserIcon } from 'vue-feather-icons';
 import { BaseMixin } from '@/mixins/BaseMixin';
 import { mixins } from 'vue-class-component';
-import { InboxLog, InboxLogUser } from 'jovo-inbox-core';
+import { InboxLog, InboxLogUser } from '@jovotech/inbox-core';
 import { Api } from '@/Api';
 import InboxLogTypeDetail from '@/components/conversation/InboxLogTypeDetail.vue';
 import UserSettingsModal from '@/components/conversation/UserSettingsModal.vue';
@@ -97,7 +97,7 @@ export default class SidebarRight extends mixins(BaseMixin) {
         });
         await this.$store.dispatch('DataModule/buildProjectUsersMap', this.project.id);
         // await this.getInboxLogUserData();
-      } catch (e) {
+      } catch (e: any) {
         console.log(e);
       }
     }
