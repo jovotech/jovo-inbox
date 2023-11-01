@@ -14,9 +14,9 @@ import {
   DeleteUserImageDto,
   GetInboxLogUserDto,
   UpdateInboxLogUserDto,
-} from 'jovo-inbox-core';
+  UploadedFile,
+} from '@jovotech/inbox-core';
 import { FilesInterceptor } from '@nestjs/platform-express';
-import { UploadedFile } from 'jovo-inbox-core';
 
 @Controller('inboxloguser')
 export class InboxLogUserController {

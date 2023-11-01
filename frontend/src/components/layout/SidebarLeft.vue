@@ -64,7 +64,7 @@
 
 <script lang="ts">
 import { Component, Watch } from 'vue-property-decorator';
-import { GetLastConversationsDto, InboxLog, Interaction } from 'jovo-inbox-core';
+import { GetLastConversationsDto, InboxLog, Interaction } from '@jovotech/inbox-core';
 
 import { BaseMixin } from '@/mixins/BaseMixin';
 import { mixins } from 'vue-class-component';

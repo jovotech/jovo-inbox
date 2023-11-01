@@ -14,7 +14,7 @@ COPY backend ./backend
 
 # Install dependencies and compile the files
 RUN echo "Installing and building core (development)"
-RUN cd /app/core && npm ci && npm run build:commonjs
+RUN cd /app/core && npm ci && npm run build
 RUN echo "Installing and building core (development) completed"
 
 RUN echo "Installing and building backend  (development)"
@@ -41,7 +41,7 @@ COPY backend ./backend
 
 # Install dependencies and compile the files
 RUN echo "Installing and building core (production)"
-RUN cd /app/core && npm i && npm run build:commonjs && npm prune --production
+RUN cd /app/core && npm i && npm run build && npm prune --production
 RUN echo "Installing and building core (production) completed"
 
 RUN echo "Installing and building backend (production)"

@@ -106,7 +106,7 @@
 
 <script lang="ts">
 import { Component, Watch } from 'vue-property-decorator';
-import { SelectUserConversationsDto } from 'jovo-inbox-core';
+import { SelectUserConversationsDto } from '@jovotech/inbox-core';
 import DetailConversationPart from '@/components/conversation/DetailConversationPart.vue';
 import { mixins } from 'vue-class-component';
 import { BaseMixin } from '@/mixins/BaseMixin';

@@ -36,7 +36,7 @@ COPY package*.json ./
 COPY frontend ./frontend
 COPY core ./core
 
-RUN cd /app/core && npm i && npm run build:esnext && npm prune --production
+RUN cd /app/core && npm i && npm run build && npm prune --production
 RUN cd /app/frontend && npm i --prefer-offline --no-audit && npm run build && npm prune --production
 
 ###################

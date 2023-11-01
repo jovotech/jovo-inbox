@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreateProjectDto, UpdateProjectDto } from 'jovo-inbox-core';
+import { CreateProjectDto, UpdateProjectDto } from '@jovotech/inbox-core';
 import { getRepository } from 'typeorm';
 import { ProjectEntity } from '../../entity/project.entity';
 import { InboxLogEntity } from '../../entity/inbox-log.entity';

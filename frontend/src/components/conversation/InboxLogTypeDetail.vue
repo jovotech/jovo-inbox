@@ -49,7 +49,7 @@
 
 <script lang="ts">
 import { Component, Prop } from 'vue-property-decorator';
-import { InboxLog } from 'jovo-inbox-core';
+import { InboxLog } from '@jovotech/inbox-core';
 import VueJsonPretty from 'vue-json-pretty';
 import 'vue-json-pretty/lib/styles.css';
 import { ArrowDownIcon, ArrowUpIcon, ChevronDownIcon, ChevronUpIcon } from 'vue-feather-icons';

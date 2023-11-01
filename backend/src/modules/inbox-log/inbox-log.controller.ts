@@ -13,7 +13,7 @@ import {
   GetLastConversationsDto,
   SelectUserConversationsDto,
   UserConversationsResponse,
-} from 'jovo-inbox-core';
+} from '@jovotech/inbox-core';
 import { InboxLogEntity } from '../../entity/inbox-log.entity';
 import { getConnection } from 'typeorm';
 
@@ -26,6 +26,7 @@ export class InboxLogController {
     @Body() inboxLog: AddInboxLogDto | AddInboxLogDto[],
   ): Promise<void> {
     const logs = Array.isArray(inboxLog) ? inboxLog : [inboxLog];
+
     await getConnection()
       .createQueryBuilder()
       .insert()

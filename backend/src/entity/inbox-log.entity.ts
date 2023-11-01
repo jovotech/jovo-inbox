@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, Index } from 'typeorm';
-import { InboxLog, InboxLogType } from 'jovo-inbox-core';
+import { InboxLog, InboxLogType } from '@jovotech/inbox-core';
 
 @Entity({
   name: 'inboxlog',
@@ -8,7 +8,11 @@ export class InboxLogEntity implements InboxLog {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column({ type: 'datetime', precision: 3 })
+  @Column({
+    type: 'datetime',
+    precision: 3,
+    default: () => 'CURRENT_TIMESTAMP(3)',
+  })
   createdAt: Date = new Date();
 
   @Column()

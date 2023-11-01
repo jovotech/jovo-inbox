@@ -6,7 +6,7 @@ import {
   GetLastConversationsDto,
   Interaction,
   Project,
-} from 'jovo-inbox-core';
+} from '@jovotech/inbox-core';
 import { Api } from '@/Api';
 
 export interface DataState {

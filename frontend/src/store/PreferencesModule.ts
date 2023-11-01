@@ -1,5 +1,5 @@
 import { Module, MutationAction, VuexModule } from 'vuex-module-decorators';
-import { GetLastConversationsDto } from 'jovo-inbox-core';
+import { GetLastConversationsDto } from '@jovotech/inbox-core';
 
 export interface PreferencesState {
   liveMode: boolean;

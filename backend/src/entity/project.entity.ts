@@ -1,5 +1,5 @@
 import { Column, Entity, Index } from 'typeorm';
-import { Project } from 'jovo-inbox-core';
+import { Project } from '@jovotech/inbox-core';
 
 @Entity({
   name: 'projects',

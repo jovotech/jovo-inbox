@@ -39,7 +39,7 @@ import MainPanel from '@/components/layout/MainPanel.vue';
 import SidebarRight from '@/components/layout/SidebarRight.vue';
 import { EditIcon } from 'vue-feather-icons';
 import EditProjectModal from '@/components/EditProjectModal.vue';
-import { Project } from 'jovo-inbox-core';
+import { Project } from '@jovotech/inbox-core';
 
 @Component({
   name: 'project-view',

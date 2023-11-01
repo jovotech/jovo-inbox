@@ -1,16 +1,14 @@
 {
-  "name": "jovo-inbox-core",
-  "version": "0.2.1",
+  "name": "@jovotech/inbox-core",
+  "version": "4.0.3",
   "description": "",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "private": true,
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm5/index.js",
+  "es2015": "dist/esm2015/index.js",
+  "types": "dist/types/index.d.ts",
   "scripts": {
-    "build": "tsc",
-    "tsc": "tsc",
-    "watch": "tsc -w",
-    "build:esnext": "tsc --module esnext",
-    "build:commonjs": "tsc --module commonjs"
+    "build": "tsc -b tsconfig.build.cjs.json tsconfig.build.esm5.json tsconfig.build.esm2015.json tsconfig.build.types.json",
+    "watch": "tsc -b tsconfig.build.cjs.json tsconfig.build.esm5.json tsconfig.build.esm2015.json tsconfig.build.types.json --watch"
   },
   "author": "jovotech",
   "license": "Apache-2.0",
@@ -19,13 +17,13 @@
     "lodash.get": "^4.4.2",
     "lodash.merge": "^4.6.2",
     "lodash.set": "^4.3.2",
-    "@jovotech/framework": "^4.5.2",
-    "@jovotech/platform-alexa": "^4.5.2",
-    "@jovotech/platform-core": "^4.5.2",
-    "@jovotech/platform-facebookmessenger": "^4.5.2",
-    "@jovotech/platform-googleassistant": "^4.5.2",
-    "@jovotech/platform-googlebusiness": "^4.5.2",
-    "@jovotech/platform-web": "^4.5.2"
+    "@jovotech/framework": "^4.5.16",
+    "@jovotech/platform-alexa": "^4.5.16",
+    "@jovotech/platform-core": "^4.5.16",
+    "@jovotech/platform-facebookmessenger": "^4.5.16",
+    "@jovotech/platform-googleassistant": "^4.5.16",
+    "@jovotech/platform-googlebusiness": "^4.5.16",
+    "@jovotech/platform-web": "^4.5.16"
   },
   "devDependencies": {
     "@types/lodash.get": "^4.4.6",
@@ -33,7 +31,7 @@
     "@types/lodash.set": "^4.3.6",
     "@types/node": "^14.14.22",
     "@types/validator": "^13.7.9",
-    "@jovotech/common": "^4.4.2",
+    "@jovotech/common": "^4.5.16",
     "prettier": "^2.0.5",
     "tslint": "^5.20.0",
     "typescript": "^4.4.4"

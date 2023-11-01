@@ -188,7 +188,7 @@
 
 <script lang="ts">
 import { Component, Prop, Watch } from 'vue-property-decorator';
-import { InboxLog, InboxLogUser } from 'jovo-inbox-core';
+import { InboxLog, InboxLogUser } from '@jovotech/inbox-core';
 import 'vue-json-pretty/lib/styles.css';
 import { mixins } from 'vue-class-component';
 import { BaseMixin } from '@/mixins/BaseMixin';
@@ -324,7 +324,7 @@ export default class UserSettingsModal extends mixins(BaseMixin) {
       this.user = {
         ...result.data,
       };
-    } catch (e) {
+    } catch (e: any) {
       console.log(e);
     }
   }

@@ -44,12 +44,10 @@
 <script lang="ts">
 import DetailConversationPart from '@/components/conversation/DetailConversationPart.vue';
 import ScreenConversationPart from '@/components/conversation/ScreenConversationPart.vue';
-import { InboxLog, InboxLogType } from 'jovo-inbox-core';
+import { InboxLog } from '@jovotech/inbox-core';
 import { ChevronDownIcon, ChevronUpIcon, CodeIcon, MonitorIcon, UserIcon } from 'vue-feather-icons';
-import { Component, Prop, Watch } from 'vue-property-decorator';
-import Plyr from 'plyr';
+import { Component, Prop } from 'vue-property-decorator';
 import 'plyr/src/sass/plyr.scss';
-import { FormatUtil } from '@/utils/FormatUtil';
 import { BaseMixin } from '@/mixins/BaseMixin';
 import { mixins } from 'vue-class-component';
 

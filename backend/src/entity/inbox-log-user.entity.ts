@@ -1,5 +1,5 @@
 import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
-import { InboxLogUser } from 'jovo-inbox-core';
+import { InboxLogUser } from '@jovotech/inbox-core';
 
 @Entity({
   name: 'inboxlogusers',

@@ -69,7 +69,7 @@
 <script lang="ts">
 import Component, { mixins } from 'vue-class-component';
 import { Prop } from 'vue-property-decorator';
-import { InboxLog, Interaction } from 'jovo-inbox-core';
+import { InboxLog, Interaction } from '@jovotech/inbox-core';
 import { BaseMixin } from '@/mixins/BaseMixin';
 import { FormatUtil } from '@/utils/FormatUtil';
 import LoadingSpinner from '@/components/layout/partials/LoadingSpinner.vue';
